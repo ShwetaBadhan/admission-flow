@@ -1,5 +1,34 @@
 @extends('layout.master')
+<!-- Session Messages -->
+@if (session('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: @json(session('success')),
+                timer: 5000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+        });
+    </script>
+@endif
 
+@if ($errors->any())
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                html: @json($errors->all()),
+                timer: 6000,
+                timerProgressBar: true,
+                showConfirmButton: true
+            });
+        });
+    </script>
+@endif
 @section('content')
 <div class="page-wrapper">
     <div class="content pb-0">
@@ -256,24 +285,28 @@
                         <span class="text-dark">{{ $doc->file_name }}</span>
                     </td>
                     <td>
-                        @php
-                            $verified = $doc->is_verified;
-                        @endphp
-                        
-                        @if($verified == 1 || $verified === true)
-                            <span class="badge badge-pill bg-soft-success text-success border-0">
-                                <i class="ti ti-check me-1"></i>verified
-                            </span>
-                        @elseif($verified == 0 || $verified === false)
-                            <span class="badge badge-pill bg-soft-danger text-danger border-0">
-                                <i class="ti ti-x me-1"></i>rejected
-                            </span>
-                        @else
-                            <span class="badge badge-pill bg-soft-warning text-warning border-0">
-                                <i class="ti ti-clock me-1"></i>pending
-                            </span>
-                        @endif
-                    </td>
+    @php
+        // Normalize is_verified for proper comparison
+        $status = $doc->is_verified;
+    @endphp
+    
+    @if($status === null)
+        <!-- 🟡 Pending -->
+        <span class="badge badge-pill bg-soft-warning text-warning border-0">
+            <i class="ti ti-clock me-1"></i>pending
+        </span>
+    @elseif($status == 1 || $status === true)
+        <!-- 🟢 Verified -->
+        <span class="badge badge-pill bg-soft-success text-success border-0">
+            <i class="ti ti-check me-1"></i>verified
+        </span>
+    @else
+        <!-- 🔴 Rejected -->
+        <span class="badge badge-pill bg-soft-danger text-danger border-0">
+            <i class="ti ti-x me-1"></i>rejected
+        </span>
+    @endif
+</td>
                     <td>
                         @if($doc->is_verified == 1 || $doc->is_verified === true)
                             <span class="text-dark">{{ $doc->uploaded_by ?? '—' }}</span>
@@ -285,32 +318,33 @@
                         <span class="text-muted">{{ \Carbon\Carbon::parse($doc->created_at)->diffForHumans() }}</span>
                     </td>
                     <td class="text-end">
-                        @if($doc->is_verified === null)
-                            <!-- Pending: Show Verify and Reject buttons -->
-                            <div class="d-inline-flex align-items-center gap-2">
-                                <form action="{{ route('leads.verify-document', [$doc->lead, $doc]) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-link text-success p-0" 
-                                            onclick="return confirm('Verify this document?')">
-                                        Verify
-                                    </button>
-                                </form>
-                                <span class="text-muted">|</span>
-                                <form action="{{ route('leads.reject-document', [$doc->lead, $doc]) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-link text-danger p-0"
-                                            onclick="return confirm('Reject this document?')">
-                                        Reject
-                                    </button>
-                                </form>
-                            </div>
-                        @else
-                            <!-- Verified/Rejected: Show View button -->
-                            <a href="{{ asset($doc->file_path) }}" target="_blank" class="btn btn-sm btn-link text-dark p-0">
-                                <i class="ti ti-external-link me-1"></i>View
-                            </a>
-                        @endif
-                    </td>
+    @if($doc->is_verified === null)
+        <!-- Pending: Show Verify and Reject buttons -->
+        <div class="d-inline-flex align-items-center gap-2">
+            <form action="{{ route('leads.verify-document', [$doc->lead, $doc]) }}" method="POST" class="d-inline">
+                @csrf
+               <button type="button" class="btn btn-sm btn-link text-success p-0 verify-btn"
+        data-doc-id="{{ $doc->id }}">
+    Verify
+</button>
+
+            </form>
+            <span class="text-muted">|</span>
+            <form action="{{ route('leads.reject-document', [$doc->lead, $doc]) }}" method="POST" class="d-inline">
+                @csrf
+               <button type="button" class="btn btn-sm btn-link text-danger p-0 reject-btn"
+        data-doc-id="{{ $doc->id }}">
+    Reject
+</button>
+            </form>
+        </div>
+    @else
+        <!-- Verified/Rejected: Show View button -->
+        <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" class="btn btn-sm btn-link text-dark p-0">
+            <i class="ti ti-external-link me-1"></i>View
+        </a>
+    @endif
+</td>
                 </tr>
             @empty
                 <tr>
@@ -386,5 +420,60 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+</script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Verify button click handler
+        document.querySelectorAll('.verify-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault(); // ⚠️ Stop immediate form submission
+                
+                const docId = this.getAttribute('data-doc-id');
+                const form = document.getElementById(`verify-form-${docId}`);
+
+                Swal.fire({
+                    title: 'Verify Document?',
+                    text: 'Are you sure you want to verify this document?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, Verify it!',
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit(); // ✅ Submit only after confirmation
+                    }
+                });
+            });
+        });
+
+        // Reject button click handler
+        document.querySelectorAll('.reject-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault(); // ⚠️ Stop immediate form submission
+                
+                const docId = this.getAttribute('data-doc-id');
+                const form = document.getElementById(`reject-form-${docId}`);
+
+                Swal.fire({
+                    title: 'Reject Document?',
+                    text: 'Are you sure you want to reject this document?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, Reject it!',
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit(); // ✅ Submit only after confirmation
+                    }
+                });
+            });
+        });
+    });
 </script>
 @endpush

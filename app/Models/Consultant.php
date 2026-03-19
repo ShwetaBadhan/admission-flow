@@ -40,4 +40,19 @@ class Consultant extends Model
     {
         return $query->where('status', 1);
     }
+    // Add this relationship
+public function kycDocuments()
+{
+    return $this->hasMany(ConsultantKyc::class, 'consultant_id');
+}
+
+// Helper: Check if a specific KYC type exists
+public function hasKycDocument($type, $excludeRejected = true)
+{
+    $query = $this->kycDocuments()->where('document_type', $type);
+    if ($excludeRejected) {
+        $query->where('is_verified', '!=', false);
+    }
+    return $query->exists();
+}
 }

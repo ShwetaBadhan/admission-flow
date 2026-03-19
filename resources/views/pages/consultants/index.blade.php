@@ -70,7 +70,7 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
-                                    
+
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -86,13 +86,14 @@
                                         <td><span class="title-name">{{ $consultant->name }}</span></td>
                                         <td>{{ $consultant->email }}</td>
                                         <td>{{ $consultant->phone }}</td>
-                                        
+
                                         <td>
                                             <span
                                                 class="badge badge-pill badge-status bg-{{ $consultant->status == 1 ? 'success' : 'danger' }}">
                                                 {{ $consultant->status == 1 ? 'Active' : 'Inactive' }}
                                             </span>
                                         </td>
+
                                         <td>
                                             <div class="dropdown table-action">
                                                 <a href="#"
@@ -112,6 +113,11 @@
                                                         data-address="{{ $consultant->address }}"
                                                         data-status="{{ $consultant->status }}">
                                                         <i class="ti ti-edit text-blue"></i> Edit
+                                                    </a>
+
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('consultants.show', $consultant->id) }}">
+                                                        <i class="ti ti-id-badge me-1"></i> View Details
                                                     </a>
                                                     {{-- Delete Button --}}
                                                     <a class="dropdown-item delete-btn" href="javascript:void(0);"
@@ -180,8 +186,8 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Name <span class="text-danger">*</span></label>
-                                    <input type="text" name="name" class="form-control" value="{{ old('name') }}"
-                                        required>
+                                    <input type="text" name="name" class="form-control"
+                                        value="{{ old('name') }}" required>
                                 </div>
                             </div>
                             <div class="col-md-6">

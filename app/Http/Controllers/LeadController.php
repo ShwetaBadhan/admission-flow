@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 
 class LeadController extends Controller
 {
@@ -32,10 +33,10 @@ class LeadController extends Controller
         $leads = Lead::with(['city', 'state', 'leadSource', 'consultant', 'qualification', 'intake', 'priority', 'counsellor'])
             ->latest()
             ->paginate(15);
-        
+
         // Group leads by status
         $leadsByStatus = $leads->groupBy('status');
-        
+
         // Status config for UI
         $statuses = [
             'new' => ['label' => 'New', 'color' => 'warning'],
@@ -54,13 +55,20 @@ class LeadController extends Controller
         $qualifications = Qualification::where('status', 1)->orderBy('name')->get();
         $intakes = Intake::where('status', 1)->orderBy('name', 'desc')->get();
         $priorities = Priority::where('status', 1)->get();
-        
-        
+
+
 
         return view('pages.leads.index', compact(
-            'leads', 'leadsByStatus', 'statuses',
-            'states', 'cities', 'courses', 'leadsources',
-            'qualifications', 'intakes', 'priorities' 
+            'leads',
+            'leadsByStatus',
+            'statuses',
+            'states',
+            'cities',
+            'courses',
+            'leadsources',
+            'qualifications',
+            'intakes',
+            'priorities'
         ));
     }
 
@@ -74,10 +82,16 @@ class LeadController extends Controller
         $qualifications = Qualification::where('status', 1)->orderBy('name')->get();
         $intakes = Intake::where('status', 1)->orderBy('name', 'desc')->get();
         $priorities = Priority::where('status', 1)->get();
-        
+
         return view('leads.create', compact(
-            'states', 'cities', 'courses', 'leadSources', 'consultants',
-            'qualifications', 'intakes', 'priorities'
+            'states',
+            'cities',
+            'courses',
+            'leadSources',
+            'consultants',
+            'qualifications',
+            'intakes',
+            'priorities'
         ));
     }
 
@@ -105,53 +119,68 @@ class LeadController extends Controller
     }
 
     public function show(Lead $lead)
-{
-    $lead->load([
-        'city', 'state', 'course', 'leadSource', 'consultant', 
-        'qualification', 'intake', 'priority',
-        'currentStage', 'stages', 
-        'documents', 
-        'communications',
-        'admissionRequests.college', 'admissionRequests.course'
-    ]);
-    
-    // ✅ Only consultant role - no counsellor
-    $consultants = Consultant::where('status', true)->orderBy('name')->get();
-    $colleges = College::where('status', true)->orderBy('name')->get();
-    $courses = Course::where('status', true)->orderBy('name')->get();
-    $priorities = Priority::where('status', 1)->orderBy('name')->get();
-    $documentTypes = DocumentSetting::where('status', 1)->orderBy('name')->get();
-    $stages = ContactStage::where('status', 1)->orderBy('name')->get();
+    {
+        $lead->load([
+            'city',
+            'state',
+            'course',
+            'leadSource',
+            'consultant',
+            'qualification',
+            'intake',
+            'priority',
+            'currentStage',
+            'stages',
+            'documents',
+            'communications',
+            'admissionRequests.college',
+            'admissionRequests.course'
+        ]);
 
-    $communicationTypes = \App\Models\CommunicationLog::active()
-        ->orderBy('name')
-        ->pluck('name');
- 
-    $admissionStatuses = [
-        'draft' => 'Draft',
-        'submitted' => 'Submitted',
-        'under_review' => 'Under Review',
-        'accepted' => 'Accepted',
-        'rejected' => 'Rejected',
-        'withdrawn' => 'Withdrawn'
-    ];
-    
-    $statuses = [
-        'new' => ['label' => 'New', 'color' => 'warning'],
-        'contacted' => ['label' => 'Contacted', 'color' => 'info'],
-        'qualified' => ['label' => 'Qualified', 'color' => 'primary'],
-        'proposal' => ['label' => 'Proposal', 'color' => 'purple'],
-        'negotiation' => ['label' => 'Negotiation', 'color' => 'orange'],
-        'won' => ['label' => 'Won', 'color' => 'success'],
-        'lost' => ['label' => 'Lost', 'color' => 'danger'],
-    ];
+        // ✅ Only consultant role - no counsellor
+        $consultants = Consultant::where('status', true)->orderBy('name')->get();
+        $colleges = College::where('status', true)->orderBy('name')->get();
+        $courses = Course::where('status', true)->orderBy('name')->get();
+        $priorities = Priority::where('status', 1)->orderBy('name')->get();
+        $documentTypes = DocumentSetting::where('status', 1)->orderBy('name')->get();
+        $stages = ContactStage::where('status', 1)->orderBy('name')->get();
 
-    return view('pages.leads.lead-details', compact(
-        'lead', 'consultants', 'colleges', 'courses',
-        'stages', 'documentTypes', 'communicationTypes',
-        'admissionStatuses', 'statuses', 'priorities'
-    ));
-}
+        $communicationTypes = \App\Models\CommunicationLog::active()
+            ->orderBy('name')
+            ->pluck('name');
+
+        $admissionStatuses = [
+            'draft' => 'Draft',
+            'submitted' => 'Submitted',
+            'under_review' => 'Under Review',
+            'accepted' => 'Accepted',
+            'rejected' => 'Rejected',
+            'withdrawn' => 'Withdrawn'
+        ];
+
+        $statuses = [
+            'new' => ['label' => 'New', 'color' => 'warning'],
+            'contacted' => ['label' => 'Contacted', 'color' => 'info'],
+            'qualified' => ['label' => 'Qualified', 'color' => 'primary'],
+            'proposal' => ['label' => 'Proposal', 'color' => 'purple'],
+            'negotiation' => ['label' => 'Negotiation', 'color' => 'orange'],
+            'won' => ['label' => 'Won', 'color' => 'success'],
+            'lost' => ['label' => 'Lost', 'color' => 'danger'],
+        ];
+
+        return view('pages.leads.lead-details', compact(
+            'lead',
+            'consultants',
+            'colleges',
+            'courses',
+            'stages',
+            'documentTypes',
+            'communicationTypes',
+            'admissionStatuses',
+            'statuses',
+            'priorities'
+        ));
+    }
 
     public function edit(Lead $lead)
     {
@@ -159,13 +188,20 @@ class LeadController extends Controller
         $cities = City::all();
         $courses = Course::where('status', true)->get();
         $leadSources = LeadSource::where('status', true)->get();
-       $consultants = Consultant::where('status', true)->orderBy('name')->get();
+        $consultants = Consultant::where('status', true)->orderBy('name')->get();
         $qualifications = Qualification::where('status', 1)->orderBy('name')->get();
         $intakes = Intake::where('status', 1)->orderBy('name', 'desc')->get();
-       $priorities = Priority::where('status', 1)->get();
+        $priorities = Priority::where('status', 1)->get();
         return view('leads.edit', compact(
-            'lead', 'states', 'cities', 'courses', 'leadSources', 'consultants',
-            'qualifications', 'intakes', 'priorities'
+            'lead',
+            'states',
+            'cities',
+            'courses',
+            'leadSources',
+            'consultants',
+            'qualifications',
+            'intakes',
+            'priorities'
         ));
     }
 
@@ -186,9 +222,9 @@ class LeadController extends Controller
             'consultant_id' => 'nullable|exists:users,id',
             'counsellor_id' => 'nullable|exists:users,id',
         ]);
-    
+
         $lead->update($validated);
- 
+
         return redirect()->route('leads.index')
             ->with('success', 'Lead updated successfully!');
     }
@@ -228,58 +264,71 @@ class LeadController extends Controller
         return back()->with('success', 'Lead stage updated to "' . ucfirst($validated['stage']) . '" successfully!');
     }
 
-   /**
- * Assign consultant to lead
- */
-public function assignCounsellor(Request $request, Lead $lead)
-{
-    $validated = $request->validate([
-        'consultant_id' => 'required|exists:consultants,id'  // ✅ Fixed
-    ]);
+    /**
+     * Assign consultant to lead
+     */
+    public function assignCounsellor(Request $request, Lead $lead)
+    {
+        $validated = $request->validate([
+            'consultant_id' => 'required|exists:consultants,id'  // ✅ Fixed
+        ]);
 
-    $lead->update([
-        'consultant_id' => $validated['consultant_id'], 
-        'assigned_at' => now()
-    ]);
+        $lead->update([
+            'consultant_id' => $validated['consultant_id'],
+            'assigned_at' => now()
+        ]);
 
-    // Log communication for audit trail
-    $lead->communications()->create([
-        'type' => 'note',
-        'content' => 'Consultant assigned: ' . (Consultant::find($validated['consultant_id'])?->name ?? 'Unknown'), // ✅ Fixed
-        'created_by' => Auth::id(),
-        'status' => 'completed'
-    ]);
+        // Log communication for audit trail
+        $lead->communications()->create([
+            'type' => 'note',
+            'content' => 'Consultant assigned: ' . (Consultant::find($validated['consultant_id'])?->name ?? 'Unknown'), // ✅ Fixed
+            'created_by' => Auth::id(),
+            'status' => 'completed'
+        ]);
 
-    return back()->with('success', 'Consultant assigned successfully!');
-}
+        return back()->with('success', 'Consultant assigned successfully!');
+    }
     /**
      * Upload document for lead
      */
-  public function uploadDocument(Request $request, Lead $lead)
-{
-    $validated = $request->validate([
-        'document_type' => 'required|string',
-        'file' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png,webp|max:10240',
-        'remarks' => 'nullable|string|max:500'
-    ]);
-
-    if ($request->hasFile('file')) {
-        $file = $request->file('file');
-        $path = $file->store('leads/' . $lead->id . '/documents', 'public');
-        
-        $lead->documents()->create([
-            'document_type' => $validated['document_type'],
-            'file_name' => $file->getClientOriginalName(),
-            'file_path' => $path,
-            'file_size' => $this->formatFileSize($file->getSize()),
-            'uploaded_by' => auth()->user()->name,
-            'remarks' => $validated['remarks'] ?? null,
-            'is_verified' => null  // ✅ Must be null for pending status
+    public function uploadDocument(Request $request, Lead $lead)
+    {
+        $validated = $request->validate([
+            'document_type' => [
+                'required',
+                'string',
+                Rule::unique('documents', 'document_type')
+                    ->where('lead_id', $lead->id)
+                    // Optional: Only block if previous doc is still pending/verified
+                    // Remove the where() if you want to block regardless of status
+                    ->where(function ($query) {
+                        $query->whereNull('is_verified') // pending
+                            ->orWhere('is_verified', true); // already verified
+                    })
+            ],
+            'file' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png,webp|max:10240',
+            'remarks' => 'nullable|string|max:500'
+        ], [
+            'document_type.unique' => 'A document of this type has already been uploaded for this lead.'
         ]);
-    }
 
-    return back()->with('success', 'Document uploaded successfully!');
-}
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $path = $file->store('leads/' . $lead->id . '/documents', 'public');
+
+            $lead->documents()->create([
+                'document_type' => $validated['document_type'],
+                'file_name' => $file->getClientOriginalName(),
+                'file_path' => $path,
+                'file_size' => $this->formatFileSize($file->getSize()),
+                'uploaded_by' => Auth::id(),
+                'remarks' => $validated['remarks'] ?? null,
+                'is_verified' => null
+            ]);
+        }
+
+        return back()->with('success', 'Document uploaded successfully!');
+    }
 
 
     /**
@@ -291,9 +340,9 @@ public function assignCounsellor(Request $request, Lead $lead)
         if (Storage::disk('public')->exists($document->file_path)) {
             Storage::disk('public')->delete($document->file_path);
         }
-        
+
         $document->delete();
-        
+
         return back()->with('success', 'Document deleted successfully!');
     }
 
@@ -353,72 +402,71 @@ public function assignCounsellor(Request $request, Lead $lead)
     /**
      * Create new admission request for lead
      */
- 
+
 
     /**
      * Update admission request status and details
      */
-public function updateAdmissionStatus(Request $request, AdmissionRequest $admission)
-{
-    try {
-        Log::info("=== Admission Status Update Attempt ===");
-        Log::info("Admission ID: {$admission->id}");
-        Log::info("Request status: " . $request->input('status'));
-        Log::info("Current status: {$admission->status}");
+    public function updateAdmissionStatus(Request $request, AdmissionRequest $admission)
+    {
+        try {
+            Log::info("=== Admission Status Update Attempt ===");
+            Log::info("Admission ID: {$admission->id}");
+            Log::info("Request status: " . $request->input('status'));
+            Log::info("Current status: {$admission->status}");
 
-        $admission->load('lead');
-        
-        if (!$admission->lead) {
-            Log::error("Lead not found for admission #{$admission->id}");
-            return back()->with('error', 'Associated lead not found!');
-        }
+            $admission->load('lead');
 
-        $validated = $request->validate([
-            'status' => 'required|in:draft,submitted,under_review,accepted,rejected,withdrawn',
-        ]);
+            if (!$admission->lead) {
+                Log::error("Lead not found for admission #{$admission->id}");
+                return back()->with('error', 'Associated lead not found!');
+            }
 
-        $oldStatus = $admission->status;
-        $newStatus = $validated['status'];
-
-        $updated = $admission->update([
-            'status' => $newStatus,
-            'submitted_date' => $newStatus === 'submitted' && !$admission->submitted_date 
-                ? now() 
-                : $admission->submitted_date
-        ]);
-
-        Log::info("Update result: " . ($updated ? 'SUCCESS' : 'FAILED'));
-
-        if ($admission->lead) {
-            $admission->lead->communications()->create([
-                'type' => 'note',
-                'content' => "Admission request #{$admission->id} status: '{$oldStatus}' → '{$newStatus}'",
-                'created_by' => auth()->id(),
-                'status' => 'completed'
+            $validated = $request->validate([
+                'status' => 'required|in:draft,submitted,under_review,accepted,rejected,withdrawn',
             ]);
+
+            $oldStatus = $admission->status;
+            $newStatus = $validated['status'];
+
+            $updated = $admission->update([
+                'status' => $newStatus,
+                'submitted_date' => $newStatus === 'submitted' && !$admission->submitted_date
+                    ? now()
+                    : $admission->submitted_date
+            ]);
+
+            Log::info("Update result: " . ($updated ? 'SUCCESS' : 'FAILED'));
+
+            if ($admission->lead) {
+                $admission->lead->communications()->create([
+                    'type' => 'note',
+                    'content' => "Admission request #{$admission->id} status: '{$oldStatus}' → '{$newStatus}'",
+                    'created_by' => Auth::id(),
+                    'status' => 'completed'
+                ]);
+            }
+
+            return back()->with('success', 'Admission status updated to "' . ucfirst(str_replace('_', ' ', $newStatus)) . '"!');
+        } catch (\Exception $e) {
+            Log::error('Admission status update ERROR: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
+            return back()->with('error', 'Failed: ' . $e->getMessage());
         }
-
-        return back()->with('success', 'Admission status updated to "' . ucfirst(str_replace('_', ' ', $newStatus)) . '"!');
-        
-    } catch (\Exception $e) {
-        Log::error('Admission status update ERROR: ' . $e->getMessage());
-        Log::error($e->getTraceAsString());
-        return back()->with('error', 'Failed: ' . $e->getMessage());
     }
-}
 
- 
+
 
     // ============================================
     // EXISTING API METHOD (unchanged)
     // ============================================
-    
+
     public function getCitiesByState($stateId)
     {
         $cities = City::where('state_id', $stateId)
             ->orderBy('name')
             ->get(['id', 'name']);
-        
+
         return response()->json($cities);
     }
 
@@ -438,179 +486,222 @@ public function updateAdmissionStatus(Request $request, AdmissionRequest $admiss
         return round($bytes / (1 << (10 * $pow)), 2) . ' ' . $units[$pow];
     }
     public function createAdmissionRequest(Request $request, Lead $lead)
-{
-    $validated = $request->validate([
-        'college_id' => 'required|exists:colleges,id',
-        'course_id' => 'required|exists:courses,id',
-        'consultant_id' => 'nullable|exists:users,id'  // Optional counselor assignment
-    ]);
-
-    $admission = $lead->admissionRequests()->create([
-        'college_id' => $validated['college_id'],
-        'course_id' => $validated['course_id'],
-        'submitted_by' => auth()->user()->id,  // ✅ Fixed
-        'status' => 'submitted'
-    ]);
-
-    // ✅ Optionally assign counselor if selected
-    if (!empty($validated['consultant_id'])) {
-        $lead->update(['consultant_id' => $validated['consultant_id']]);
-    }
-
-    return back()->with('success', 'Admission request created! Reference: ADM-' . $admission->id);
-}
-/**
- * Verify/Unverify a document
- */
-/**
- * Verify a document
- */
-public function verifyDocument(Request $request, Lead $lead, LeadDocument $document)
-{
-    if ($document->lead_id !== $lead->id) {
-        return back()->with('error', 'Document does not belong to this lead!');
-    }
-    
-    $document->update([
-        'is_verified' => 1,  // ✅ Use integer 1
-        'verified_at' => now(),
-        'verified_by' => auth()->id()
-    ]);
-
-    return back()->with('success', 'Document verified successfully!');
-}
-
-/**
- * Reject a document
- */
-public function rejectDocument(Request $request, Lead $lead, LeadDocument $document)
-{
-    if ($document->lead_id !== $lead->id) {
-        return back()->with('error', 'Document does not belong to this lead!');
-    }
-    
-    $document->update([
-        'is_verified' => 0,  // ✅ Use integer 0
-        'verified_at' => now(),
-        'verified_by' => auth()->id()
-    ]);
-
-    return back()->with('success', 'Document rejected successfully!');
-}
-public function sendMessage(Request $request, Lead $lead)
-{
-    try {
+    {
         $validated = $request->validate([
-            'message_type' => 'required|in:email,sms',
-            'to' => 'required',
-            'subject' => 'nullable|string|max:255',
-            'content' => 'required|string',
+            'college_id' => 'required|exists:colleges,id',
+            'course_id' => 'required|exists:courses,id',
+            'consultant_id' => 'nullable|exists:users,id'  // Optional counselor assignment
         ]);
 
-        if ($validated['message_type'] === 'email') {
-            // Additional email-specific validation
-            $request->validate([
-                'to' => 'required|email',
-                'subject' => 'required|string|max:255',
+        $admission = $lead->admissionRequests()->create([
+            'college_id' => $validated['college_id'],
+            'course_id' => $validated['course_id'],
+            'submitted_by' => Auth::id(),  // ✅ Fixed
+            'status' => 'submitted'
+        ]);
+
+        // ✅ Optionally assign counselor if selected
+        if (!empty($validated['consultant_id'])) {
+            $lead->update(['consultant_id' => $validated['consultant_id']]);
+        }
+
+        return back()->with('success', 'Admission request created! Reference: ADM-' . $admission->id);
+    }
+    /**
+     * Verify/Unverify a document
+     */
+    /**
+     * Verify a document
+     */
+    public function verifyDocument(Request $request, Lead $lead, LeadDocument $document)
+    {
+        if ($document->lead_id !== $lead->id) {
+            return back()->with('error', 'Document does not belong to this lead!');
+        }
+
+        $document->update([
+            'is_verified' => 1,  // ✅ Use integer 1
+            'verified_at' => now(),
+            'verified_by' => Auth::id()
+        ]);
+
+        return back()->with('success', 'Document verified successfully!');
+    }
+
+    /**
+     * Reject a document
+     */
+    public function rejectDocument(Request $request, Lead $lead, LeadDocument $document)
+    {
+        if ($document->lead_id !== $lead->id) {
+            return back()->with('error', 'Document does not belong to this lead!');
+        }
+
+        $document->update([
+            'is_verified' => 0,  // ✅ Use integer 0
+            'verified_at' => now(),
+            'verified_by' => Auth::id()
+        ]);
+
+        return back()->with('success', 'Document rejected successfully!');
+    }
+    public function sendMessage(Request $request, Lead $lead)
+    {
+        try {
+            $validated = $request->validate([
+                'message_type' => 'required|in:email,sms',
+                'to' => 'required',
+                'subject' => 'nullable|string|max:255',
+                'content' => 'required|string',
             ]);
-            
-            // Send email using Laravel Mail facade
-            Mail::raw($validated['content'], function($message) use ($validated) {
-                $message->to($validated['to'])
+
+            if ($validated['message_type'] === 'email') {
+                // Additional email-specific validation
+                $request->validate([
+                    'to' => 'required|email',
+                    'subject' => 'required|string|max:255',
+                ]);
+
+                // Send email using Laravel Mail facade
+                Mail::raw($validated['content'], function ($message) use ($validated) {
+                    $message->to($validated['to'])
                         ->subject($validated['subject'])
                         ->from(config('mail.from.address'), config('mail.from.name'));
+                });
+
+                // Log to database
+                $lead->communications()->create([
+                    'type' => 'email',
+                    'subject' => $validated['subject'],
+                    'content' => $validated['content'],
+                    'created_by' => Auth::id(),
+                    'status' => 'completed'
+                ]);
+
+                return back()->with('success', 'Email sent successfully to ' . $validated['to']);
+            } else {
+                // SMS validation
+                $request->validate([
+                    'to' => 'required|string|max:20',
+                    'content' => 'required|string|max:160',
+                ]);
+
+                // TODO: Integrate SMS provider (Twilio, MSG91, etc.)
+                // For now, just log it
+                $lead->communications()->create([
+                    'type' => 'sms',
+                    'content' => $validated['content'],
+                    'created_by' => Auth::id(),
+                    'status' => 'completed'
+                ]);
+
+                return back()->with('success', 'SMS logged successfully! (Provider not configured)');
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            Log::error('SendMessage Error: ' . $e->getMessage());
+            return back()->with('error', 'Failed: ' . $e->getMessage());
+        }
+    }
+    /**
+     * Display all uploaded documents
+     */
+    public function documents(Request $request)
+    {
+        $query = LeadDocument::with(['lead', 'documentSetting']);
+
+        // 🔍 Search filter
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('file_name', 'like', "%{$request->search}%")
+                    ->orWhere('document_type', 'like', "%{$request->search}%");
             });
-            
-            // Log to database
-            $lead->communications()->create([
-                'type' => 'email',
-                'subject' => $validated['subject'],
-                'content' => $validated['content'],
-                'created_by' => auth()->id(),
-                'status' => 'completed'
-            ]);
-            
-            return back()->with('success', 'Email sent successfully to ' . $validated['to']);
-            
-        } else {
-            // SMS validation
-            $request->validate([
-                'to' => 'required|string|max:20',
-                'content' => 'required|string|max:160',
-            ]);
-            
-            // TODO: Integrate SMS provider (Twilio, MSG91, etc.)
-            // For now, just log it
-            $lead->communications()->create([
-                'type' => 'sms',
-                'content' => $validated['content'],
-                'created_by' => auth()->id(),
-                'status' => 'completed'
-            ]);
-            
-            return back()->with('success', 'SMS logged successfully! (Provider not configured)');
         }
-        
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return back()->withErrors($e->errors())->withInput();
-        
-    } catch (\Exception $e) {
-        Log::error('SendMessage Error: ' . $e->getMessage());
-        return back()->with('error', 'Failed: ' . $e->getMessage());
-    }
-}
-/**
- * Display all uploaded documents
- */
-public function documents(Request $request)
-{
-    $query = LeadDocument::with(['lead', 'documentSetting']);
-    
-    // 🔍 Search filter
-    if ($request->filled('search')) {
-        $query->where(function($q) use ($request) {
-            $q->where('file_name', 'like', "%{$request->search}%")
-              ->orWhere('document_type', 'like', "%{$request->search}%");
-        });
-    }
-    
-    // 📅 Date range filter
-    if ($request->filled('start_date') && $request->filled('end_date')) {
-        $query->whereBetween('created_at', [
-            $request->start_date,
-            $request->end_date . ' 23:59:59'
-        ]);
-    }
-    
-    // 🏷️ Status filter
-    if ($request->filled('status')) {
-        if ($request->status === 'verified') {
-            $query->where('is_verified', true);
-        } elseif ($request->status === 'rejected') {
-            $query->where('is_verified', false);
-        } elseif ($request->status === 'pending') {
-            $query->whereNull('is_verified');
+
+        // 📅 Date range filter
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [
+                $request->start_date,
+                $request->end_date . ' 23:59:59'
+            ]);
         }
+
+        // 🏷️ Status filter
+        if ($request->filled('status')) {
+            if ($request->status === 'verified') {
+                $query->where('is_verified', true);
+            } elseif ($request->status === 'rejected') {
+                $query->where('is_verified', false);
+            } elseif ($request->status === 'pending') {
+                $query->whereNull('is_verified');
+            }
+        }
+
+        // 🔄 Sort - ✅ Sanitize input
+        $allowedSorts = ['created_at', 'file_name', 'file_size', 'updated_at'];
+        $sort = $request->get('sort', 'created_at');
+
+        // Only allow whitelisted columns
+        if (!in_array($sort, $allowedSorts)) {
+            $sort = 'created_at';
+        }
+
+        // Only allow 'asc' or 'desc' (lowercase)
+        $order = strtolower($request->get('order', 'desc'));
+        $order = in_array($order, ['asc', 'desc']) ? $order : 'desc';
+
+        $query->orderBy($sort, $order);
+
+        // ✅ Paginate and pass to view
+        $documents = $query->paginate(15)->withQueryString();
+
+        return view('pages.documents.index', compact('documents'));
     }
-    
-    // 🔄 Sort - ✅ Sanitize input
-    $allowedSorts = ['created_at', 'file_name', 'file_size', 'updated_at'];
-    $sort = $request->get('sort', 'created_at');
-    
-    // Only allow whitelisted columns
-    if (!in_array($sort, $allowedSorts)) {
-        $sort = 'created_at';
+    /**
+     * Display all admission requests
+     */
+    public function admissionRequests(Request $request)
+    {
+        $query = AdmissionRequest::with(['lead', 'college', 'course', 'submittedBy']);
+
+        // 🔍 Search filter
+        if ($request->filled('search')) {
+            $query->whereHas('lead', function ($q) use ($request) {
+                $q->where('full_name', 'like', "%{$request->search}%");
+            })->orWhereHas('college', function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%");
+            });
+        }
+
+        // 📅 Date range filter
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [
+                $request->start_date,
+                $request->end_date . ' 23:59:59'
+            ]);
+        }
+
+        // 🏷️ Status filter
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // 🔄 Sort
+        $allowedSorts = ['created_at', 'updated_at', 'status'];
+        $sort = $request->get('sort', 'created_at');
+
+        if (!in_array($sort, $allowedSorts)) {
+            $sort = 'created_at';
+        }
+
+        $order = strtolower($request->get('order', 'desc'));
+        $order = in_array($order, ['asc', 'desc']) ? $order : 'desc';
+
+        $query->orderBy($sort, $order);
+
+        $admissions = $query->paginate(15)->withQueryString();
+
+        return view('pages.admissions.index', compact('admissions'));
     }
-    
-    // Only allow 'asc' or 'desc' (lowercase)
-    $order = strtolower($request->get('order', 'desc'));
-    $order = in_array($order, ['asc', 'desc']) ? $order : 'desc';
-    
-    $query->orderBy($sort, $order);
-    
-    // ✅ Paginate and pass to view
-    $documents = $query->paginate(15)->withQueryString();
-    
-    return view('pages.documents.index', compact('documents'));
-}
 }

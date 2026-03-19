@@ -54,37 +54,37 @@ Route::middleware('auth')->group(function () {
     // Feature Routes (All POST for simplicity)
     Route::post('/lead/{lead}/update-stage', [LeadController::class, 'updateStage'])->name('leads.update-stage');
     Route::post('/leads/{lead}/assign-consultant', [LeadController::class, 'assignCounsellor'])
-     ->name('leads.assign-consultant');
+        ->name('leads.assign-consultant');
     Route::post('/lead/{lead}/upload-document', [LeadController::class, 'uploadDocument'])->name('leads.upload-document');
     Route::post('/lead/{lead}/add-communication', [LeadController::class, 'addCommunication'])->name('leads.add-communication');
     Route::post('/lead/{lead}/create-admission', [LeadController::class, 'createAdmissionRequest'])->name('leads.create-admission');
     Route::post('/leads/{lead}/admission-request', [LeadController::class, 'createAdmissionRequest'])
-    ->name('leads.admission-request');
-    
-Route::put('/admission-requests/{admission}/status', [LeadController::class, 'updateAdmissionStatus'])
-    ->name('admission-requests.update-status');
+        ->name('leads.admission-request');
 
-Route::post('/leads/{lead}/documents/{document}/verify', [LeadController::class, 'verifyDocument'])
-    ->name('leads.verify-document');
+    Route::put('/admission-requests/{admission}/status', [LeadController::class, 'updateAdmissionStatus'])
+        ->name('admission-requests.update-status');
 
-Route::post('/leads/{lead}/documents/{document}/reject', [LeadController::class, 'rejectDocument'])
-    ->name('leads.reject-document');
+    Route::post('/leads/{lead}/documents/{document}/verify', [LeadController::class, 'verifyDocument'])
+        ->name('leads.verify-document');
 
- Route::post('/leads/{lead}/send-message', [LeadController::class, 'sendMessage'])
-    ->name('leads.send-message')
-    ->middleware('auth');
+    Route::post('/leads/{lead}/documents/{document}/reject', [LeadController::class, 'rejectDocument'])
+        ->name('leads.reject-document');
+
+    Route::post('/leads/{lead}/send-message', [LeadController::class, 'sendMessage'])
+        ->name('leads.send-message')
+        ->middleware('auth');
 
 
-Route::delete('/leads/documents/{document}', [LeadController::class, 'deleteDocument'])
-    ->name('leads.delete-document');
-    
-Route::delete('/admission-requests/{admissionRequest}', [LeadController::class, 'deleteAdmissionRequest'])
-    ->name('admission-requests.destroy');
+    Route::delete('/leads/documents/{document}', [LeadController::class, 'deleteDocument'])
+        ->name('leads.delete-document');
+
+    Route::delete('/admission-requests/{admissionRequest}', [LeadController::class, 'deleteAdmissionRequest'])
+        ->name('admission-requests.destroy');
     // Delete routes
     Route::delete('/document/{document}', [LeadController::class, 'deleteDocument'])->name('leads.delete-document');
     Route::delete('/communication/{communication}', [LeadController::class, 'deleteCommunication'])->name('leads.delete-communication');
     Route::delete('/admission/{admission}', [LeadController::class, 'deleteAdmissionRequest'])->name('leads.delete-admission');
-    
+
     // API
     Route::get('/leads/cities/{state}', [LeadController::class, 'getCitiesByState'])->name('leads.cities.by-state');
 });
@@ -104,9 +104,13 @@ Route::delete('/colleges/{college}', [CollegeController::class, 'destroy'])->mid
 Route::get('/get-cities/{stateId}', [CollegeController::class, 'getCities'])->middleware(middleware: 'auth')->name('colleges.cities');
 
 // admissions
-Route::get('/admissions', function () {
-    return view('pages.admissions.index');
-})->name('admissions');
+Route::get('/admissions', [LeadController::class, 'admissionRequests'])
+    ->name('admissions.index')
+    ->middleware('auth');
+
+Route::put('/admissions/{admission}/update-status', [LeadController::class, 'updateAdmissionStatus'])
+    ->name('admissions.update-status')  // ✅ Make sure name matches
+    ->middleware('auth');
 
 // documents
 Route::get('/documents', [LeadController::class, 'documents'])
@@ -207,9 +211,15 @@ Route::put('/consultants/{id}', [ConsultantController::class, 'update'])->name('
 Route::delete('/consultants/{id}', [ConsultantController::class, 'destroy'])->name('consultants.destroy');
 Route::post('/consultants/{id}/toggle', [ConsultantController::class, 'toggleStatus'])->name('consultants.toggle');
 
+// ✅ KYC Routes - Matching your convention
+Route::get('/consultants/{id}', [ConsultantController::class, 'show'])->name('consultants.show');
+Route::post('/consultants/{id}/kyc/upload', [ConsultantController::class, 'uploadKyc'])->name('consultants.kyc.upload');
+Route::post('/consultants/{id}/kyc/{kyc_id}/verify', [ConsultantController::class, 'verifyKyc'])->name('consultants.kyc.verify');
+Route::post('/consultants/{id}/kyc/{kyc_id}/reject', [ConsultantController::class, 'rejectKyc'])->name('consultants.kyc.reject');
+
 // API route for AJAX (must be BEFORE any conflicting routes)
 Route::get('/api/cities/{stateId}', [ConsultantController::class, 'getCitiesByState'])
-     ->name('api.cities.byState');
+    ->name('api.cities.byState');
 
 // user-management
 Route::prefix('user-management')->group(function () {
@@ -242,6 +252,4 @@ Route::prefix('user-management')->group(function () {
     Route::post('/permissions', [PermissionController::class, 'store'])->name('permissions.store');
     Route::put('/permissions/{permission}', [PermissionController::class, 'update'])->name('permissions.update');
     Route::delete('/permissions/{permission}', [PermissionController::class, 'destroy'])->name('permissions.destroy');
-
 });
-

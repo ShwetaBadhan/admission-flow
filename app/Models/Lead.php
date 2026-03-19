@@ -100,4 +100,12 @@ class Lead extends Model
     {
         return $this->belongsTo(User::class, 'assigned_by');
     }
+    public function hasDocumentType($typeId, $excludeRejected = true)
+{
+    $query = $this->documents()->where('document_type', $typeId);
+    if ($excludeRejected) {
+        $query->where('is_verified', '!=', false);
+    }
+    return $query->exists();
+}
 }

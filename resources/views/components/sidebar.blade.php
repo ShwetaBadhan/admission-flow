@@ -61,7 +61,7 @@
                               <a href="{{ route('courses.index') }}"><i class="ti ti-building"></i><span>Courses</span></a>
                           </li>
                           <li>
-                              <a href="{{ route('admissions') }}"><i class="ti ti-user-up"></i><span>Admissions</span></a>
+                              <a href="{{ route('admissions.index') }}"><i class="ti ti-user-up"></i><span>Admissions</span></a>
                           </li>
                           <li>
                               <a href="{{ route('documents.index') }}"><i class="ti ti-file-invoice"></i><span>Documents</span></a>
