@@ -7,8 +7,7 @@
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
                 <div>
-                    <h4 class="mb-1">Permissions <span
-                            class="badge badge-soft-primary ms-2">{{ $permissions->total() }}</span></h4>
+                    <h4 class="mb-1">Permissions <span class="badge badge-soft-primary ms-2"></span></h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
@@ -16,10 +15,12 @@
                         </ol>
                     </nav>
                 </div>
-                <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
-                    data-bs-target="#add_permission">
-                    <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Permission
-                </a>
+                @can('create-permissions')
+                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#add_permission">
+                        <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Permission
+                    </a>
+                @endcan
             </div>
 
             <!-- Permissions Table -->
@@ -65,18 +66,23 @@
                                                     <i class="ti ti-dots-vertical"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-end">
-                                                    <!-- Edit -->
-                                                    <a class="dropdown-item" href="javascript:void(0);"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#edit_permission_{{ $permission->id }}">
-                                                        <i class="ti ti-edit text-blue"></i> Edit
-                                                    </a>
-                                                    <!-- Delete -->
-                                                    <a class="dropdown-item text-danger" href="javascript:void(0);"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#delete_permission_{{ $permission->id }}">
-                                                        <i class="ti ti-trash"></i> Delete
-                                                    </a>
+                                                    @can('edit-permissions')
+                                                        <!-- Edit -->
+                                                        <a class="dropdown-item" href="javascript:void(0);"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#edit_permission_{{ $permission->id }}">
+                                                            <i class="ti ti-edit text-blue"></i> Edit
+                                                        </a>
+                                                    @endcan
+                                                    @can('delete-permissions')
+                                                        <!-- Delete -->
+                                                        <a class="dropdown-item text-danger" href="javascript:void(0);"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#delete_permission_{{ $permission->id }}">
+                                                            <i class="ti ti-trash"></i> Delete
+                                                        </a>
+                                                    @endcan
+
                                                 </div>
                                             </div>
                                         </td>
@@ -164,10 +170,7 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-end mt-3">
-                        {{ $permissions->links() }}
-                    </div>
+
                 </div>
             </div>
 

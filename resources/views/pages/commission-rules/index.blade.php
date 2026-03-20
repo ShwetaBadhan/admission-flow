@@ -32,8 +32,8 @@
 @endif
 @section('content')
     <!-- ========================
-       Start Page Content
-      ========================= -->
+           Start Page Content
+          ========================= -->
 
     <div class="page-wrapper">
 
@@ -43,7 +43,8 @@
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
                 <div>
-                    <h4 class="mb-1">Commission Rules<span class="badge badge-soft-primary ms-2">{{ $commissionRules->total() }}</span></h4>
+                    <h4 class="mb-1">Commission Rules<span
+                            class="badge badge-soft-primary ms-2">{{ $commissionRules->total() }}</span></h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
@@ -91,9 +92,12 @@
                         <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
                         <input type="text" class="form-control" placeholder="Search">
                     </div>
-                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
-                        data-bs-target="#offcanvas_add"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add New
-                        Commission Rules</a>
+                    @can('create-commission-rules')
+                        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvas_add"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add New
+                            Commission Rules</a>
+                    @endcan
+
                 </div>
                 <div class="card-body">
 
@@ -564,16 +568,23 @@
                                                     <i class="ti ti-dots-vertical"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right">
-                                                    <a class="dropdown-item edit-college" href="javascript:void(0)"
-                                                        data-bs-toggle="offcanvas"
-                                                        data-bs-target="#offcanvas_edit{{ $rule->id }}">
-                                                        <i class="ti ti-edit text-blue me-1"></i> Edit
-                                                    </a>
-                                                    <a class="dropdown-item delete-btn" href="#"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#delete_rule{{ $rule->id }}">
-                                                        <i class="ti ti-trash"></i> Delete
-                                                    </a>
+                                                    @can('edit-commission-rules')
+                                                        <a class="dropdown-item edit-college" href="javascript:void(0)"
+                                                            data-bs-toggle="offcanvas"
+                                                            data-bs-target="#offcanvas_edit{{ $rule->id }}">
+                                                            <i class="ti ti-edit text-blue me-1"></i> Edit
+                                                        </a>
+                                                    @endcan
+
+                                                    @can('delete-commission-rules')
+                                                        <a class="dropdown-item delete-btn" href="#"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#delete_rule{{ $rule->id }}">
+                                                            <i class="ti ti-trash"></i> Delete
+                                                        </a>
+                                                    @endcan
+
+
                                                 </div>
                                             </div>
 
@@ -788,8 +799,8 @@
     </div>
 
     <!-- ========================
-       End Page Content
-      ========================= -->
+           End Page Content
+          ========================= -->
 
     <!-- Add Commission Rule -->
     <div class="offcanvas offcanvas-end offcanvas-large" tabindex="-1" id="offcanvas_add">

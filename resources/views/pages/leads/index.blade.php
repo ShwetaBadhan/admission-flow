@@ -457,8 +457,11 @@
                         <a href="leads.html" class="flex-shrink-0 btn btn-sm p-1 border-0 ms-1 fs-14 active"><i
                                 class="ti ti-grid-dots"></i></a>
                     </div>
-                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
+                    @can('create-leads')
+                        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
                         data-bs-target="#offcanvas_add"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add Lead</a>
+                    @endcan
+                    
                 </div>
             </div>
             <!-- table header -->
@@ -500,13 +503,16 @@
                                                         <div class="d-flex justify-content-between align-items-center">
                                                             <div class="d-flex align-items-center">
                                                                 <div class="d-flex align-items-center mb-3">
-                                                                    <a href="{{ route('leads.index', $lead) }}"
+                                                                    @can('view-lead-details')
+                                                                        <a href="{{ route('leads.index', $lead) }}"
                                                                         class="avatar rounded-circle bg-soft-{{ $statusInfo['color'] }} flex-shrink-0 me-2">
                                                                         <span
                                                                             class="avatar-title text-{{ $statusInfo['color'] }}">
                                                                             {{ strtoupper(substr($lead->full_name, 0, 2)) }}
                                                                         </span>
                                                                     </a>
+                                                                    @endcan
+                                                                    
                                                                     <h6 class="fw-medium fs-14 mb-0">
                                                                         <a href="{{ route('lead-details',$lead->id) }}">
                                                                             {{ $lead->full_name }}
@@ -524,7 +530,9 @@
                                                                         <i class="ti ti-dots-vertical"></i>
                                                                     </a>
                                                                     <div class="dropdown-menu dropdown-menu-end">
-                                                                        <!-- Edit Button - Opens offcanvas with lead ID -->
+
+                                                                    @can('edit-leads')
+                                                                         <!-- Edit Button - Opens offcanvas with lead ID -->
                                                                         <a class="dropdown-item" href="javascript:void(0)"
                                                                             data-bs-toggle="offcanvas"
                                                                             data-bs-target="#offcanvas_edit_{{ $lead->id }}">
@@ -532,12 +540,17 @@
                                                                                 class="ti ti-square-rounded-plus-filled me-1"></i>
                                                                             Edit
                                                                         </a>
-                                                                        <!-- Delete Button -->
+                                                                    @endcan
+                                                                       
+                                                                       @can('delete-leads')
+                                                                             <!-- Delete Button -->
                                                                         <a class="dropdown-item delete-btn" href="#"
                                                                             data-bs-toggle="modal"
                                                                             data-bs-target="#delete_lead{{ $lead->id }}">
                                                                             <i class="ti ti-trash"></i> Delete
                                                                         </a>
+                                                                       @endcan
+                                                                      
                                                                     </div>
                                                                 </div>
                                                             </div>

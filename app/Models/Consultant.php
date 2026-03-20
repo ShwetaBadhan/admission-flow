@@ -22,7 +22,7 @@ class Consultant extends Model
     protected $casts = [
         'status' => 'integer',
     ];
- // ✅ State Relationship - explicitly specify foreign key column
+    // ✅ State Relationship - explicitly specify foreign key column
     public function state()
     {
         return $this->belongsTo(State::class, 'state', 'id');
@@ -41,18 +41,27 @@ class Consultant extends Model
         return $query->where('status', 1);
     }
     // Add this relationship
-public function kycDocuments()
-{
-    return $this->hasMany(ConsultantKyc::class, 'consultant_id');
-}
-
-// Helper: Check if a specific KYC type exists
-public function hasKycDocument($type, $excludeRejected = true)
-{
-    $query = $this->kycDocuments()->where('document_type', $type);
-    if ($excludeRejected) {
-        $query->where('is_verified', '!=', false);
+    public function kycDocuments()
+    {
+        return $this->hasMany(ConsultantKyc::class, 'consultant_id');
     }
-    return $query->exists();
-}
+
+    // Helper: Check if a specific KYC type exists
+    public function hasKycDocument($type, $excludeRejected = true)
+    {
+        $query = $this->kycDocuments()->where('document_type', $type);
+        if ($excludeRejected) {
+            $query->where('is_verified', '!=', false);
+        }
+        return $query->exists();
+    }
+    public function getUser()
+    {
+        return User::where('email', $this->email)->first();
+    }
+
+    public function leads()
+    {
+        return $this->hasMany(Lead::class, 'consultant_id');
+    }
 }

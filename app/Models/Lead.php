@@ -63,9 +63,9 @@ class Lead extends Model
 
     public function consultant()
     {
-        return $this->belongsTo(User::class, 'consultant_id');
+        return $this->belongsTo(Consultant::class, 'consultant_id');
     }
-     // New relationships
+    // New relationships
     public function stages()
     {
         return $this->hasMany(LeadStage::class)->orderBy('created_at', 'desc');
@@ -101,11 +101,11 @@ class Lead extends Model
         return $this->belongsTo(User::class, 'assigned_by');
     }
     public function hasDocumentType($typeId, $excludeRejected = true)
-{
-    $query = $this->documents()->where('document_type', $typeId);
-    if ($excludeRejected) {
-        $query->where('is_verified', '!=', false);
+    {
+        $query = $this->documents()->where('document_type', $typeId);
+        if ($excludeRejected) {
+            $query->where('is_verified', '!=', false);
+        }
+        return $query->exists();
     }
-    return $query->exists();
-}
 }

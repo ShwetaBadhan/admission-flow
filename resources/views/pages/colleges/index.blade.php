@@ -31,8 +31,8 @@
 @endif
 @section('content')
     <!-- ========================
-                       Start Page Content
-                      ========================= -->
+                           Start Page Content
+                          ========================= -->
 
     <div class="page-wrapper">
 
@@ -428,9 +428,12 @@
                         <a href="Colleges.html" class="flex-shrink-0 btn btn-sm p-1 border-0 ms-1 fs-14 active"><i
                                 class="ti ti-grid-dots"></i></a>
                     </div>
-                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
+                    @can('create-colleges')
+                         <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
                         data-bs-target="#offcanvas_add"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add
                         College</a>
+                    @endcan
+                   
                 </div>
             </div>
             <!-- table header -->
@@ -484,15 +487,20 @@
                                             <i class="ti ti-dots-vertical"></i>
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item edit-college" href="javascript:void(0)"
+                                            @can('edit-colleges')
+                                                <a class="dropdown-item edit-college" href="javascript:void(0)"
                                                 data-bs-toggle="offcanvas"
                                                 data-bs-target="#offcanvas_edit_{{ $college->id }}">
                                                 <i class="ti ti-edit text-blue me-1"></i> Edit
                                             </a>
-                                            <a class="dropdown-item delete-college" href="#" data-bs-toggle="modal"
+                                            @endcan
+                                            @can('delete-colleges')
+                                                <a class="dropdown-item delete-college" href="#" data-bs-toggle="modal"
                                                 data-bs-target="#delete_contact{{ $college->id }}">
                                                 <i class="ti ti-trash text-danger me-1"></i> Delete
                                             </a>
+                                            @endcan
+                                            
                                             <a class="dropdown-item" href="{{ route('colleges.index', $college->id) }}">
                                                 <i class="ti ti-eye text-blue-light me-1"></i> Preview
                                             </a>
@@ -852,168 +860,176 @@
     </div>
 
     <!-- ========================
-                           End Page Content
-                          ========================= -->
+                               End Page Content
+                              ========================= -->
 
     </div>
     <!-- End Wrapper -->
-   <!-- Add College Offcanvas -->
-<div class="offcanvas offcanvas-end offcanvas-large" tabindex="-1" id="offcanvas_add">
-    <div class="offcanvas-header border-bottom">
-        <h5 class="mb-0" id="offcanvas_title">Add New College</h5>
-        <button type="button"
-            class="btn-close custom-btn-close border p-1 me-0 d-flex align-items-center justify-content-center rounded-circle"
-            data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body">
-        <form action="{{ route('colleges.store') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            <div class="accordion accordion-bordered" id="main_accordion">
-                <!-- Basic Info -->
-                <div class="accordion-item rounded mb-3">
-                    <div class="accordion-header">
-                        <a href="#" class="accordion-button accordion-custom-button rounded"
-                            data-bs-toggle="collapse" data-bs-target="#basic">
-                            <span class="avatar avatar-md rounded me-1"><i class="ti ti-user-plus"></i></span> Basic Info
-                        </a>
+    <!-- Add College Offcanvas -->
+    <div class="offcanvas offcanvas-end offcanvas-large" tabindex="-1" id="offcanvas_add">
+        <div class="offcanvas-header border-bottom">
+            <h5 class="mb-0" id="offcanvas_title">Add New College</h5>
+            <button type="button"
+                class="btn-close custom-btn-close border p-1 me-0 d-flex align-items-center justify-content-center rounded-circle"
+                data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <form action="{{ route('colleges.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="accordion accordion-bordered" id="main_accordion">
+                    <!-- Basic Info -->
+                    <div class="accordion-item rounded mb-3">
+                        <div class="accordion-header">
+                            <a href="#" class="accordion-button accordion-custom-button rounded"
+                                data-bs-toggle="collapse" data-bs-target="#basic">
+                                <span class="avatar avatar-md rounded me-1"><i class="ti ti-user-plus"></i></span> Basic
+                                Info
+                            </a>
+                        </div>
+                        <div class="accordion-collapse collapse show" id="basic" data-bs-parent="#main_accordion">
+                            <div class="accordion-body border-top">
+                                <div class="row">
+                                    <!-- Image Upload -->
+                                    <div class="col-md-12">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="avatar avatar-xxl border border-dashed me-3 flex-shrink-0">
+                                                <div class="position-relative d-flex align-items-center">
+                                                    <img id="image_preview" src=""
+                                                        style="display:none; width:100%; height:100%; object-fit:cover;"
+                                                        class="rounded">
+                                                    <i id="image_icon" class="ti ti-photo text-dark fs-16"></i>
+                                                </div>
+                                            </div>
+                                            <div class="d-inline-flex flex-column align-items-start">
+                                                <div class="drag-upload-btn btn btn-sm btn-primary position-relative mb-2">
+                                                    <i class="ti ti-file-broken me-1"></i>Upload file
+                                                    <input type="file" class="form-control image-sign"
+                                                        name="college_image" id="college_image" accept="image/*">
+                                                </div>
+                                                <span>JPG, GIF or PNG. Max size of 800K</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- College Name -->
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">College Name<span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="name" id="name"
+                                                required>
+                                        </div>
+                                    </div>
+                                    <!-- Email -->
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                                            <input type="email" class="form-control" name="email" id="email"
+                                                required>
+                                        </div>
+                                    </div>
+                                    <!-- Phone & Website -->
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Phone</label>
+                                            <input type="text" class="form-control" name="phone" id="phone">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Website</label>
+                                            <input type="url" class="form-control" name="website" id="website">
+                                        </div>
+                                    </div>
+                                    <!-- Courses (Fixed - No $college reference) -->
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">Select Courses <span
+                                                    class="text-danger">*</span></label>
+                                            <select class="form-select" name="course_ids[]" id="course_ids_add"
+                                                data-choices data-choices-removeItem multiple>
+                                                <option value="">Select Courses</option>
+                                                @if (isset($courses))
+                                                    @foreach ($courses as $course)
+                                                        <option value="{{ $course->id }}">{{ $course->name }}</option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                            <div class="invalid-feedback">Please select at least one course.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Deadline & Fees -->
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Application Deadline</label>
+                                            <input type="date" class="form-control" name="application_deadline"
+                                                id="application_deadline">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Fees Range</label>
+                                            <input type="text" class="form-control" name="fees_range" id="fees_range"
+                                                placeholder="e.g. 50k - 1L">
+                                        </div>
+                                    </div>
+                                    <!-- Status -->
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Status</label>
+                                            <select class="select" name="status" data-toggle="select">
+                                                <option value="" disabled>Select Status</option>
+                                                <option value="active">Active</option>
+                                                <option value="inactive">Inactive</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="accordion-collapse collapse show" id="basic" data-bs-parent="#main_accordion">
-                        <div class="accordion-body border-top">
-                            <div class="row">
-                                <!-- Image Upload -->
-                                <div class="col-md-12">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="avatar avatar-xxl border border-dashed me-3 flex-shrink-0">
-                                            <div class="position-relative d-flex align-items-center">
-                                                <img id="image_preview" src=""
-                                                    style="display:none; width:100%; height:100%; object-fit:cover;"
-                                                    class="rounded">
-                                                <i id="image_icon" class="ti ti-photo text-dark fs-16"></i>
-                                            </div>
-                                        </div>
-                                        <div class="d-inline-flex flex-column align-items-start">
-                                            <div class="drag-upload-btn btn btn-sm btn-primary position-relative mb-2">
-                                                <i class="ti ti-file-broken me-1"></i>Upload file
-                                                <input type="file" class="form-control image-sign"
-                                                    name="college_image" id="college_image" accept="image/*">
-                                            </div>
-                                            <span>JPG, GIF or PNG. Max size of 800K</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- College Name -->
-                                <div class="col-md-12">
-                                    <div class="mb-3">
-                                        <label class="form-label">College Name<span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" name="name" id="name" required>
-                                    </div>
-                                </div>
-                                <!-- Email -->
-                                <div class="col-md-12">
-                                    <div class="mb-3">
-                                        <label class="form-label">Email <span class="text-danger">*</span></label>
-                                        <input type="email" class="form-control" name="email" id="email" required>
-                                    </div>
-                                </div>
-                                <!-- Phone & Website -->
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Phone</label>
-                                        <input type="text" class="form-control" name="phone" id="phone">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Website</label>
-                                        <input type="url" class="form-control" name="website" id="website">
-                                    </div>
-                                </div>
-                                <!-- Courses (Fixed - No $college reference) -->
-                                <div class="col-md-12">
-                                    <div class="mb-3">
-                                        <label class="form-label">Select Courses <span class="text-danger">*</span></label>
-                                        <select class="form-select" name="course_ids[]" id="course_ids_add" 
-                                            data-choices data-choices-removeItem multiple>
-                                            <option value="">Select Courses</option>
-                                            @if(isset($courses))
-                                                @foreach($courses as $course)
-                                                    <option value="{{ $course->id }}">{{ $course->name }}</option>
+                    <!-- Address Info -->
+                    <div class="accordion-item border-top rounded mb-3">
+                        <div class="accordion-header">
+                            <a href="#" class="accordion-button accordion-custom-button rounded"
+                                data-bs-toggle="collapse" data-bs-target="#address">
+                                <span class="avatar avatar-md rounded me-1"><i class="ti ti-map-pin-cog"></i></span>
+                                Address Info
+                            </a>
+                        </div>
+                        <div class="accordion-collapse collapse" id="address" data-bs-parent="#main_accordion">
+                            <div class="accordion-body border-top">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">State <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="state_id" id="state_id" required>
+                                                <option value="">Select State</option>
+                                                @foreach ($states as $state)
+                                                    <option value="{{ $state->id }}">{{ $state->name }}</option>
                                                 @endforeach
-                                            @endif
-                                        </select>
-                                        <div class="invalid-feedback">Please select at least one course.</div>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <!-- Deadline & Fees -->
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Application Deadline</label>
-                                        <input type="date" class="form-control" name="application_deadline" id="application_deadline">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Fees Range</label>
-                                        <input type="text" class="form-control" name="fees_range" id="fees_range" placeholder="e.g. 50k - 1L">
-                                    </div>
-                                </div>
-                                <!-- Status -->
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Status</label>
-                                        <select class="select" name="status" data-toggle="select">
-                                            <option value="" disabled>Select Status</option>
-                                            <option value="active">Active</option>
-                                            <option value="inactive">Inactive</option>
-                                        </select>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">City <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="city_id" id="city_id" required>
+                                                <option value="">Select City</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Address Info -->
-                <div class="accordion-item border-top rounded mb-3">
-                    <div class="accordion-header">
-                        <a href="#" class="accordion-button accordion-custom-button rounded"
-                            data-bs-toggle="collapse" data-bs-target="#address">
-                            <span class="avatar avatar-md rounded me-1"><i class="ti ti-map-pin-cog"></i></span> Address Info
-                        </a>
-                    </div>
-                    <div class="accordion-collapse collapse" id="address" data-bs-parent="#main_accordion">
-                        <div class="accordion-body border-top">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">State <span class="text-danger">*</span></label>
-                                        <select class="form-select" name="state_id" id="state_id" required>
-                                            <option value="">Select State</option>
-                                            @foreach ($states as $state)
-                                                <option value="{{ $state->id }}">{{ $state->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">City <span class="text-danger">*</span></label>
-                                        <select class="form-select" name="city_id" id="city_id" required>
-                                            <option value="">Select City</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="d-flex align-items-center justify-content-end mt-3">
+                    <button type="button" data-bs-dismiss="offcanvas" class="btn btn-light me-2">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save College</button>
                 </div>
-            </div>
-            <div class="d-flex align-items-center justify-content-end mt-3">
-                <button type="button" data-bs-dismiss="offcanvas" class="btn btn-light me-2">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save College</button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
 @endsection
 @push('scripts')
     <script>

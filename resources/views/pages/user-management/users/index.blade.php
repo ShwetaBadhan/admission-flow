@@ -47,10 +47,13 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
-                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
-                        data-bs-target="#offcanvas_add">
-                        <i class="ti ti-square-rounded-plus-filled me-1"></i>Add User
-                    </a>
+                    @can('create-users')
+                        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvas_add">
+                            <i class="ti ti-square-rounded-plus-filled me-1"></i>Add User
+                        </a>
+                    @endcan
+
                 </div>
             </div>
             <!-- End Page Header -->
@@ -134,16 +137,21 @@
                                                     <i class="ti ti-dots-vertical"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right">
-                                                    <a class="dropdown-item edit-btn" href="javascript:void(0);"
-                                                        data-bs-toggle="offcanvas"
-                                                        data-bs-target="#offcanvas_edit{{ $user->id }}">
-                                                        <i class="ti ti-edit text-blue"></i> Edit
-                                                    </a>
-                                                    <a class="dropdown-item" href="javascript:void(0);"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#delete_user{{ $user->id }}">
-                                                        <i class="ti ti-trash"></i> Delete
-                                                    </a>
+                                                    {{-- @can('edit-users') --}}
+                                                        <a class="dropdown-item edit-btn" href="javascript:void(0);"
+                                                            data-bs-toggle="offcanvas"
+                                                            data-bs-target="#offcanvas_edit{{ $user->id }}">
+                                                            <i class="ti ti-edit text-blue"></i> Edit
+                                                        </a>
+                                                    {{-- @endcan --}}
+                                                    @can('delete-users')
+                                                        <a class="dropdown-item" href="javascript:void(0);"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#delete_user{{ $user->id }}">
+                                                            <i class="ti ti-trash"></i> Delete
+                                                        </a>
+                                                    @endcan
+
                                                 </div>
                                             </div>
                                         </td>

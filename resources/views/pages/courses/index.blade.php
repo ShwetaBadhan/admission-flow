@@ -30,7 +30,6 @@
     </script>
 @endif
 @section('content')
-
     <div class="page-wrapper">
         <div class="content pb-0">
 
@@ -46,15 +45,18 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
-                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#add_source">
-                        <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New courses
-                    </a>
+                    @can('create-courses')
+                        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#add_source">
+                            <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New courses
+                        </a>
+                    @endcan
+
                 </div>
             </div>
             <!-- End Page Header -->
 
-           
+
             <div class="card border-0 rounded-0">
                 <div class="card-header d-flex align-items-center justify-content-between gap-2 flex-wrap">
                     <div class="input-icon input-icon-start position-relative">
@@ -104,15 +106,20 @@
                                                     <i class="ti ti-dots-vertical"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right">
-                                                    <a class="dropdown-item edit-btn" href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#edit_source{{ $course->id }}">
-                                                        <i class="ti ti-edit text-blue"></i> Edit
-                                                    </a>
-                                                    <a class="dropdown-item delete-btn" href="#"
-                                                        data-bs-toggle="modal" data-bs-target="#delete_source"
-                                                        data-id="{{ $course->id }}" data-name="{{ $course->name }}">
-                                                        <i class="ti ti-trash"></i> Delete
-                                                    </a>
+                                                    @can('edit-courses')
+                                                        <a class="dropdown-item edit-btn" href="#" data-bs-toggle="modal"
+                                                            data-bs-target="#edit_source{{ $course->id }}">
+                                                            <i class="ti ti-edit text-blue"></i> Edit
+                                                        </a>
+                                                    @endcan
+                                                    @can('delete-courses')
+                                                        <a class="dropdown-item delete-btn" href="#"
+                                                            data-bs-toggle="modal" data-bs-target="#delete_source"
+                                                            data-id="{{ $course->id }}" data-name="{{ $course->name }}">
+                                                            <i class="ti ti-trash"></i> Delete
+                                                        </a>
+                                                    @endcan
+
                                                 </div>
                                             </div>
                                         </td>
@@ -142,8 +149,8 @@
                                                             <div class="d-flex align-items-center">
                                                                 <div class="me-2">
                                                                     <input type="radio" class="status-radio"
-                                                                        id="edit-active-{{ $course->id }}"
-                                                                        name="status" value="1"
+                                                                        id="edit-active-{{ $course->id }}" name="status"
+                                                                        value="1"
                                                                         {{ $course->status == 1 ? 'checked' : '' }}>
                                                                     <label
                                                                         for="edit-active-{{ $course->id }}">Active</label>
@@ -260,11 +267,4 @@
             </div>
         </div>
     </div>
-
-
-
-
-
-
-
 @endsection

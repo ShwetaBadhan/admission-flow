@@ -25,14 +25,60 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
+use Spatie\Permission\Traits\HasRoles;
 
 class LeadController extends Controller
 {
+    use HasRoles;
     public function index()
     {
-        $leads = Lead::with(['city', 'state', 'leadSource', 'consultant', 'qualification', 'intake', 'priority', 'counsellor'])
-            ->latest()
-            ->paginate(15);
+        $user = Auth::user()->load('roles');
+
+        // 🔍 DEBUGGING - Add this temporarily
+        Log::info('=== LEAD ACCESS DEBUG ===');
+        Log::info('User ID: ' . $user->id);
+        Log::info('User Name: ' . $user->name);
+        Log::info('User Email: ' . $user->email);
+        Log::info('User Roles: ' . json_encode($user->getRoleNames()));
+        Log::info('Is Consultant: ' . ($user->hasRole('consultant') ? 'YES' : 'NO'));
+
+        // Find consultant record by email
+        $consultant = \App\Models\Consultant::where('email', $user->email)->first();
+        Log::info('Consultant Record Found: ' . ($consultant ? 'YES (ID: ' . $consultant->id . ')' : 'NO'));
+
+        $leadsQuery = Lead::with([
+            'city',
+            'state',
+            'leadSource',
+            'consultant',
+            'qualification',
+            'intake',
+            'priority',
+            'counsellor'
+        ])->latest();
+
+        // Check total leads before filter
+        $totalLeads = $leadsQuery->count();
+        Log::info('Total Leads in DB: ' . $totalLeads);
+
+        // 🔐 ROLE-BASED FILTERING
+        if ($user->hasRole('consultant')) {
+            if ($consultant) {
+                // Show leads assigned to this consultant
+                $leadsQuery->where('consultant_id', $consultant->id);
+                Log::info('Filtering by consultant_id: ' . $consultant->id);
+            } else {
+                // No consultant record - show no leads
+                $leadsQuery->whereRaw('1 = 0');
+                Log::info('No consultant record found - showing no leads');
+            }
+        }
+
+        $leads = $leadsQuery->paginate(15);
+
+        // Check leads after filter
+        Log::info('Leads After Filter: ' . $leads->count());
+        Log::info('=== END DEBUG ===');
 
         // Group leads by status
         $leadsByStatus = $leads->groupBy('status');
@@ -71,7 +117,6 @@ class LeadController extends Controller
             'priorities'
         ));
     }
-
     public function create()
     {
         $states = State::all();
@@ -117,9 +162,30 @@ class LeadController extends Controller
         return redirect()->route('leads.index')
             ->with('success', 'Lead created successfully!');
     }
+    /**
+     * Check if current user can access this lead
+     */
+    private function canAccessLead(Lead $lead)
+    {
+        $user = Auth::user();
 
+        // ✅ Clear and explicit
+        if ($user->hasAnyRole(['superadmin', 'admin'])) {
+            return true;
+        }
+
+        if ($user->hasRole('consultant')) {
+            return $lead->consultant && $lead->consultant->email === $user->email;
+        }
+
+        return false;
+    }
     public function show(Lead $lead)
     {
+        // 🔐 Authorization check
+        if (!$this->canAccessLead($lead)) {
+            abort(403, 'Unauthorized access to this lead.');
+        }
         $lead->load([
             'city',
             'state',
@@ -184,6 +250,9 @@ class LeadController extends Controller
 
     public function edit(Lead $lead)
     {
+        if (!$this->canAccessLead($lead)) {
+            abort(403, 'Unauthorized access.');
+        }
         $states = State::all();
         $cities = City::all();
         $courses = Course::where('status', true)->get();
@@ -207,6 +276,9 @@ class LeadController extends Controller
 
     public function update(Request $request, Lead $lead)
     {
+        if (!$this->canAccessLead($lead)) {
+            abort(403, 'Unauthorized access.');
+        }
         $validated = $request->validate([
             'full_name' => 'required|string|max:255',
             'mobile' => 'required|string|max:20',
@@ -231,6 +303,9 @@ class LeadController extends Controller
 
     public function destroy(Lead $lead)
     {
+        if (!$this->canAccessLead($lead)) {
+            abort(403, 'Unauthorized access.');
+        }
         $lead->delete();
         return redirect()->route('leads.index')
             ->with('success', 'Lead deleted successfully!');
@@ -270,18 +345,26 @@ class LeadController extends Controller
     public function assignCounsellor(Request $request, Lead $lead)
     {
         $validated = $request->validate([
-            'consultant_id' => 'required|exists:consultants,id'  // ✅ Fixed
+            'consultant_id' => 'required|exists:consultants,id',
         ]);
 
+        $consultant = Consultant::find($validated['consultant_id']);
+
+        // Verify consultant has a user account
+        $user = User::where('email', $consultant->email)->first();
+
+        if (!$user) {
+            return back()->with('error', 'Consultant does not have a login account. Please create user account first.');
+        }
+
         $lead->update([
-            'consultant_id' => $validated['consultant_id'],
+            'consultant_id' => $consultant->id,
             'assigned_at' => now()
         ]);
 
-        // Log communication for audit trail
         $lead->communications()->create([
             'type' => 'note',
-            'content' => 'Consultant assigned: ' . (Consultant::find($validated['consultant_id'])?->name ?? 'Unknown'), // ✅ Fixed
+            'content' => 'Consultant assigned: ' . $consultant->name,
             'created_by' => Auth::id(),
             'status' => 'completed'
         ]);

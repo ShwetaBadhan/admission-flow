@@ -366,8 +366,11 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add New Call Reason</h5>
-                    <button class="btn-close custom-btn-close border p-1 me-0 text-dark" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                   
+                       <button class="btn-close custom-btn-close border p-1 me-0 text-dark" data-bs-dismiss="modal"
+                        aria-label="Close"></button>   
+                    
+                  
                 </div>
                 <form action="calls.html">
                     <div class="modal-body">

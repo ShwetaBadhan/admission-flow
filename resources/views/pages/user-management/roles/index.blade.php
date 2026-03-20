@@ -48,10 +48,13 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
-                    <a href="{{ route('roles.create') }}" class="btn btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#add_role">
-                        <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Role
-                    </a>
+                    @can('create-roles')
+                        <a href="{{ route('roles.create') }}" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#add_role">
+                            <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Role
+                        </a>
+                    @endcan
+
                 </div>
             </div>
             <!-- End Page Header -->
@@ -112,23 +115,31 @@
                                                     <i class="ti ti-dots-vertical"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right">
-                                                    <a class="dropdown-item edit-btn" href="javascript:void(0);"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#edit_role{{ $role->id }}">
-                                                        <i class="ti ti-edit text-blue"></i> Edit
-                                                    </a>
+                                                    @can('edit-roles')
+                                                        <a class="dropdown-item edit-btn" href="javascript:void(0);"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#edit_role{{ $role->id }}">
+                                                            <i class="ti ti-edit text-blue"></i> Edit
+                                                        </a>
+                                                    @endcan
 
-                                                    <a class="dropdown-item" href="javascript:void(0);"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#permissionsModal_{{ $role->id }}">
-                                                        <i class="ti ti-shield-check text-purple"></i> Assign Permissions
-                                                    </a>
+                                                    @can('assign-permissions')
+                                                        <a class="dropdown-item" href="javascript:void(0);"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#permissionsModal_{{ $role->id }}">
+                                                            <i class="ti ti-shield-check text-purple"></i> Assign Permissions
+                                                        </a>
+                                                    @endcan
 
-                                                    <a class="dropdown-item" href="javascript:void(0);"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#delete_role{{ $role->id }}"><i
-                                                            class="ti ti-trash"></i>
-                                                        Delete</a>
+                                                    @can('delete-roles')
+                                                        <a class="dropdown-item" href="javascript:void(0);"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#delete_role{{ $role->id }}"><i
+                                                                class="ti ti-trash"></i>
+                                                            Delete</a>
+                                                    @endcan
+
+
                                                 </div>
                                             </div>
                                         </td>
@@ -238,7 +249,8 @@
                                                     @csrf
                                                     <div class="modal-header">
                                                         <h5 class="modal-title">Manage Permissions for:
-                                                            <strong>{{ $role->name }}</strong></h5>
+                                                            <strong>{{ $role->name }}</strong>
+                                                        </h5>
                                                         <button type="button" class="btn-close"
                                                             data-bs-dismiss="modal"></button>
                                                     </div>
