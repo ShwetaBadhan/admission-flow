@@ -137,13 +137,13 @@
                                                     <i class="ti ti-dots-vertical"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right">
-                                                    {{-- @can('edit-users') --}}
+                                                    @can('edit-users')
                                                         <a class="dropdown-item edit-btn" href="javascript:void(0);"
                                                             data-bs-toggle="offcanvas"
                                                             data-bs-target="#offcanvas_edit{{ $user->id }}">
                                                             <i class="ti ti-edit text-blue"></i> Edit
                                                         </a>
-                                                    {{-- @endcan --}}
+                                                    @endcan
                                                     @can('delete-users')
                                                         <a class="dropdown-item" href="javascript:void(0);"
                                                             data-bs-toggle="modal"

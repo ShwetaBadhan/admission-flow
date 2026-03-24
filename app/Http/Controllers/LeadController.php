@@ -491,52 +491,62 @@ class LeadController extends Controller
      * Update admission request status and details
      */
     public function updateAdmissionStatus(Request $request, AdmissionRequest $admission)
-    {
-        try {
-            Log::info("=== Admission Status Update Attempt ===");
-            Log::info("Admission ID: {$admission->id}");
-            Log::info("Request status: " . $request->input('status'));
-            Log::info("Current status: {$admission->status}");
+{
+    try {
+        Log::info("=== Admission Status Update Attempt ===");
+        Log::info("Admission ID: {$admission->id}");
+        Log::info("Request status: " . $request->input('status'));
+        Log::info("Current status: {$admission->status}");
 
-            $admission->load('lead');
-
-            if (!$admission->lead) {
-                Log::error("Lead not found for admission #{$admission->id}");
-                return back()->with('error', 'Associated lead not found!');
-            }
-
-            $validated = $request->validate([
-                'status' => 'required|in:draft,submitted,under_review,accepted,rejected,withdrawn',
-            ]);
-
-            $oldStatus = $admission->status;
-            $newStatus = $validated['status'];
-
-            $updated = $admission->update([
-                'status' => $newStatus,
-                'submitted_date' => $newStatus === 'submitted' && !$admission->submitted_date
-                    ? now()
-                    : $admission->submitted_date
-            ]);
-
-            Log::info("Update result: " . ($updated ? 'SUCCESS' : 'FAILED'));
-
-            if ($admission->lead) {
-                $admission->lead->communications()->create([
-                    'type' => 'note',
-                    'content' => "Admission request #{$admission->id} status: '{$oldStatus}' → '{$newStatus}'",
-                    'created_by' => Auth::id(),
-                    'status' => 'completed'
-                ]);
-            }
-
-            return back()->with('success', 'Admission status updated to "' . ucfirst(str_replace('_', ' ', $newStatus)) . '"!');
-        } catch (\Exception $e) {
-            Log::error('Admission status update ERROR: ' . $e->getMessage());
-            Log::error($e->getTraceAsString());
-            return back()->with('error', 'Failed: ' . $e->getMessage());
+        $admission->load('lead');
+        if (!$admission->lead) {
+            Log::error("Lead not found for admission #{$admission->id}");
+            return back()->with('error', 'Associated lead not found!');
         }
+
+        $validated = $request->validate([
+            'status' => 'required|in:draft,submitted,under_review,accepted,rejected,withdrawn',
+        ]);
+
+        $oldStatus = $admission->status;
+        $newStatus = $validated['status'];
+
+        $updated = $admission->update([
+            'status' => $newStatus,
+            'submitted_date' => $newStatus === 'submitted' && !$admission->submitted_date
+                ? now()
+                : $admission->submitted_date
+        ]);
+
+        Log::info("Update result: " . ($updated ? 'SUCCESS' : 'FAILED'));
+
+        // 🎯 AUTO-GENERATE COMMISSION PAYMENT WHEN STATUS BECOMES ACCEPTED
+        if ($newStatus === 'accepted' && $oldStatus !== 'accepted') {
+            try {
+                $paymentController = new \App\Http\Controllers\CommissionPaymentController();
+                $paymentController->generatePayment($admission);
+            } catch (\Exception $e) {
+                Log::error('Auto commission generation failed: ' . $e->getMessage());
+                // Don't fail the status update, just log the error
+            }
+        }
+
+        if ($admission->lead) {
+            $admission->lead->communications()->create([
+                'type' => 'note',
+                'content' => "Admission request #{$admission->id} status: '{$oldStatus}' → '{$newStatus}'",
+                'created_by' => Auth::id(),
+                'status' => 'completed'
+            ]);
+        }
+
+        return back()->with('success', 'Admission status updated to "' . ucfirst(str_replace('_', ' ', $newStatus)) . '"!');
+    } catch (\Exception $e) {
+        Log::error('Admission status update ERROR: ' . $e->getMessage());
+        Log::error($e->getTraceAsString());
+        return back()->with('error', 'Failed: ' . $e->getMessage());
     }
+}
 
 
 

@@ -17,6 +17,7 @@ use App\Http\Controllers\IntakeController;
 use App\Http\Controllers\PriorityController;
 use App\Http\Controllers\DocumentSettingController;
 use App\Http\Controllers\CommunicationLogController;
+use App\Http\Controllers\CommissionPaymentController;
 use App\Models\LeadSource;
 
 // auth pages
@@ -129,11 +130,16 @@ Route::delete('/commission-rules/{commissionRule}', [CommissionRuleController::c
 
 
 // commission-payments
-Route::get('/commission-payments', function () {
-    return view(view: 'pages.commission-payments.index');
-})->name('commission-payments');
-
-// sources
+// Route::get('/commission-payments', function () {
+//     return view(view: 'pages.commission-payments.index');
+// })->name('commission-payments');
+Route::get('/commission-payments', [CommissionPaymentController::class, 'index'])->name('commission-payments');
+    Route::get('/commission-payments/{payment}', [CommissionPaymentController::class, 'show'])->name('commission-payments.show');
+    Route::post('/commission-payments/generate/{admission}', [CommissionPaymentController::class, 'generatePayment'])->name('commission-payments.generate');
+    Route::post('/commission-payments/{payment}/mark-paid', [CommissionPaymentController::class, 'markAsPaid'])->name('commission-payments.mark-paid');
+    Route::post('/commission-payments/{payment}/cancel', [CommissionPaymentController::class, 'cancel'])->name('commission-payments.cancel');
+    Route::post('/commission-payments/bulk-generate', [CommissionPaymentController::class, 'bulkGenerate'])->name('commission-payments.bulk-generate');
+    // sources
 
 Route::get('/sources', [LeadSourceController::class, 'index'])->name('sources.index');
 Route::post('/sources', [LeadSourceController::class, 'store'])->name('sources.store');

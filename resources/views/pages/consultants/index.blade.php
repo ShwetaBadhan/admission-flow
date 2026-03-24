@@ -48,10 +48,13 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
-                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
+                @can('create-consultants')
+                     <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
                         data-bs-target="#add_consultant">
                         <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Consultants
                     </a>
+                @endcan
+                   
                 </div>
             </div>
             <!-- End Page Header -->
@@ -102,8 +105,8 @@
                                                     <i class="ti ti-dots-vertical"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right">
-                                                    {{-- Edit Button with data attributes --}}
-                                                    <a class="dropdown-item edit-btn" href="javascript:void(0);"
+                                                @can('edit-consultants')
+                                                     <a class="dropdown-item edit-btn" href="javascript:void(0);"
                                                         data-bs-toggle="modal" data-bs-target="#edit_consultant"
                                                         data-id="{{ $consultant->id }}" data-name="{{ $consultant->name }}"
                                                         data-email="{{ $consultant->email }}"
@@ -114,17 +117,23 @@
                                                         data-status="{{ $consultant->status }}">
                                                         <i class="ti ti-edit text-blue"></i> Edit
                                                     </a>
-
-                                                    <a class="dropdown-item"
+                                                @endcan
+                                                   
+                                                   @can('view-consultant-details')
+                                                         <a class="dropdown-item"
                                                         href="{{ route('consultants.show', $consultant->id) }}">
                                                         <i class="ti ti-id-badge me-1"></i> View Details
                                                     </a>
-                                                    {{-- Delete Button --}}
+                                                   @endcan
+                                                  @can('delete-consultants')
+                                                       {{-- Delete Button --}}
                                                     <a class="dropdown-item delete-btn" href="javascript:void(0);"
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#delete_consultant{{ $consultant->id }}">
                                                         <i class="ti ti-trash"></i> Delete
                                                     </a>
+                                                  @endcan
+                                                   
                                                 </div>
                                             </div>
                                         </td>

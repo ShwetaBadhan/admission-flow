@@ -50,6 +50,7 @@
                             <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
                             <input type="text" class="form-control" placeholder="Search">
                         </div>
+                       
                         <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_lost_reason"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Reason</a>
                     </div>
 					<div class="card-body">

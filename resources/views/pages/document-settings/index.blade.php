@@ -46,10 +46,13 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
-                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
+                @can('create-document-settings')
+                      <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
                         data-bs-target="#add_Document">
                         <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Documents
                     </a>
+                @endcan
+                  
                 </div>
             </div>
             <!-- End Page Header -->
@@ -98,21 +101,27 @@
                                         </td>
                                         <td>
                                             <div class="dropdown table-action">
+
                                                 <a href="#"
                                                     class="action-icon btn btn-xs shadow btn-icon btn-outline-light"
                                                     data-bs-toggle="dropdown">
                                                     <i class="ti ti-dots-vertical"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right">
+                                                @can('edit-document-settings')
                                                     <a class="dropdown-item edit-btn" href="#" data-bs-toggle="modal"
                                                         data-bs-target="#edit_Document{{ $setting->id }}">
                                                         <i class="ti ti-edit text-blue"></i> Edit
                                                     </a>
-                                                    <a class="dropdown-item delete-btn" href="#"
+                                                @endcan
+                                                    @can('delete-document-settings')
+                                                        <a class="dropdown-item delete-btn" href="#"
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#delete_Document{{ $setting->id }}">
                                                         <i class="ti ti-trash"></i> Delete
                                                     </a>
+                                                    @endcan
+                                                    
                                                 </div>
                                             </div>
                                         </td>

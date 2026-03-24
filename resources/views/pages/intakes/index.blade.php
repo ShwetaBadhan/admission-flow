@@ -46,10 +46,13 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
-                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
+                @can('create-intakes')
+                      <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
                         data-bs-target="#add_Intake">
                         <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Intakes
                     </a>
+                @endcan
+                  
                 </div>
             </div>
             <!-- End Page Header -->
@@ -104,15 +107,20 @@
                                                     <i class="ti ti-dots-vertical"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right">
-                                                    <a class="dropdown-item edit-btn" href="#" data-bs-toggle="modal"
+                                                @can('edit-intakes')
+                                                     <a class="dropdown-item edit-btn" href="#" data-bs-toggle="modal"
                                                         data-bs-target="#edit_Intake{{ $intake->id }}">
                                                         <i class="ti ti-edit text-blue"></i> Edit
-                                                    </a>
-                                                    <a class="dropdown-item delete-btn" href="#"
+                                                    </a> 
+                                                @endcan
+                                                  @can('delete-intakes')
+                                                        <a class="dropdown-item delete-btn" href="#"
                                                         data-bs-toggle="modal" data-bs-target="#delete_Intake{{ $intake->id }}"
                                                         >
                                                         <i class="ti ti-trash"></i> Delete
                                                     </a>
+                                                  @endcan
+                                                  
                                                 </div>
                                             </div>
                                         </td>

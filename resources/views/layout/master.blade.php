@@ -53,7 +53,7 @@
 
      <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="{{url ('assets/plugins/flatpickr/flatpickr.min.css')}}">
-
+    <script src="{{url ('assets/json/dashboard.js')}}"></script>
     <!-- Tabler Icon CSS -->
     <link rel="stylesheet" href="{{url ('assets/plugins/tabler-icons/tabler-icons.min.css')}}">
 
@@ -123,4 +123,7 @@
     <!-- Main JS -->
     <script src="{{ url ('assets/js/script.js')}}" ></script>
 @stack('scripts')
+
+
+
 </html>

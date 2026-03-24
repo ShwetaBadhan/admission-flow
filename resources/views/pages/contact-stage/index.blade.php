@@ -46,10 +46,13 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
-                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
+                @can('create-sources')
+                   <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
                         data-bs-target="#add_source">
                         <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Sources
-                    </a>
+                    </a> 
+                @endcan
+                    
                 </div>
             </div>
             <!-- End Page Header -->
@@ -104,15 +107,21 @@
                                                     <i class="ti ti-dots-vertical"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right">
-                                                    <a class="dropdown-item edit-btn" href="#" data-bs-toggle="modal"
+                                                @can('edit-sources')
+                                                   <a class="dropdown-item edit-btn" href="#" data-bs-toggle="modal"
                                                         data-bs-target="#edit_source{{ $stage->id }}">
                                                         <i class="ti ti-edit text-blue"></i> Edit
-                                                    </a>
-                                                    <a class="dropdown-item delete-btn" href="#"
+                                                    </a>   
+                                                @endcan
+                                                @can('delete-sources')
+                                                     <a class="dropdown-item delete-btn" href="#"
                                                         data-bs-toggle="modal" data-bs-target="#delete_source"
                                                         data-id="{{ $stage->id }}" data-name="{{ $stage->name }}">
                                                         <i class="ti ti-trash"></i> Delete
                                                     </a>
+                                                @endcan
+                                                  
+                                                   
                                                 </div>
                                             </div>
                                         </td>

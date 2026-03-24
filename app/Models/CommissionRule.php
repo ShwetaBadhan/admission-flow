@@ -30,4 +30,8 @@ class CommissionRule extends Model
     {
         return $this->belongsTo(College::class);
     }
+   public function payments()
+    {
+        return $this->hasMany(CommissionPayment::class);
+    }
 }

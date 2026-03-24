@@ -223,6 +223,7 @@
                                         <span class="text-muted">{{ $admission->created_at->diffForHumans() }}</span>
                                     </td>
                                     <td>
+                                    @can('update-admission-status')
                                         <!-- Status Dropdown -->
                                         <div class="dropdown">
                                             <span class="badge bg-{{
@@ -252,7 +253,9 @@
                                             @csrf
                                             @method('PUT')
                                             <input type="hidden" name="status" id="status-input-{{ $admission->id }}">
-                                        </form>
+                                        </form>  
+                                    @endcan
+                                      
                                     </td>
                                     <td class="text-end">
                                         <a href="{{ route('lead-details', $admission->lead) }}" class="btn btn-sm btn-link text-primary p-0" title="View Lead">

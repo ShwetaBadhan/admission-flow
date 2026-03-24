@@ -32,11 +32,15 @@ public function college()
 
 public function course()
 {
-    return $this->belongsTo(Course::class);
+    return $this->belongsTo(Course::class, 'course_id');
 }
 
 public function submittedBy()
 {
     return $this->belongsTo(User::class, 'submitted_by');
+}
+public function commissionPayments()
+{
+    return $this->hasMany(CommissionPayment::class);
 }
 }
