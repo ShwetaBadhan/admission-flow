@@ -123,13 +123,13 @@
                                                         </a>
                                                     @endcan
 
-                                                    @can('assign-permissions')
+                                                    {{-- @can('assign-permissions') --}}
                                                         <a class="dropdown-item" href="javascript:void(0);"
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#permissionsModal_{{ $role->id }}">
                                                             <i class="ti ti-shield-check text-purple"></i> Assign Permissions
                                                         </a>
-                                                    @endcan
+                                                    {{-- @endcan --}}
 
                                                     @can('delete-roles')
                                                         <a class="dropdown-item" href="javascript:void(0);"
