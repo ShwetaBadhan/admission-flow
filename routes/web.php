@@ -51,7 +51,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/lead-details/{lead}', [LeadController::class, 'show'])->name('lead-details');
     Route::put('/leads/{lead}', [LeadController::class, 'update'])->name('leads.update');
     Route::delete('/leads/{lead}', [LeadController::class, 'destroy'])->name('leads.destroy');
-
+// Bulk Lead Import Routes
+Route::get('/leads/bulk-import', [LeadController::class, 'showBulkImport'])->name('leads.bulk.import');
+Route::post('/leads/bulk-import', [LeadController::class, 'processBulkImport'])->name('leads.bulk.process');
+Route::get('/leads/sample-csv', [LeadController::class, 'downloadSampleCsv'])->name('leads.sample.csv');
+  // ✅ Export Routes
+Route::get('/leads/export/excel', [LeadController::class, 'exportExcel'])->name('leads.export.excel');
+Route::get('/leads/export/pdf', [LeadController::class, 'exportPdf'])->name('leads.export.pdf');
     // Feature Routes (All POST for simplicity)
     Route::post('/lead/{lead}/update-stage', [LeadController::class, 'updateStage'])->name('leads.update-stage');
     Route::post('/leads/{lead}/assign-consultant', [LeadController::class, 'assignCounsellor'])

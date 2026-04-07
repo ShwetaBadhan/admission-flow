@@ -1,4 +1,5 @@
 @extends('layout.master')
+
 <!-- Session Messages -->
 @if (session('success'))
     <script>
@@ -29,10 +30,11 @@
         });
     </script>
 @endif
+
 @section('content')
     <!-- ========================
-           Start Page Content
-          ========================= -->
+               Start Page Content
+              ========================= -->
 
     <div class="page-wrapper">
 
@@ -54,15 +56,15 @@
                     <div class="dropdown">
                         <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-light px-2 shadow"
                             data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
-                        <div class="dropdown-menu  dropdown-menu-end">
+                        <div class="dropdown-menu dropdown-menu-end">
                             <ul>
                                 <li>
-                                    <a href="javascript:void(0);" class="dropdown-item"><i
+                                    <a href="{{ route('leads.export.pdf', request()->query()) }}" class="dropdown-item"><i
                                             class="ti ti-file-type-pdf me-1"></i>Export as
                                         PDF</a>
                                 </li>
                                 <li>
-                                    <a href="javascript:void(0);" class="dropdown-item"><i
+                                    <a class="dropdown-item" href="{{ route('leads.export.excel', request()->query()) }}" class="dropdown-item"><i
                                             class="ti ti-file-type-xls me-1"></i>Export as
                                         Excel </a>
                                 </li>
@@ -82,386 +84,180 @@
             <!-- table header -->
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <div class="dropdown">
-                        <a href="javascript:void(0);" class="btn btn-outline-light shadow px-2" data-bs-toggle="dropdown"
-                            data-bs-auto-close="outside"><i class="ti ti-filter me-2"></i>Filter<i
-                                class="ti ti-chevron-down ms-2"></i></a>
-                        <div class="filter-dropdown-menu dropdown-menu dropdown-menu-lg p-0">
-                            <div class="filter-header d-flex align-items-center justify-content-between border-bottom">
-                                <h6 class="mb-0"><i class="ti ti-filter me-1"></i>Filter</h6>
-                                <button type="button" class="btn-close close-filter-btn" data-bs-dismiss="dropdown-menu"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="filter-set-view p-3">
-                                <div class="accordion" id="accordionExample">
-                                    <div class="filter-set-content">
-                                        <div class="filter-set-content-head">
-                                            <a href="#" data-bs-toggle="collapse" data-bs-target="#collapseTwo"
-                                                aria-expanded="true" aria-controls="collapseTwo">Lead Name</a>
-                                        </div>
-                                        <div class="filter-set-contents accordion-collapse collapse show" id="collapseTwo"
-                                            data-bs-parent="#accordionExample">
-                                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                                <div class="mb-2">
-                                                    <div class="input-icon-start input-icon position-relative">
-                                                        <span class="input-icon-addon fs-12">
-                                                            <i class="ti ti-search"></i>
-                                                        </span>
-                                                        <input type="text" class="form-control form-control-md"
-                                                            placeholder="Search">
-                                                    </div>
-                                                </div>
-                                                <ul class="mb-0">
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-06.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Elizabeth Morgan
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-40.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Katherine Brooks
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-05.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Sophia Lopez
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-10.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>John Michael
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-15.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Natalie Brooks
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-01.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>William Turner
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-13.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Ava Martinez
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-12.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Nathan Reed
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-03.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Lily Anderson
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-18.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Ryan Coleman
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0);"
-                                                            class="link-primary text-decoration-underline p-2 d-flex">Load
-                                                            More</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="filter-set-content">
-                                        <div class="filter-set-content-head">
-                                            <a href="#" class="collapsed" data-bs-toggle="collapse"
-                                                data-bs-target="#collapseThree" aria-expanded="false"
-                                                aria-controls="collapseThree">Company Name</a>
-                                        </div>
-                                        <div class="filter-set-contents accordion-collapse collapse" id="collapseThree"
-                                            data-bs-parent="#accordionExample">
-                                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                                <div class="mb-2">
-                                                    <div class="input-icon-start input-icon position-relative">
-                                                        <span class="input-icon-addon fs-12">
-                                                            <i class="ti ti-search"></i>
-                                                        </span>
-                                                        <input type="text" class="form-control form-control-md"
-                                                            placeholder="Search">
-                                                    </div>
-                                                </div>
-                                                <ul>
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            NovaWave LLC
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            BlueSky Industries
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            Silver Hawk
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            Summit Peak
-                                                        </label>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="filter-set-content">
-                                        <div class="filter-set-content-head">
-                                            <a href="#" class="collapsed" data-bs-toggle="collapse"
-                                                data-bs-target="#status" aria-expanded="false"
-                                                aria-controls="status">Lead Status</a>
-                                        </div>
-                                        <div class="filter-set-contents accordion-collapse collapse" id="status"
-                                            data-bs-parent="#accordionExample">
-                                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                                <div class="mb-1">
-                                                    <div class="input-icon-start input-icon position-relative">
-                                                        <span class="input-icon-addon fs-12">
-                                                            <i class="ti ti-search"></i>
-                                                        </span>
-                                                        <input type="text" class="form-control form-control-md"
-                                                            placeholder="Search">
-                                                    </div>
-                                                </div>
-                                                <ul class="mb-0">
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            Closed
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            Not Closed
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            Contacted
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            Lost
-                                                        </label>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="filter-set-content">
-                                        <div class="filter-set-content-head">
-                                            <a href="#" class="collapsed" data-bs-toggle="collapse"
-                                                data-bs-target="#date2" aria-expanded="false"
-                                                aria-controls="date2">Created Date</a>
-                                        </div>
-                                        <div class="filter-set-contents accordion-collapse collapse" id="date2"
-                                            data-bs-parent="#accordionExample">
-                                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                                <div class="input-group w-auto input-group-flat">
-                                                    <input type="text" class="form-control" data-provider="flatpickr"
-                                                        data-date-format="d M, Y">
-                                                    <span class="input-group-text">
-                                                        <i class="ti ti-calendar"></i>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="filter-set-content">
-                                        <div class="filter-set-content-head">
-                                            <a href="#" class="collapsed" data-bs-toggle="collapse"
-                                                data-bs-target="#owner" aria-expanded="false" aria-controls="owner">Lead
-                                                Owner</a>
-                                        </div>
-                                        <div class="filter-set-contents accordion-collapse collapse" id="owner"
-                                            data-bs-parent="#accordionExample">
-                                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                                <div class="mb-2">
-                                                    <div class="input-icon-start input-icon position-relative">
-                                                        <span class="input-icon-addon fs-12">
-                                                            <i class="ti ti-search"></i>
-                                                        </span>
-                                                        <input type="text" class="form-control form-control-md"
-                                                            placeholder="Search">
-                                                    </div>
-                                                </div>
-                                                <ul class="mb-0">
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-17.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Robert Johnson
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-16.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Isabella Cooper
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-14.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>John Smith
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-22.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Sophia Parker
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-25.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Emma Reynolds
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-24.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Liam Carter
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-39.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Noah Mitchell
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-31.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Mason Hayes
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-21.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Ron Thompson
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-10.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Laura Bennett
-                                                        </label>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
+                   <!-- Filter Form Wrapper -->
+<form id="leads-filter-form" action="{{ route('leads.index') }}" method="GET">
+    <div class="dropdown">
+        <a href="javascript:void(0);" class="btn btn-outline-light shadow px-2" data-bs-toggle="dropdown"
+            data-bs-auto-close="outside"><i class="ti ti-filter me-2"></i>Filter<i
+                class="ti ti-chevron-down ms-2"></i></a>
+        <div class="filter-dropdown-menu dropdown-menu dropdown-menu-lg p-0">
+            <div class="filter-header d-flex align-items-center justify-content-between border-bottom">
+                <h6 class="mb-0"><i class="ti ti-filter me-1"></i>Filter</h6>
+                <button type="button" class="btn-close close-filter-btn" data-bs-dismiss="dropdown-menu"
+                    aria-label="Close"></button>
+            </div>
+            <div class="filter-set-view p-3">
+                <div class="accordion" id="accordionExample">
+                    
+                    <!-- Lead Name Filter -->
+                    <div class="filter-set-content">
+                        <div class="filter-set-content-head">
+                            <a href="#" data-bs-toggle="collapse" data-bs-target="#collapseTwo"
+                                aria-expanded="true" aria-controls="collapseTwo">Lead Name</a>
+                        </div>
+                        <div class="filter-set-contents accordion-collapse collapse show" id="collapseTwo"
+                            data-bs-parent="#accordionExample">
+                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
+                                <div class="mb-2">
+                                    <div class="input-icon-start input-icon position-relative">
+                                        <span class="input-icon-addon fs-12"><i class="ti ti-search"></i></span>
+                                        <input type="text" class="form-control form-control-md" 
+                                            placeholder="Search" 
+                                            name="lead_name" 
+                                            value="{{ request('lead_name') }}">
                                     </div>
                                 </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <a href="javascript:void(0);" class="btn btn-outline-light w-100">Reset</a>
-                                    <a href="javascript:void(0);" class="btn btn-primary w-100">Filter</a>
+                                <ul class="mb-0">
+                                    @foreach($leads as $lead)
+                                        <li class="mb-1">
+                                            <label class="dropdown-item px-2 d-flex align-items-center">
+                                                <input class="form-check-input m-0 me-1 lead-name-checkbox" 
+                                                    type="checkbox" 
+                                                    name="lead_ids[]" 
+                                                    value="{{ $lead->id }}"
+                                                    {{ in_array($lead->id, request('lead_ids', [])) ? 'checked' : '' }}>
+                                                <span class="avatar avatar-xs rounded-circle me-2">
+                                                    <img src="{{ asset('assets/img/users/user-06.jpg') }}" 
+                                                        class="flex-shrink-0 rounded-circle" alt="img">
+                                                </span>
+                                                {{ $lead->full_name }}
+                                            </label>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lead Status Filter -->
+                    <div class="filter-set-content">
+                        <div class="filter-set-content-head">
+                            <a href="#" class="collapsed" data-bs-toggle="collapse"
+                                data-bs-target="#status" aria-expanded="false" aria-controls="status">Lead Status</a>
+                        </div>
+                        <div class="filter-set-contents accordion-collapse collapse" id="status"
+                            data-bs-parent="#accordionExample">
+                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
+                                @foreach($statuses as $key => $status)
+                                    <div class="mb-1">
+                                        <label class="dropdown-item px-2 d-flex align-items-center">
+                                            <input class="form-check-input m-0 me-1" type="checkbox" 
+                                                name="statuses[]" 
+                                                value="{{ $key }}"
+                                                {{ in_array($key, request('statuses', [])) ? 'checked' : '' }}>
+                                            {{ $status['label'] }}
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Created Date Filter -->
+                    <div class="filter-set-content">
+                        <div class="filter-set-content-head">
+                            <a href="#" class="collapsed" data-bs-toggle="collapse"
+                                data-bs-target="#date2" aria-expanded="false" aria-controls="date2">Created Date</a>
+                        </div>
+                        <div class="filter-set-contents accordion-collapse collapse" id="date2"
+                            data-bs-parent="#accordionExample">
+                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
+                                <div class="input-group w-auto input-group-flat">
+                                    <input type="text" class="form-control" 
+                                        name="created_date"
+                                        value="{{ request('created_date') }}"
+                                        data-provider="flatpickr" 
+                                        data-date-format="d M, Y">
+                                    <span class="input-group-text"><i class="ti ti-calendar"></i></span>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Lead Owner (Consultant) Filter -->
+                    <div class="filter-set-content">
+                        <div class="filter-set-content-head">
+                            <a href="#" class="collapsed" data-bs-toggle="collapse"
+                                data-bs-target="#owner" aria-expanded="false" aria-controls="owner">Lead Owner</a>
+                        </div>
+                        <div class="filter-set-contents accordion-collapse collapse" id="owner"
+                            data-bs-parent="#accordionExample">
+                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
+                                <div class="mb-2">
+                                    <div class="input-icon-start input-icon position-relative">
+                                        <span class="input-icon-addon fs-12"><i class="ti ti-search"></i></span>
+                                        <input type="text" class="form-control form-control-md" 
+                                            placeholder="Search" 
+                                            id="consultant-search">
+                                    </div>
+                                </div>
+                                <ul class="mb-0" id="consultant-list">
+                                    @foreach($consultants as $consultant)
+                                        <li class="mb-1 consultant-item">
+                                            <label class="dropdown-item px-2 d-flex align-items-center">
+                                                <input class="form-check-input m-0 me-1" type="checkbox" 
+                                                    name="consultant_ids[]" 
+                                                    value="{{ $consultant->id }}"
+                                                    {{ in_array($consultant->id, request('consultant_ids', [])) ? 'checked' : '' }}>
+                                                <span class="avatar avatar-xs rounded-circle me-2">
+                                                    <img src="{{ asset('assets/img/users/user-17.jpg') }}" 
+                                                        class="flex-shrink-0 rounded-circle" alt="img">
+                                                </span>
+                                                {{ $consultant->name }}
+                                            </label>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Filter Actions -->
+                <div class="d-flex align-items-center gap-2 mt-3">
+                    <button type="button" class="btn btn-outline-light w-100" id="reset-filters">Reset</button>
+                    <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Global Search Input (outside form, handled via JS) -->
+<div class="input-icon input-icon-start position-relative">
+    <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
+    <input type="text" class="form-control" 
+        placeholder="Search leads..." 
+        id="global-search"
+        value="{{ request('search') }}">
+</div>
                     <div class="input-icon input-icon-start position-relative">
                         <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
                         <input type="text" class="form-control" placeholder="Search">
                     </div>
                 </div>
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <div class="d-flex align-items-center shadow p-1 rounded border view-icons bg-white">
-                        <a href="leads-list.html" class="btn btn-sm p-1 border-0 fs-14"><i
-                                class="ti ti-list-tree"></i></a>
-                        <a href="leads.html" class="flex-shrink-0 btn btn-sm p-1 border-0 ms-1 fs-14 active"><i
-                                class="ti ti-grid-dots"></i></a>
-                    </div>
+                    
                     @can('create-leads')
                         <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
-                        data-bs-target="#offcanvas_add"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add Lead</a>
+                            data-bs-target="#offcanvas_add"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add Lead</a>
+
+                        <!-- ✅ Bulk Import Button -->
+                        <a href="{{ route('leads.bulk.import') }}" class="btn btn-outline-primary">
+                            <i class="ti ti-file-upload me-1"></i>Bulk Import
+                        </a>
                     @endcan
-                    
                 </div>
             </div>
             <!-- table header -->
@@ -486,7 +282,6 @@
                                         </h6>
                                         <span class="fw-medium">{{ $statusLeads->count() }} Leads</span>
                                     </div>
-
                                 </div>
                             </div>
 
@@ -505,16 +300,16 @@
                                                                 <div class="d-flex align-items-center mb-3">
                                                                     @can('view-lead-details')
                                                                         <a href="{{ route('leads.index', $lead) }}"
-                                                                        class="avatar rounded-circle bg-soft-{{ $statusInfo['color'] }} flex-shrink-0 me-2">
-                                                                        <span
-                                                                            class="avatar-title text-{{ $statusInfo['color'] }}">
-                                                                            {{ strtoupper(substr($lead->full_name, 0, 2)) }}
-                                                                        </span>
-                                                                    </a>
+                                                                            class="avatar rounded-circle bg-soft-{{ $statusInfo['color'] }} flex-shrink-0 me-2">
+                                                                            <span
+                                                                                class="avatar-title text-{{ $statusInfo['color'] }}">
+                                                                                {{ strtoupper(substr($lead->full_name, 0, 2)) }}
+                                                                            </span>
+                                                                        </a>
                                                                     @endcan
-                                                                    
+
                                                                     <h6 class="fw-medium fs-14 mb-0">
-                                                                        <a href="{{ route('lead-details',$lead->id) }}">
+                                                                        <a href="{{ route('lead-details', $lead->id) }}">
                                                                             {{ $lead->full_name }}
                                                                         </a>
                                                                     </h6>
@@ -531,26 +326,26 @@
                                                                     </a>
                                                                     <div class="dropdown-menu dropdown-menu-end">
 
-                                                                    @can('edit-leads')
-                                                                         <!-- Edit Button - Opens offcanvas with lead ID -->
-                                                                        <a class="dropdown-item" href="javascript:void(0)"
-                                                                            data-bs-toggle="offcanvas"
-                                                                            data-bs-target="#offcanvas_edit_{{ $lead->id }}">
-                                                                            <i
-                                                                                class="ti ti-square-rounded-plus-filled me-1"></i>
-                                                                            Edit
-                                                                        </a>
-                                                                    @endcan
-                                                                       
-                                                                       @can('delete-leads')
-                                                                             <!-- Delete Button -->
-                                                                        <a class="dropdown-item delete-btn" href="#"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#delete_lead{{ $lead->id }}">
-                                                                            <i class="ti ti-trash"></i> Delete
-                                                                        </a>
-                                                                       @endcan
-                                                                      
+                                                                        @can('edit-leads')
+                                                                            <!-- Edit Button - Opens offcanvas with lead ID -->
+                                                                            <a class="dropdown-item" href="javascript:void(0)"
+                                                                                data-bs-toggle="offcanvas"
+                                                                                data-bs-target="#offcanvas_edit_{{ $lead->id }}">
+                                                                                <i
+                                                                                    class="ti ti-square-rounded-plus-filled me-1"></i>
+                                                                                Edit
+                                                                            </a>
+                                                                        @endcan
+
+                                                                        @can('delete-leads')
+                                                                            <!-- Delete Button -->
+                                                                            <a class="dropdown-item delete-btn" href="#"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#delete_lead{{ $lead->id }}">
+                                                                                <i class="ti ti-trash"></i> Delete
+                                                                            </a>
+                                                                        @endcan
+
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -730,15 +525,39 @@
                                                             </div>
 
                                                             <!-- Lead Source -->
+                                                            <!-- Lead Source (Edit) - with data-name attribute -->
                                                             <div class="col-md-6">
                                                                 <div class="mb-3">
                                                                     <label class="form-label">Lead Source</label>
-                                                                    <select name="lead_source_id" class="select">
+                                                                    <select name="lead_source_id"
+                                                                        id="lead_source_edit_{{ $lead->id }}"
+                                                                        class="select">
                                                                         <option value="">Select</option>
                                                                         @foreach ($leadsources as $source)
                                                                             <option value="{{ $source->id }}"
+                                                                                data-name="{{ strtolower($source->name) }}"
                                                                                 {{ old('lead_source_id', $lead->lead_source_id) == $source->id ? 'selected' : '' }}>
                                                                                 {{ $source->name }}
+                                                                            </option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Consultant Field (Conditional - Edit) -->
+                                                            <div class="col-md-6"
+                                                                id="consultant_field_edit_{{ $lead->id }}"
+                                                                style="display: {{ $lead->leadSource && stripos($lead->leadSource->name, 'consultant') !== false ? 'block' : 'none' }};">
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">Assign to Consultant</label>
+                                                                    <select name="consultant_id"
+                                                                        id="consultant_select_edit_{{ $lead->id }}"
+                                                                        class="select">
+                                                                        <option value="">Select Consultant</option>
+                                                                        @foreach ($consultants as $consultant)
+                                                                            <option value="{{ $consultant->id }}"
+                                                                                {{ old('consultant_id', $lead->consultant_id) == $consultant->id ? 'selected' : '' }}>
+                                                                                {{ $consultant->name }}
                                                                             </option>
                                                                         @endforeach
                                                                     </select>
@@ -749,12 +568,10 @@
                                                             <div class="col-md-6">
                                                                 <div class="mb-3">
                                                                     <label class="form-label">Priority</label>
-                                                                    <!-- Priority in Edit Form - Correct Pre-fill -->
                                                                     <select name="priority_id" class="select">
                                                                         <option value="">Select Priority</option>
                                                                         @foreach ($priorities as $priority)
                                                                             @php
-                                                                                // Get the current priority ID from lead or old input
                                                                                 $currentPriorityId = old(
                                                                                     'priority_id',
                                                                                     $lead->priority_id,
@@ -788,6 +605,7 @@
                                                 </div>
                                             </div>
                                             <!-- ✅ /Edit Offcanvas -->
+
                                             <!-- delete modal -->
                                             <div class="modal fade" id="delete_lead{{ $lead->id }}">
                                                 <div class="modal-dialog modal-dialog-centered modal-sm rounded-0">
@@ -831,15 +649,11 @@
             <!-- /Leads Kanban -->
         </div>
         <!-- End Content -->
-
-
-
     </div>
 
     <!-- ========================
-           End Page Content
-          ========================= -->
-
+               End Page Content
+              ========================= -->
 
     <!-- Add lead-->
     <div class="offcanvas offcanvas-end offcanvas-large" tabindex="-1" id="offcanvas_add">
@@ -959,18 +773,40 @@
                         </div>
                     </div>
 
+                    <!-- Lead Source -->
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label">Lead Source</label>
-                            <select name="lead_source_id" class="select">
+                            <!-- In your Lead Source dropdown, add data attribute -->
+                            <select name="lead_source_id" id="lead_source" class="select">
                                 <option value="" disabled selected>Select Lead Source</option>
                                 @foreach ($leadsources as $leadsource)
                                     <option value="{{ $leadsource->id }}"
+                                        data-name="{{ strtolower($leadsource->name) }}"
                                         {{ old('lead_source_id') == $leadsource->id ? 'selected' : '' }}>
                                         {{ $leadsource->name }}
                                     </option>
                                 @endforeach
                             </select>
+                        </div>
+                    </div>
+
+                    <!-- ✅ Consultant Dropdown (Shows only when Lead Source = Consultant) -->
+                    <div class="col-md-6" id="consultant_field" style="display: none;">
+                        <div class="mb-3">
+                            <label class="form-label">Assign to Consultant <span class="text-danger">*</span></label>
+                            <select name="consultant_id" id="consultant_select" class="select">
+                                <option value="">Select Consultant</option>
+                                @foreach ($consultants as $consultant)
+                                    <option value="{{ $consultant->id }}"
+                                        {{ old('consultant_id') == $consultant->id ? 'selected' : '' }}>
+                                        {{ $consultant->name }} ({{ $consultant->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('consultant_id')
+                                <span class="text-danger small">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
@@ -1011,10 +847,104 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            // --- Helper: Load Cities via AJAX ---
+            console.log('🚀 Page loaded, initializing consultant toggle...');
+
+            // === Helper: Check if element is Select2-enhanced ===
+            function isSelect2(element) {
+                return $(element).data('select2') !== undefined;
+            }
+
+            // === Helper: Get selected option's data-name or text ===
+            function getSourceName(selectEl) {
+                const selected = selectEl.options[selectEl.selectedIndex];
+                return selected.getAttribute('data-name') || selected.text.toLowerCase();
+            }
+
+            // === 1. Toggle Consultant Field (Add Form) ===
+            const leadSourceSelect = document.getElementById('lead_source');
+            const consultantField = document.getElementById('consultant_field');
+            const consultantSelect = document.getElementById('consultant_select');
+
+            function toggleConsultantField() {
+                if (!leadSourceSelect || !consultantField || !consultantSelect) {
+                    console.warn('Missing elements for consultant toggle');
+                    return;
+                }
+
+                const sourceName = getSourceName(leadSourceSelect);
+                console.log('📋 Lead source selected:', sourceName);
+
+                if (sourceName.includes('consultant')) {
+                    console.log('✅ Showing consultant field');
+                    consultantField.style.display = 'block';
+                    consultantSelect.setAttribute('required', 'required');
+                } else {
+                    console.log('❌ Hiding consultant field');
+                    consultantField.style.display = 'none';
+                    consultantSelect.removeAttribute('required');
+                    consultantSelect.value = '';
+                }
+            }
+
+            if (leadSourceSelect) {
+                // Initial check
+                toggleConsultantField();
+
+                // Handle Select2 or native change
+                if (typeof jQuery !== 'undefined' && $(leadSourceSelect).hasClass('select2-hidden-accessible')) {
+                    console.log('🔄 Using Select2 event listener');
+                    $(leadSourceSelect).on('change.select2', function() {
+                        toggleConsultantField();
+                    });
+                } else {
+                    console.log('🔄 Using native change listener');
+                    leadSourceSelect.addEventListener('change', toggleConsultantField);
+                }
+            }
+
+            // === 2. Toggle Consultant Field for Edit Forms ===
+            document.querySelectorAll('[id^="lead_source_edit_"]').forEach(function(sourceSelect) {
+                const consultantFieldEdit = sourceSelect.closest('.row')?.querySelector(
+                    '[id^="consultant_field_edit_"]');
+                const consultantSelectEdit = sourceSelect.closest('.row')?.querySelector(
+                    '[id^="consultant_select_edit_"]');
+
+                if (consultantFieldEdit && consultantSelectEdit) {
+                    // Initial check
+                    toggleConsultantFieldForEdit(sourceSelect, consultantFieldEdit, consultantSelectEdit);
+
+                    // Handle Select2 or native
+                    if (typeof jQuery !== 'undefined' && $(sourceSelect).hasClass(
+                            'select2-hidden-accessible')) {
+                        $(sourceSelect).on('change.select2', function() {
+                            toggleConsultantFieldForEdit(this, consultantFieldEdit,
+                                consultantSelectEdit);
+                        });
+                    } else {
+                        sourceSelect.addEventListener('change', function() {
+                            toggleConsultantFieldForEdit(this, consultantFieldEdit,
+                                consultantSelectEdit);
+                        });
+                    }
+                }
+            });
+
+            function toggleConsultantFieldForEdit(sourceSelect, fieldEl, selectEl) {
+                const sourceName = getSourceName(sourceSelect);
+
+                if (sourceName.includes('consultant')) {
+                    fieldEl.style.display = 'block';
+                    selectEl.setAttribute('required', 'required');
+                } else {
+                    fieldEl.style.display = 'none';
+                    selectEl.removeAttribute('required');
+                    selectEl.value = '';
+                }
+            }
+
+            // === 3. Load Cities via AJAX ===
             function loadCities(stateId, citySelect, selectedCityId = null) {
                 citySelect.innerHTML = '<option value="">Select City</option>';
-
                 if (!stateId) return;
 
                 fetch(`/api/cities/${stateId}`)
@@ -1036,64 +966,121 @@
                     .catch(error => console.error('Error loading cities:', error));
             }
 
-            // --- Add Modal: State Change ---
+            // === 4. Add Form: State/City Listener ===
             const addState = document.getElementById('add_state');
             const addCity = document.getElementById('add_city');
             if (addState && addCity) {
-                addState.addEventListener('change', function() {
-                    loadCities(this.value, addCity);
-                });
+                if (typeof jQuery !== 'undefined' && $(addState).hasClass('select2-hidden-accessible')) {
+                    $(addState).on('change.select2', function() {
+                        loadCities(this.value, addCity);
+                    });
+                } else {
+                    addState.addEventListener('change', function() {
+                        loadCities(this.value, addCity);
+                    });
+                }
                 if (addState.value) {
                     loadCities(addState.value, addCity);
                 }
             }
 
-            // --- Edit Modal: Populate with data from button attributes ---
-            const editModal = document.getElementById('edit_consultant');
-            if (editModal) {
-                editModal.addEventListener('show.bs.modal', function(event) {
-                    const button = event.relatedTarget;
+            // === 5. Edit Forms: State/City Listeners ===
+            document.querySelectorAll('select[name="state_id"]').forEach(function(stateSelect) {
+                if (stateSelect.id === 'add_state') return;
 
-                    // Set form action
-                    const consultantId = button.getAttribute('data-id');
-                    document.getElementById('editForm').action = `/consultants/${consultantId}`;
-
-                    // Populate fields
-                    document.getElementById('edit-name').value = button.getAttribute('data-name');
-                    document.getElementById('edit-email').value = button.getAttribute('data-email');
-                    document.getElementById('edit-phone').value = button.getAttribute('data-phone');
-                    document.getElementById('edit-address').value = button.getAttribute('data-address');
-
-                    // Populate state and trigger city load
-                    const editState = document.getElementById('edit_state');
-                    const editCity = document.getElementById('edit_city');
-                    const stateId = button.getAttribute('data-state-id');
-                    const cityId = button.getAttribute('data-city-id');
-
-                    editState.value = stateId;
-                    if (stateId) {
-                        loadCities(stateId, editCity, cityId);
+                const citySelect = stateSelect.closest('.row')?.querySelector('select[name="city_id"]');
+                if (citySelect) {
+                    if (typeof jQuery !== 'undefined' && $(stateSelect).hasClass(
+                            'select2-hidden-accessible')) {
+                        $(stateSelect).on('change.select2', function() {
+                            loadCities(this.value, citySelect);
+                        });
+                    } else {
+                        stateSelect.addEventListener('change', function() {
+                            loadCities(this.value, citySelect);
+                        });
                     }
-
-                    // Populate status
-                    const status = button.getAttribute('data-status');
-                    document.getElementById('edit-active').checked = (status == 1);
-                    document.getElementById('edit-inactive').checked = (status == 0);
-                });
-
-                // Handle state change in edit modal
-                const editStateEl = document.getElementById('edit_state');
-                const editCityEl = document.getElementById('edit_city');
-                if (editStateEl) {
-                    editStateEl.addEventListener('change', function() {
-                        loadCities(this.value, editCityEl);
-                    });
+                    if (stateSelect.value) {
+                        loadCities(stateSelect.value, citySelect, citySelect.value);
+                    }
                 }
-            }
-
-
-
+            });
 
         });
+         // === Global Search with Debounce ===
+    const globalSearch = document.getElementById('global-search');
+    let searchTimeout;
+    
+    if (globalSearch) {
+        globalSearch.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const url = new URL(window.location);
+                if (this.value.trim()) {
+                    url.searchParams.set('search', this.value.trim());
+                } else {
+                    url.searchParams.delete('search');
+                }
+                // Remove page param to reset pagination
+                url.searchParams.delete('page');
+                window.location.href = url.toString();
+            }, 500);
+        });
+    }
+
+    // === Reset Filters ===
+    const resetBtn = document.getElementById('reset-filters');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+            // Clear all filter inputs
+            document.getElementById('leads-filter-form')?.reset();
+            // Redirect to clean URL
+            window.location.href = "{{ route('leads.index') }}";
+        });
+    }
+
+    // === Consultant Search within Filter ===
+    const consultantSearch = document.getElementById('consultant-search');
+    const consultantItems = document.querySelectorAll('.consultant-item');
+    
+    if (consultantSearch && consultantItems.length > 0) {
+        consultantSearch.addEventListener('input', function() {
+            const term = this.value.toLowerCase();
+            consultantItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(term) ? 'block' : 'none';
+            });
+        });
+    }
+
+    // === Lead Name Search within Filter ===
+    const leadNameSearch = document.querySelector('#collapseTwo input[type="text"]');
+    const leadNameItems = document.querySelectorAll('#collapseTwo ul li');
+    
+    if (leadNameSearch && leadNameItems.length > 0) {
+        leadNameSearch.addEventListener('input', function() {
+            const term = this.value.toLowerCase();
+            leadNameItems.forEach(item => {
+                if (item.querySelector('a')) return; // Skip "Load More"
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(term) ? 'block' : 'none';
+            });
+        });
+    }
+
+    // === Preserve Scroll Position on Filter Submit ===
+    const filterForm = document.getElementById('leads-filter-form');
+    if (filterForm) {
+        filterForm.addEventListener('submit', function() {
+            sessionStorage.setItem('leadsScrollPos', window.scrollY);
+        });
+    }
+    
+    // Restore scroll position on page load
+    const scrollPos = sessionStorage.getItem('leadsScrollPos');
+    if (scrollPos) {
+        window.scrollTo(0, parseInt(scrollPos));
+        sessionStorage.removeItem('leadsScrollPos');
+    }
     </script>
 @endpush

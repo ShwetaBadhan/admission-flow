@@ -14,14 +14,14 @@
                     <div>
                         <h4 class="mb-0">Leads Dashboard</h4>
                     </div>
-                    <div class="gap-2 d-flex align-items-center flex-wrap">
+                    {{-- <div class="gap-2 d-flex align-items-center flex-wrap">
 						<div class="daterangepick form-control w-auto d-flex align-items-center">
 							<i class="ti ti-calendar text-dark me-2"></i>
 							<span class="reportrange-picker-field text-dark">23 May 2025 - 30 May 2025</span>
 						</div>	
                         <a href="javascript:void(0);" class="btn btn-icon btn-outline-light shadow" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh"><i class="ti ti-refresh"></i></a>
                         <a href="javascript:void(0);" class="btn btn-icon btn-outline-light shadow" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Collapse" data-bs-original-title="Collapse" id="collapse-header"><i class="ti ti-transition-top"></i></a>
-                    </div>
+                    </div> --}}
                 </div>
 				<!-- End Page Header -->
  <!-- start row -->
@@ -31,7 +31,7 @@
 						<div class="card flex-fill">
 							<div class="card-body position-relative">
 								<p class="fw-medium mb-1">Total Leads</p>
-								<h4 class="mb-3">$15,44,540</h4>
+								<h4 class="mb-3">Rs. 15,44,540</h4>
 								<div class="d-flex align-items-center gap-2 flex-wrap">
 									<span class="d-inline-flex align-items-center badge rounded-pill badge-soft-success border-0">+2.5%</span>
 									<p class="text-dark mb-0">From Last Week</p>

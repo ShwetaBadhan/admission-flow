@@ -21,102 +21,384 @@ use App\Models\ContactStage;
 use App\Models\DocumentSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Traits\HasRoles;
-
+use Illuminate\Support\Facades\Validator;  // ← Add this line
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Exports\LeadsExport;
 class LeadController extends Controller
 {
     use HasRoles;
-    public function index()
-    {
-        $user = Auth::user()->load('roles');
+    public function showBulkImport()
+{
+    $states = State::orderBy('name')->get();
+    $cities = City::orderBy('name')->get();
+    $courses = Course::where('status', true)->get();
+    $leadsources = LeadSource::where('status', true)->get();
+    $qualifications = Qualification::where('status', 1)->orderBy('name')->get();
+    $intakes = Intake::where('status', 1)->orderBy('name', 'desc')->get();
+    $priorities = Priority::where('status', 1)->get();
+    $consultants = Consultant::where('status', true)->orderBy('name')->get();
 
-        // 🔍 DEBUGGING - Add this temporarily
-        Log::info('=== LEAD ACCESS DEBUG ===');
-        Log::info('User ID: ' . $user->id);
-        Log::info('User Name: ' . $user->name);
-        Log::info('User Email: ' . $user->email);
-        Log::info('User Roles: ' . json_encode($user->getRoleNames()));
-        Log::info('Is Consultant: ' . ($user->hasRole('consultant') ? 'YES' : 'NO'));
+    return view('pages.leads.bulk-import', compact(
+        'states', 'cities', 'courses', 'leadsources', 
+        'qualifications', 'intakes', 'priorities', 'consultants'
+    ));
+}
 
-        // Find consultant record by email
-        $consultant = \App\Models\Consultant::where('email', $user->email)->first();
-        Log::info('Consultant Record Found: ' . ($consultant ? 'YES (ID: ' . $consultant->id . ')' : 'NO'));
+/**
+ * Download sample CSV template
+ */
+public function downloadSampleCsv()
+{
+    $filename = 'leads_sample_template.csv';
+    $headers = [
+        'Content-Type' => 'text/csv',
+        'Content-Disposition' => "attachment; filename=\"$filename\"",
+    ];
 
-        $leadsQuery = Lead::with([
-            'city',
-            'state',
-            'leadSource',
-            'consultant',
-            'qualification',
-            'intake',
-            'priority',
-            'counsellor'
-        ])->latest();
+    $output = fopen('php://output', 'w');
+    
+    // Header row - intake_name only (no year column)
+    fputcsv($output, [
+    'full_name', 'mobile', 'email', 'state_name', 'city_name', 
+    'qualification_name', 'course_name', 'intake_name', 
+    'lead_source_name', 'priority_name', 'notes', 'consultant_email'
+]);
 
-        // Check total leads before filter
-        $totalLeads = $leadsQuery->count();
-        Log::info('Total Leads in DB: ' . $totalLeads);
+// Sample row:
+fputcsv($output, [
+    'John Doe', '9876543210', 'john@example.com', 'Punjab', 'Jalandhar',
+    'Graduate', 'MBA', '2026', 
+    'Website', 'High', 
+    'Interested in admission', 'consultant@example.com'
+]);
 
-        // 🔐 ROLE-BASED FILTERING
-        if ($user->hasRole('consultant')) {
-            if ($consultant) {
-                // Show leads assigned to this consultant
-                $leadsQuery->where('consultant_id', $consultant->id);
-                Log::info('Filtering by consultant_id: ' . $consultant->id);
-            } else {
-                // No consultant record - show no leads
-                $leadsQuery->whereRaw('1 = 0');
-                Log::info('No consultant record found - showing no leads');
-            }
-        }
+    fclose($output);
 
-        $leads = $leadsQuery->paginate(15);
+    return response()->stream(function() use ($output) {}, 200, $headers);
+}
 
-        // Check leads after filter
-        Log::info('Leads After Filter: ' . $leads->count());
-        Log::info('=== END DEBUG ===');
+/**
+ * Process bulk CSV import
+ */
+public function processBulkImport(Request $request)
+{
+    $request->validate([
+        'csv_file' => 'required|file|mimes:csv,txt|max:10240', // 10MB max
+    ]);
 
-        // Group leads by status
-        $leadsByStatus = $leads->groupBy('status');
-
-        // Status config for UI
-        $statuses = [
-            'new' => ['label' => 'New', 'color' => 'warning'],
-            'contacted' => ['label' => 'Contacted', 'color' => 'info'],
-            'qualified' => ['label' => 'Qualified', 'color' => 'primary'],
-            'proposal' => ['label' => 'Proposal', 'color' => 'purple'],
-            'negotiation' => ['label' => 'Negotiation', 'color' => 'orange'],
-            'won' => ['label' => 'Won', 'color' => 'success'],
-            'lost' => ['label' => 'Lost', 'color' => 'danger'],
+    try {
+        $file = $request->file('csv_file');
+        $handle = fopen($file->getRealPath(), 'r');
+        
+        // Skip header row
+        $header = fgetcsv($handle);
+        
+        $results = [
+            'success' => 0,
+            'failed' => 0,
+            'errors' => []
         ];
 
-        $states = State::orderBy('name')->get();
-        $cities = City::orderBy('name')->get();
-        $courses = Course::where('status', true)->get();
-        $leadsources = LeadSource::where('status', true)->get();
-        $qualifications = Qualification::where('status', 1)->orderBy('name')->get();
-        $intakes = Intake::where('status', 1)->orderBy('name', 'desc')->get();
-        $priorities = Priority::where('status', 1)->get();
+        $rowNumber = 1; // Start after header
+        
+        DB::beginTransaction();
 
+        while (($data = fgetcsv($handle)) !== false) {
+            $rowNumber++;
+            
+            try {
+                // Map CSV columns to array
+                $mapped = $this->mapCsvRow($header, $data);
+                
+                // Validate row data
+                $validated = $this->validateCsvRow($mapped, $rowNumber);
+                
+                // Process the lead
+                $this->createOrUpdateLead($validated);
+                
+                $results['success']++;
+                
+            } catch (\Exception $e) {
+                $results['failed']++;
+                $results['errors'][] = [
+                    'row' => $rowNumber,
+                    'data' => array_slice($data, 0, 3), // Show first 3 fields
+                    'error' => $e->getMessage()
+                ];
+                // Continue processing other rows
+            }
+        }
+        
+        fclose($handle);
+        DB::commit();
 
+        $message = "Import completed: {$results['success']} successful, {$results['failed']} failed.";
+        
+        if (!empty($results['errors'])) {
+            return redirect()->back()
+                ->with('success', $message)
+                ->with('import_errors', $results['errors']);
+        }
+        
+        return redirect()->route('leads.index')
+            ->with('success', $message);
 
-        return view('pages.leads.index', compact(
-            'leads',
-            'leadsByStatus',
-            'statuses',
-            'states',
-            'cities',
-            'courses',
-            'leadsources',
-            'qualifications',
-            'intakes',
-            'priorities'
-        ));
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()
+            ->with('error', 'Import failed: ' . $e->getMessage())
+            ->withInput();
     }
+}
+
+/**
+ * Map CSV header to row data
+ */
+private function mapCsvRow($header, $row)
+{
+    $mapped = [];
+    foreach ($header as $index => $key) {
+        $mapped[trim($key)] = trim($row[$index] ?? '');
+    }
+    return $mapped;
+}
+
+/**
+ * Validate individual CSV row
+ */
+private function validateCsvRow($data, $rowNumber)
+{
+    $validator = Validator::make($data, [
+        'full_name' => 'required|string|max:255',
+        'mobile' => 'required|string|max:20',
+        'email' => 'nullable|email|max:255',
+        'state_name' => 'nullable|string|max:100',
+        'city_name' => 'nullable|string|max:100',
+        'qualification_name' => 'nullable|string|max:100',
+        'course_name' => 'nullable|string|max:100',
+        'intake_name' => 'nullable|string|max:100',
+        'lead_source_name' => 'nullable|string|max:100',
+        'priority_name' => 'nullable|string|max:50',
+        'notes' => 'nullable|string',
+        'consultant_email' => 'nullable|email',
+    ]);
+
+    if ($validator->fails()) {
+        throw new \Exception("Row $rowNumber: " . $validator->errors()->first());
+    }
+
+    // Start with clean data (exclude _name fields)
+    $resolved = [
+        'full_name' => $data['full_name'],
+        'mobile' => $data['mobile'],
+        'email' => $data['email'] ?? null,
+        'notes' => $data['notes'] ?? null,
+        'status' => 'new', // Default status
+    ];
+
+    // ✅ Resolve State
+    if (!empty($data['state_name'])) {
+        $state = State::where('name', 'LIKE', trim($data['state_name']))->first();
+        if ($state) {
+            $resolved['state_id'] = $state->id;
+        } else {
+            // Optional: Create state if not exists
+            // $state = State::create(['name' => trim($data['state_name'])]);
+            // $resolved['state_id'] = $state->id;
+            Log::warning("State not found: {$data['state_name']} in row $rowNumber");
+        }
+    }
+
+    // ✅ Resolve City (requires state)
+    if (!empty($data['city_name']) && !empty($resolved['state_id'])) {
+        $city = City::where('name', 'LIKE', trim($data['city_name']))
+                    ->where('state_id', $resolved['state_id'])
+                    ->first();
+        if ($city) {
+            $resolved['city_id'] = $city->id;
+        } else {
+            Log::warning("City not found: {$data['city_name']} in row $rowNumber");
+        }
+    }
+
+    // ✅ Resolve Qualification
+    if (!empty($data['qualification_name'])) {
+        $qual = Qualification::where('name', 'LIKE', trim($data['qualification_name']))
+                            ->where('status', 1)
+                            ->first();
+        if ($qual) {
+            $resolved['qualification_id'] = $qual->id;
+        } else {
+            Log::warning("Qualification not found: {$data['qualification_name']} in row $rowNumber");
+        }
+    }
+
+    // ✅ Resolve Course
+    if (!empty($data['course_name'])) {
+        $course = Course::where('name', 'LIKE', trim($data['course_name']))
+                       ->where('status', true)
+                       ->first();
+        if ($course) {
+            $resolved['interested_course_id'] = $course->id;
+        } else {
+            Log::warning("Course not found: {$data['course_name']} in row $rowNumber");
+        }
+    }
+
+    // ✅ Resolve Intake
+    if (!empty($data['intake_name'])) {
+        $intake = Intake::where('name', 'LIKE', trim($data['intake_name']))
+                       ->where('status', 1)
+                       ->first();
+        if ($intake) {
+            $resolved['preferred_intake_id'] = $intake->id;
+        } else {
+            Log::warning("Intake not found: {$data['intake_name']} in row $rowNumber");
+        }
+    }
+
+    // ✅ Resolve Lead Source
+    if (!empty($data['lead_source_name'])) {
+        $source = LeadSource::where('name', 'LIKE', trim($data['lead_source_name']))
+                           ->where('status', true)
+                           ->first();
+        if ($source) {
+            $resolved['lead_source_id'] = $source->id;
+        } else {
+            Log::warning("Lead source not found: {$data['lead_source_name']} in row $rowNumber");
+        }
+    }
+
+    // ✅ Resolve Priority
+    if (!empty($data['priority_name'])) {
+        $priority = Priority::where('name', 'LIKE', trim($data['priority_name']))
+                           ->where('status', 1)
+                           ->first();
+        if ($priority) {
+            $resolved['priority_id'] = $priority->id;
+        } else {
+            Log::warning("Priority not found: {$data['priority_name']} in row $rowNumber");
+        }
+    }
+
+    // ✅ Resolve Consultant
+    if (!empty($data['consultant_email'])) {
+        $consultant = Consultant::where('email', trim($data['consultant_email']))
+                               ->where('status', true)
+                               ->first();
+        if ($consultant) {
+            $resolved['consultant_id'] = $consultant->id;
+        } else {
+            Log::warning("Consultant not found: {$data['consultant_email']} in row $rowNumber");
+        }
+    }
+
+    return $resolved;
+}
+private function createOrUpdateLead($data)
+{
+    // ✅ Use clean keys: 'mobile', 'full_name' (no asterisks)
+    $existing = Lead::where('mobile', $data['mobile'])
+        ->orWhere('email', $data['email'] ?? null)
+        ->first();
+
+    if ($existing) {
+        $existing->update($data); // $data already has clean keys
+    } else {
+        Lead::create(array_merge($data, [
+            'status' => 'new'
+        ]));
+    }
+}
+   public function index(Request $request)
+{
+    $user = Auth::user()->load('roles');
+    
+    $leadsQuery = Lead::with([
+        'city', 'state', 'leadSource', 'consultant', 
+        'qualification', 'intake', 'priority', 'counsellor'
+    ]);
+
+    // 🔍 Global Search
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $leadsQuery->where(function($q) use ($search) {
+            $q->where('full_name', 'LIKE', "%{$search}%")
+              ->orWhere('email', 'LIKE', "%{$search}%")
+              ->orWhere('mobile', 'LIKE', "%{$search}%");
+        });
+    }
+
+    // 🔍 Lead Name Search
+    if ($request->filled('lead_name')) {
+        $leadsQuery->where('full_name', 'LIKE', "%{$request->lead_name}%");
+    }
+
+    // 🔍 Specific Lead IDs (from checkbox filter)
+    if ($request->filled('lead_ids') && is_array($request->lead_ids)) {
+        $leadsQuery->whereIn('id', $request->lead_ids);
+    }
+
+    // 🔍 Status Filter
+    if ($request->filled('statuses') && is_array($request->statuses)) {
+        $leadsQuery->whereIn('status', $request->statuses);
+    }
+
+    // 🔍 Created Date Filter
+    if ($request->filled('created_date')) {
+        $leadsQuery->whereDate('created_at', $request->created_date);
+    }
+
+    // 🔍 Consultant/Lead Owner Filter
+    if ($request->filled('consultant_ids') && is_array($request->consultant_ids)) {
+        $leadsQuery->whereIn('consultant_id', $request->consultant_ids);
+    }
+
+    // 🔐 Role-Based Filtering (Consultants see only their leads)
+    if ($user->hasRole('consultant')) {
+        $consultant = \App\Models\Consultant::where('email', $user->email)->first();
+        if ($consultant) {
+            $leadsQuery->where('consultant_id', $consultant->id);
+        } else {
+            $leadsQuery->whereRaw('1 = 0'); // No access
+        }
+    }
+
+    $leads = $leadsQuery->latest()->paginate(15)->withQueryString();
+    $leadsByStatus = $leads->getCollection()->groupBy('status');
+
+    $statuses = [
+        'new' => ['label' => 'New', 'color' => 'warning'],
+        'contacted' => ['label' => 'Contacted', 'color' => 'info'],
+        'qualified' => ['label' => 'Qualified', 'color' => 'primary'],
+        'proposal' => ['label' => 'Proposal', 'color' => 'purple'],
+        'negotiation' => ['label' => 'Negotiation', 'color' => 'orange'],
+        'won' => ['label' => 'Won', 'color' => 'success'],
+        'lost' => ['label' => 'Lost', 'color' => 'danger'],
+    ];
+
+    $states = State::orderBy('name')->get();
+    $cities = City::orderBy('name')->get();
+    $courses = Course::where('status', true)->get();
+    $leadsources = LeadSource::where('status', true)->get();
+    $qualifications = Qualification::where('status', 1)->orderBy('name')->get();
+    $intakes = Intake::where('status', 1)->orderBy('name', 'desc')->get();
+    $priorities = Priority::where('status', 1)->get();
+    $consultants = Consultant::where('status', true)->orderBy('name')->get();
+
+    return view('pages.leads.index', compact(
+        'leads', 'leadsByStatus', 'statuses', 'states', 'cities', 
+        'courses', 'leadsources', 'qualifications', 'intakes', 
+        'priorities', 'consultants'
+    ));
+}
     public function create()
     {
         $states = State::all();
@@ -141,27 +423,38 @@ class LeadController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'full_name' => 'required|string|max:255',
-            'mobile' => 'required|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'city_id' => 'nullable|exists:cities,id',
-            'state_id' => 'nullable|exists:states,id',
-            'qualification_id' => 'nullable|exists:qualifications,id',
-            'interested_course_id' => 'nullable|exists:courses,id',
-            'preferred_intake_id' => 'nullable|exists:intakes,id',
-            'priority_id' => 'nullable|exists:priorities,id',
-            'lead_source_id' => 'nullable|exists:lead_sources,id',
-            'notes' => 'nullable|string',
-            'consultant_id' => 'nullable|exists:users,id',
-        ]);
+{
+    $validated = $request->validate([
+        'full_name' => 'required|string|max:255',
+        'mobile' => 'required|string|max:20',
+        'email' => 'nullable|email|max:255',
+        'city_id' => 'nullable|exists:cities,id',
+        'state_id' => 'nullable|exists:states,id',
+        'qualification_id' => 'nullable|exists:qualifications,id',
+        'interested_course_id' => 'nullable|exists:courses,id',
+        'preferred_intake_id' => 'nullable|exists:intakes,id',
+        'priority_id' => 'nullable|exists:priorities,id',
+        'lead_source_id' => 'nullable|exists:lead_sources,id',
+        'notes' => 'nullable|string',
+        // ✅ Consultant required only when lead source is "Consultant"
+        'consultant_id' => 'nullable|exists:consultants,id',
+    ]);
 
-        $lead = Lead::create($validated);
-
-        return redirect()->route('leads.index')
-            ->with('success', 'Lead created successfully!');
+    // ✅ Auto-assign consultant logic
+    if ($request->filled('lead_source_id') && $request->filled('consultant_id')) {
+        $leadSource = LeadSource::find($request->lead_source_id);
+        
+        // Check if lead source name contains "consultant" (case-insensitive)
+        if ($leadSource && stripos($leadSource->name, 'consultant') !== false) {
+            $validated['consultant_id'] = $request->consultant_id;
+        }
     }
+
+    $lead = Lead::create($validated);
+
+    return redirect()->route('leads.index')
+        ->with('success', 'Lead created successfully!');
+}
     /**
      * Check if current user can access this lead
      */
@@ -274,32 +567,42 @@ class LeadController extends Controller
         ));
     }
 
-    public function update(Request $request, Lead $lead)
-    {
-        if (!$this->canAccessLead($lead)) {
-            abort(403, 'Unauthorized access.');
-        }
-        $validated = $request->validate([
-            'full_name' => 'required|string|max:255',
-            'mobile' => 'required|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'city_id' => 'nullable|exists:cities,id',
-            'state_id' => 'nullable|exists:states,id',
-            'qualification_id' => 'nullable|exists:qualifications,id',
-            'interested_course_id' => 'nullable|exists:courses,id',
-            'preferred_intake_id' => 'nullable|exists:intakes,id',
-            'priority_id' => 'nullable|exists:priorities,id',
-            'lead_source_id' => 'nullable|exists:lead_sources,id',
-            'notes' => 'nullable|string',
-            'consultant_id' => 'nullable|exists:users,id',
-            'counsellor_id' => 'nullable|exists:users,id',
-        ]);
-
-        $lead->update($validated);
-
-        return redirect()->route('leads.index')
-            ->with('success', 'Lead updated successfully!');
+   public function update(Request $request, Lead $lead)
+{
+    if (!$this->canAccessLead($lead)) {
+        abort(403, 'Unauthorized access.');
     }
+    
+    $validated = $request->validate([
+        'full_name' => 'required|string|max:255',
+        'mobile' => 'required|string|max:20',
+        'email' => 'nullable|email|max:255',
+        'city_id' => 'nullable|exists:cities,id',
+        'state_id' => 'nullable|exists:states,id',
+        'qualification_id' => 'nullable|exists:qualifications,id',
+        'interested_course_id' => 'nullable|exists:courses,id',
+        'preferred_intake_id' => 'nullable|exists:intakes,id',
+        'priority_id' => 'nullable|exists:priorities,id',
+        'lead_source_id' => 'nullable|exists:lead_sources,id',
+        'notes' => 'nullable|string',
+        'consultant_id' => 'nullable|exists:consultants,id',
+        'counsellor_id' => 'nullable|exists:users,id',
+    ]);
+
+    // ✅ Auto-assign consultant logic for updates
+    if ($request->filled('lead_source_id') && $request->filled('consultant_id')) {
+        $leadSource = LeadSource::find($request->lead_source_id);
+        
+        if ($leadSource && stripos($leadSource->name, 'consultant') !== false) {
+            $validated['consultant_id'] = $request->consultant_id;
+        }
+    }
+
+    $lead->update($validated);
+
+    return redirect()->route('leads.index')
+        ->with('success', 'Lead updated successfully!');
+}
 
     public function destroy(Lead $lead)
     {
@@ -797,4 +1100,67 @@ class LeadController extends Controller
 
         return view('pages.admissions.index', compact('admissions'));
     }
-}
+        // ============================================
+    // ✅ EXPORT METHODS (Minimal - No filter changes)
+    // ============================================
+
+    /**
+     * Export Leads as Excel
+     */
+    public function exportExcel(Request $request)
+    {
+        return Excel::download(new LeadsExport($request->all()), 'leads_' . date('Y-m-d_His') . '.xlsx');
+    }
+
+    /**
+     * Export Leads as PDF
+     */
+    public function exportPdf(Request $request)
+    {
+        $leads = Lead::with(['city', 'state', 'leadSource', 'consultant', 'qualification', 'intake', 'priority'])
+            ->when($request->filled('search'), function($q) use ($request) {
+                $q->where(function($query) use ($request) {
+                    $query->where('full_name', 'LIKE', "%{$request->search}%")
+                          ->orWhere('email', 'LIKE', "%{$request->search}%")
+                          ->orWhere('mobile', 'LIKE', "%{$request->search}%");
+                });
+            })
+            ->when($request->filled('statuses'), function($q) use ($request) {
+                $q->whereIn('status', $request->statuses);
+            })
+            ->when($request->filled('created_date'), function($q) use ($request) {
+                $q->whereDate('created_at', $request->created_date);
+            })
+            ->when($request->filled('lead_owners'), function($q) use ($request) {
+                $q->whereIn('consultant_id', $request->lead_owners);
+            })
+            // 🔐 Role-based filter (same as your index method)
+            ->when(function() {
+                $user = Auth::user();
+                return $user && $user->hasRole('consultant');
+            }, function($q) {
+                $user = Auth::user();
+                $consultant = \App\Models\Consultant::where('email', $user->email)->first();
+                return $consultant 
+                    ? $q->where('consultant_id', $consultant->id) 
+                    : $q->whereRaw('1 = 0');
+            })
+            ->latest()
+            ->get();
+
+        $statuses = [
+            'new' => ['label' => 'New', 'color' => 'warning'],
+            'contacted' => ['label' => 'Contacted', 'color' => 'info'],
+            'qualified' => ['label' => 'Qualified', 'color' => 'primary'],
+            'proposal' => ['label' => 'Proposal', 'color' => 'purple'],
+            'negotiation' => ['label' => 'Negotiation', 'color' => 'orange'],
+            'won' => ['label' => 'Won', 'color' => 'success'],
+            'lost' => ['label' => 'Lost', 'color' => 'danger'],
+        ];
+
+        $pdf = Pdf::loadView('pages.leads.exports.pdf', compact('leads', 'statuses'));
+        $pdf->setPaper('A4', 'landscape');
+        return $pdf->download('leads_' . date('Y-m-d_His') . '.pdf');
+    }
+} 
+

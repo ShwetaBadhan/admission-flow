@@ -20,7 +20,7 @@
     <link rel="apple-touch-icon" href="{{url ('assets/img/apple-icon.png')}}">
 
     <!-- Theme Config Js -->
-    {{-- <script src="{{url ('assets/js/theme-script.js')}}" ></script> --}}
+    <script src="{{url ('assets/js/theme-script.js')}}" ></script>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="{{url ('assets/css/bootstrap.min.css')}}">

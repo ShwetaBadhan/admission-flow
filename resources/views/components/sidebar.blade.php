@@ -38,12 +38,11 @@
                   <li>
                       <ul>
                           @can('view-dashboard')
-                              <li class="submenu">
-                                  <a href="{{ route('dashboard') }}">
-                                      <i class="ti ti-dashboard"></i><span>Dashboard</span>
-                                  </a>
-
-                              </li>
+                          <li>
+    <a href="{{ route('dashboard') }}">
+        <i class="ti ti-dashboard"></i><span>Dashboard</span>
+    </a>
+</li>
                           @endcan
                       </ul>
                   </li>
