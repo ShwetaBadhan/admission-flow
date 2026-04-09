@@ -6,17 +6,17 @@
           <div>
               <!-- Logo Normal -->
               <a href="{{ route('dashboard') }}" class="logo logo-normal">
-                  <img src="{{ url ('assets/img/logo.svg')}}" alt="Logo">
+                  <img src="{{ url('assets/img/logo.svg') }}" alt="Logo">
               </a>
 
               <!-- Logo Small -->
               <a href="{{ route('dashboard') }}" class="logo-small">
-                  <img src="{{ url ('assets/img/logo-small.svg')}}" alt="Logo">
+                  <img src="{{ url('assets/img/logo-small.svg') }}" alt="Logo">
               </a>
 
               <!-- Logo Dark -->
               <a href="{{ route('dashboard') }}" class="dark-logo">
-                  <img src="{{ url ('assets/img/logo-white.svg')}}" alt="Logo">
+                  <img src="{{ url('assets/img/logo-white.svg') }}" alt="Logo">
               </a>
           </div>
           <button class="sidenav-toggle-btn btn border-0 p-0 active" id="toggle_btn">
@@ -38,11 +38,11 @@
                   <li>
                       <ul>
                           @can('view-dashboard')
-                          <li>
-    <a href="{{ route('dashboard') }}">
-        <i class="ti ti-dashboard"></i><span>Dashboard</span>
-    </a>
-</li>
+                              <li>
+                                  <a href="{{ route('dashboard') }}">
+                                      <i class="ti ti-dashboard"></i><span>Dashboard</span>
+                                  </a>
+                              </li>
                           @endcan
                       </ul>
                   </li>
@@ -108,6 +108,16 @@
                                               class="ti ti-atom-2"></i><span>Consultant</span></a>
                                   </li>
                               @endcan
+                              <li>
+                                  <a href="{{ route('payment-requests.index') }}">
+                                      <i class="ti ti-receipt me-2"></i> My Payment Requests
+                                  </a>
+                              </li>
+                              <li>
+                                  <a href="{{ route('payment-requests.requested') }}" class="nav-link">
+                                      <i class="ti ti-receipt me-2"></i> Requested Payments
+                                  </a>
+                              </li>
 
                           </ul>
                       </li>
@@ -147,6 +157,10 @@
                                   <li><a href="{{ route('communication-logs.index') }}"><i
                                               class="ti ti-phone-check"></i><span>Communication Logs</span></a></li>
                               @endcan
+                              <li><a href="{{ route('slab-rules.index') }}"><i class="ti ti-user-shield"></i><span>Slab
+                                          Rules</span></a></li>
+
+
                           </ul>
                       </li>
                   @endcanany

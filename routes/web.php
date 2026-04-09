@@ -18,7 +18,9 @@ use App\Http\Controllers\PriorityController;
 use App\Http\Controllers\DocumentSettingController;
 use App\Http\Controllers\CommunicationLogController;
 use App\Http\Controllers\CommissionPaymentController;
+use App\Http\Controllers\ConsultantPaymentRequestController;
 use App\Models\LeadSource;
+use App\Http\Controllers\SlabRuleController;
 
 // auth pages
 
@@ -51,13 +53,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/lead-details/{lead}', [LeadController::class, 'show'])->name('lead-details');
     Route::put('/leads/{lead}', [LeadController::class, 'update'])->name('leads.update');
     Route::delete('/leads/{lead}', [LeadController::class, 'destroy'])->name('leads.destroy');
-// Bulk Lead Import Routes
-Route::get('/leads/bulk-import', [LeadController::class, 'showBulkImport'])->name('leads.bulk.import');
-Route::post('/leads/bulk-import', [LeadController::class, 'processBulkImport'])->name('leads.bulk.process');
-Route::get('/leads/sample-csv', [LeadController::class, 'downloadSampleCsv'])->name('leads.sample.csv');
-  // ✅ Export Routes
-Route::get('/leads/export/excel', [LeadController::class, 'exportExcel'])->name('leads.export.excel');
-Route::get('/leads/export/pdf', [LeadController::class, 'exportPdf'])->name('leads.export.pdf');
+    // Bulk Lead Import Routes
+    Route::get('/leads/bulk-import', [LeadController::class, 'showBulkImport'])->name('leads.bulk.import');
+    Route::post('/leads/bulk-import', [LeadController::class, 'processBulkImport'])->name('leads.bulk.process');
+    Route::get('/leads/sample-csv', [LeadController::class, 'downloadSampleCsv'])->name('leads.sample.csv');
+    // ✅ Export Routes
+    Route::get('/leads/export/excel', [LeadController::class, 'exportExcel'])->name('leads.export.excel');
+    Route::get('/leads/export/pdf', [LeadController::class, 'exportPdf'])->name('leads.export.pdf');
     // Feature Routes (All POST for simplicity)
     Route::post('/lead/{lead}/update-stage', [LeadController::class, 'updateStage'])->name('leads.update-stage');
     Route::post('/leads/{lead}/assign-consultant', [LeadController::class, 'assignCounsellor'])
@@ -139,13 +141,52 @@ Route::delete('/commission-rules/{commissionRule}', [CommissionRuleController::c
 // Route::get('/commission-payments', function () {
 //     return view(view: 'pages.commission-payments.index');
 // })->name('commission-payments');
+// ============ EXISTING ROUTES (Keep as is) ============
 Route::get('/commission-payments', [CommissionPaymentController::class, 'index'])->name('commission-payments');
-    Route::get('/commission-payments/{payment}', [CommissionPaymentController::class, 'show'])->name('commission-payments.show');
-    Route::post('/commission-payments/generate/{admission}', [CommissionPaymentController::class, 'generatePayment'])->name('commission-payments.generate');
-    Route::post('/commission-payments/{payment}/mark-paid', [CommissionPaymentController::class, 'markAsPaid'])->name('commission-payments.mark-paid');
-    Route::post('/commission-payments/{payment}/cancel', [CommissionPaymentController::class, 'cancel'])->name('commission-payments.cancel');
-    Route::post('/commission-payments/bulk-generate', [CommissionPaymentController::class, 'bulkGenerate'])->name('commission-payments.bulk-generate');
-    // sources
+Route::get('/commission-payments/{payment}', [CommissionPaymentController::class, 'show'])->name('commission-payments.show');
+Route::post('/commission-payments/generate/{admission}', [CommissionPaymentController::class, 'generatePayment'])->name('commission-payments.generate');
+Route::post('/commission-payments/{payment}/mark-paid', [CommissionPaymentController::class, 'markAsPaid'])->name('commission-payments.mark-paid');
+Route::post('/commission-payments/{payment}/cancel', [CommissionPaymentController::class, 'cancel'])->name('commission-payments.cancel');
+Route::post('/commission-payments/bulk-generate', [CommissionPaymentController::class, 'bulkGenerate'])->name('commission-payments.bulk-generate');
+
+// ============ NEW: Generate for Specific Consultant ============
+Route::post('/commission-payments/generate-for-consultant', [CommissionPaymentController::class, 'generateForConsultant'])->name('commission-payments.generate-for-consultant');
+
+// ============ SIMPLE ROUTES ONLY ============
+
+// Consultant: View requests
+Route::get('/payment-requests', [ConsultantPaymentRequestController::class, 'index'])
+    ->name('payment-requests.index')
+    ->middleware(['auth']);
+
+// Consultant: Create form ✅
+Route::get('/payment-requests/create', [ConsultantPaymentRequestController::class, 'create'])
+    ->name('payment-requests.create')
+    ->middleware(['auth']);
+
+// Consultant: Store
+Route::post('/payment-requests', [ConsultantPaymentRequestController::class, 'store'])
+    ->name('payment-requests.store')
+    ->middleware(['auth']);
+
+// Admin: Approve
+Route::post('/payment-requests/{request}/approve', [ConsultantPaymentRequestController::class, 'approve'])
+    ->name('payment-requests.approve')
+    ->middleware(['auth']);
+
+// Admin: Reject
+Route::post('/payment-requests/{request}/reject', [ConsultantPaymentRequestController::class, 'reject'])
+    ->name('payment-requests.reject')
+    ->middleware(['auth']);
+
+// ✅ Requested Payments - Admin (Detailed View)
+Route::get('/payment-requests/requested', [ConsultantPaymentRequestController::class, 'requestedPayments'])
+    ->name('payment-requests.requested');
+
+    // ✅ NEW: Actually make payment for approved request
+    Route::post('/payment-requests/{request}/make-payment', [ConsultantPaymentRequestController::class, 'makePayment'])
+        ->name('payment-requests.make-payment');
+// sources
 
 Route::get('/sources', [LeadSourceController::class, 'index'])->name('sources.index');
 Route::post('/sources', [LeadSourceController::class, 'store'])->name('sources.store');
@@ -264,4 +305,11 @@ Route::prefix('user-management')->group(function () {
     Route::post('/permissions', [PermissionController::class, 'store'])->name('permissions.store');
     Route::put('/permissions/{permission}', [PermissionController::class, 'update'])->name('permissions.update');
     Route::delete('/permissions/{permission}', [PermissionController::class, 'destroy'])->name('permissions.destroy');
+
+
+
+    // slab rules
+
+
+    Route::resource('slab-rules', SlabRuleController::class)->except(['show']);
 });
