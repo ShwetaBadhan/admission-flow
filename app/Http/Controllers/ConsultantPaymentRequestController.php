@@ -122,7 +122,7 @@ class ConsultantPaymentRequestController extends Controller
             ]);
 
             DB::commit();
-            return redirect()->route('consultant.payment-requests.index')
+            return redirect()->route('consultants.payment-requests.index')
                 ->with('success', 'Payment request #' . $paymentRequest->id . ' submitted successfully! Amount: ₹' . number_format($totalAmount, 2));
         } catch (\Exception $e) {
             DB::rollBack();

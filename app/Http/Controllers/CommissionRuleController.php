@@ -11,26 +11,53 @@ use Illuminate\Http\Request;
 class CommissionRuleController extends Controller
 {
     /**
+ * Helper: Get authenticated consultant record (if user is consultant)
+ */
+private function getAuthenticatedConsultant()
+{
+    $user = auth()->user();
+    
+    if (!$user) return null;
+
+    // ✅ Role check (adjust based on your auth system)
+    if (method_exists($user, 'hasRole') && !$user->hasRole('consultant')) {
+        return null;
+    }
+    
+    if (isset($user->role) && $user->role !== 'consultant') {
+        return null;
+    }
+
+    // ✅ Fetch consultant record (assuming user.id = consultant.id)
+    return $user->consultant ?? \App\Models\Consultant::where('id', $user->id)->first();
+}
+    /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $commissionRules = CommissionRule::with(['consultant', 'college'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-
-        // Fetch dropdown data (only active records)
-        $consultants = Consultant::where('status', 1)->orderBy('name')->get();
-        $colleges = College::where('status', 1)->orderBy('name')->get();
-        $courses = Course::where('status', 1)->orderBy('name')->get();
-
-        return view('pages.commission-rules.index', compact(
-            'commissionRules',
-            'consultants',
-            'colleges',
-            'courses'
-        ));
+ public function index()
+{
+    $query = CommissionRule::with(['consultant', 'college']);
+    
+    // 🔐 Consultant? Only show THEIR rules
+    $consultant = $this->getAuthenticatedConsultant();
+    
+    if ($consultant) {
+        // Consultant hai → sirf unki rules dikhao
+        $query->where('consultant_id', $consultant->id);
     }
+    // ✅ Admin/Superadmin? Sab rules dikhengi (no filter)
+    
+    $commissionRules = $query->orderBy('created_at', 'desc')->paginate(10);
+
+    // Dropdown data (consultant ke liye bhi safe)
+    $consultants = Consultant::where('status', 1)->orderBy('name')->get();
+    $colleges = College::where('status', 1)->orderBy('name')->get();
+    $courses = Course::where('status', 1)->orderBy('name')->get();
+
+    return view('pages.commission-rules.index', compact(
+        'commissionRules', 'consultants', 'colleges', 'courses'
+    ));
+}
 
     /**
      * Show the form for creating a new resource.
@@ -58,36 +85,47 @@ class CommissionRuleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'consultant_id' => 'required|exists:consultants,id',
-            'college_id' => 'nullable|exists:colleges,id',
-            'course_name' => 'required|string|max:255',
-            'commission_type' => 'required|in:fixed_amount,percentage',
-             'commission_value' => [
-        'required', 
-        'numeric', 
-        'min:0',
-        // Custom rule: percentage cannot exceed 100
-        function ($attribute, $value, $fail) use ($request) {
-            if ($request->commission_type === 'percentage' && $value > 100) {
-                $fail('Percentage value cannot exceed 100%.');
+public function store(Request $request)
+{
+    $consultant = $this->getAuthenticatedConsultant();
+    
+    // 🔐 Validation rules - conditional based on user role
+    $validationRules = [
+        'college_id' => 'nullable|exists:colleges,id',
+        'course_name' => 'required|string|max:255',
+        'commission_type' => 'required|in:fixed_amount,percentage',
+        'commission_value' => [
+            'required', 'numeric', 'min:0',
+            function ($attribute, $value, $fail) use ($request) {
+                if ($request->commission_type === 'percentage' && $value > 100) {
+                    $fail('Percentage value cannot exceed 100%.');
+                }
             }
-        }
-    ],
-            'currency' => 'required|string|max:3',
-            'status' => 'required|in:active,inactive',
-            'notes' => 'nullable|string',
-            
-        ]);
-        // Convert empty string to null for nullable foreign keys
-        $validated['college_id'] = $validated['college_id'] ?: null;
-        CommissionRule::create($validated);
-
-        return redirect()->route('commission-rules.index')
-            ->with('success', 'Commission rule created successfully.');
+        ],
+        'currency' => 'required|string|max:3',
+        'status' => 'required|in:active,inactive',
+        'notes' => 'nullable|string',
+    ];
+    
+    // ✅ Admin MUST select consultant_id, Consultant gets it auto-assigned
+    if ($consultant) {
+        // Consultant: auto-assign, ignore request input
+        $validated = $request->validate($validationRules);
+        $validated['consultant_id'] = $consultant->id;
+        $validated['status'] = 'active'; // Optional: consultants can't create inactive
+    } else {
+        // Admin: consultant_id is required from form
+        $validationRules['consultant_id'] = 'required|exists:consultants,id';
+        $validated = $request->validate($validationRules);
     }
+    
+    $validated['college_id'] = $validated['college_id'] ?: null;
+    
+    CommissionRule::create($validated);
+
+    return redirect()->route('commission-rules.index')
+        ->with('success', 'Commission rule created successfully.');
+}
 
     /**
      * Display the specified resource.
@@ -126,12 +164,17 @@ class CommissionRuleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+   public function update(Request $request, string $id)
 {
+    $consultant = $this->getAuthenticatedConsultant();
     $commissionRule = CommissionRule::findOrFail($id);
 
+    // 🔐 Consultant can only edit THEIR rules
+    if ($consultant && $commissionRule->consultant_id !== $consultant->id) {
+        abort(403, 'Unauthorized action.');
+    }
+
     $validated = $request->validate([
-        'consultant_id' => 'required|exists:consultants,id',
         'college_id' => 'nullable|exists:colleges,id',
         'course_name' => 'required|string|max:255',
         'commission_type' => 'required|in:fixed_amount,percentage',
@@ -141,23 +184,36 @@ class CommissionRuleController extends Controller
         'notes' => 'nullable|string',
     ]);
 
-    // ✅ Add this line to convert empty string to null
-    $validated['college_id'] = $validated['college_id'] ?: null;
+    // Consultant can't change consultant_id or set status to inactive (optional)
+    if ($consultant) {
+        unset($validated['consultant_id']); // Prevent tampering
+        // Optional: $validated['status'] = 'active';
+    }
 
+    $validated['college_id'] = $validated['college_id'] ?: null;
+    
     $commissionRule->update($validated);
 
     return redirect()->route('commission-rules.index')
         ->with('success', 'Commission rule updated successfully.');
 }
-
     /**
      * Remove the specified resource from storage.
-     */public function destroy(string $id)
+     */
+public function destroy(string $id)
 {
+    $consultant = $this->getAuthenticatedConsultant();
     $commissionRule = CommissionRule::findOrFail($id);
-    $commissionRule->delete();  // ✅ Correct
+
+    // 🔐 Consultant can only delete THEIR rules
+    if ($consultant && $commissionRule->consultant_id !== $consultant->id) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    $commissionRule->delete();
 
     return redirect()->route('commission-rules.index')
         ->with('success', 'Commission rule deleted successfully.');
 }
+
 }

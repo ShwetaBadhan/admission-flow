@@ -48,7 +48,8 @@
                   </li>
 
                   @canany(['view-crm', 'view-leads', 'view-colleges', 'view-courses', 'view-admissions',
-                      'view-documents', 'view-commission-rules', 'view-commission-payments', 'view-consultants'])
+                      'view-documents', 'view-commission-rules', 'view-commission-payments', 'view-consultants',
+                      'view-payment-requests','view-requested-payments'])
 
                       <li class="menu-title"><span>CRM</span></li>
                       <li>
@@ -108,16 +109,21 @@
                                               class="ti ti-atom-2"></i><span>Consultant</span></a>
                                   </li>
                               @endcan
+                              @can('view-payment-requests')
                               <li>
                                   <a href="{{ route('payment-requests.index') }}">
                                       <i class="ti ti-receipt me-2"></i> My Payment Requests
                                   </a>
                               </li>
-                              <li>
+                              @endcan
+                              @can('view-requested-payments')
+                                   <li>
                                   <a href="{{ route('payment-requests.requested') }}" class="nav-link">
                                       <i class="ti ti-receipt me-2"></i> Requested Payments
                                   </a>
                               </li>
+                              @endcan
+                             
 
                           </ul>
                       </li>

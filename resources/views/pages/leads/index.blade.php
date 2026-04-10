@@ -33,8 +33,8 @@
 
 @section('content')
     <!-- ========================
-               Start Page Content
-              ========================= -->
+                   Start Page Content
+                  ========================= -->
 
     <div class="page-wrapper">
 
@@ -64,8 +64,8 @@
                                         PDF</a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ route('leads.export.excel', request()->query()) }}" class="dropdown-item"><i
-                                            class="ti ti-file-type-xls me-1"></i>Export as
+                                    <a class="dropdown-item" href="{{ route('leads.export.excel', request()->query()) }}"
+                                        class="dropdown-item"><i class="ti ti-file-type-xls me-1"></i>Export as
                                         Excel </a>
                                 </li>
                             </ul>
@@ -84,171 +84,174 @@
             <!-- table header -->
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                   <!-- Filter Form Wrapper -->
-<form id="leads-filter-form" action="{{ route('leads.index') }}" method="GET">
-    <div class="dropdown">
-        <a href="javascript:void(0);" class="btn btn-outline-light shadow px-2" data-bs-toggle="dropdown"
-            data-bs-auto-close="outside"><i class="ti ti-filter me-2"></i>Filter<i
-                class="ti ti-chevron-down ms-2"></i></a>
-        <div class="filter-dropdown-menu dropdown-menu dropdown-menu-lg p-0">
-            <div class="filter-header d-flex align-items-center justify-content-between border-bottom">
-                <h6 class="mb-0"><i class="ti ti-filter me-1"></i>Filter</h6>
-                <button type="button" class="btn-close close-filter-btn" data-bs-dismiss="dropdown-menu"
-                    aria-label="Close"></button>
-            </div>
-            <div class="filter-set-view p-3">
-                <div class="accordion" id="accordionExample">
-                    
-                    <!-- Lead Name Filter -->
-                    <div class="filter-set-content">
-                        <div class="filter-set-content-head">
-                            <a href="#" data-bs-toggle="collapse" data-bs-target="#collapseTwo"
-                                aria-expanded="true" aria-controls="collapseTwo">Lead Name</a>
-                        </div>
-                        <div class="filter-set-contents accordion-collapse collapse show" id="collapseTwo"
-                            data-bs-parent="#accordionExample">
-                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                <div class="mb-2">
-                                    <div class="input-icon-start input-icon position-relative">
-                                        <span class="input-icon-addon fs-12"><i class="ti ti-search"></i></span>
-                                        <input type="text" class="form-control form-control-md" 
-                                            placeholder="Search" 
-                                            name="lead_name" 
-                                            value="{{ request('lead_name') }}">
+                    <!-- Filter Form Wrapper -->
+                    <form id="leads-filter-form" action="{{ route('leads.index') }}" method="GET">
+                        <div class="dropdown">
+                            <a href="javascript:void(0);" class="btn btn-outline-light shadow px-2"
+                                data-bs-toggle="dropdown" data-bs-auto-close="outside"><i
+                                    class="ti ti-filter me-2"></i>Filter<i class="ti ti-chevron-down ms-2"></i></a>
+                            <div class="filter-dropdown-menu dropdown-menu dropdown-menu-lg p-0">
+                                <div class="filter-header d-flex align-items-center justify-content-between border-bottom">
+                                    <h6 class="mb-0"><i class="ti ti-filter me-1"></i>Filter</h6>
+                                    <button type="button" class="btn-close close-filter-btn"
+                                        data-bs-dismiss="dropdown-menu" aria-label="Close"></button>
+                                </div>
+                                <div class="filter-set-view p-3">
+                                    <div class="accordion" id="accordionExample">
+
+                                        <!-- Lead Name Filter -->
+                                        <div class="filter-set-content">
+                                            <div class="filter-set-content-head">
+                                                <a href="#" data-bs-toggle="collapse" data-bs-target="#collapseTwo"
+                                                    aria-expanded="true" aria-controls="collapseTwo">Lead Name</a>
+                                            </div>
+                                            <div class="filter-set-contents accordion-collapse collapse show"
+                                                id="collapseTwo" data-bs-parent="#accordionExample">
+                                                <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
+                                                    <div class="mb-2">
+                                                        <div class="input-icon-start input-icon position-relative">
+                                                            <span class="input-icon-addon fs-12"><i
+                                                                    class="ti ti-search"></i></span>
+                                                            <input type="text" class="form-control form-control-md"
+                                                                placeholder="Search" name="lead_name"
+                                                                value="{{ request('lead_name') }}">
+                                                        </div>
+                                                    </div>
+                                                    <ul class="mb-0">
+                                                        @foreach ($leads as $lead)
+                                                            <li class="mb-1">
+                                                                <label class="dropdown-item px-2 d-flex align-items-center">
+                                                                    <input
+                                                                        class="form-check-input m-0 me-1 lead-name-checkbox"
+                                                                        type="checkbox" name="lead_ids[]"
+                                                                        value="{{ $lead->id }}"
+                                                                        {{ in_array($lead->id, request('lead_ids', [])) ? 'checked' : '' }}>
+                                                                    <span class="avatar avatar-xs rounded-circle me-2">
+                                                                        <img src="{{ asset('assets/img/users/user-06.jpg') }}"
+                                                                            class="flex-shrink-0 rounded-circle"
+                                                                            alt="img">
+                                                                    </span>
+                                                                    {{ $lead->full_name }}
+                                                                </label>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Lead Status Filter -->
+                                        <div class="filter-set-content">
+                                            <div class="filter-set-content-head">
+                                                <a href="#" class="collapsed" data-bs-toggle="collapse"
+                                                    data-bs-target="#status" aria-expanded="false"
+                                                    aria-controls="status">Lead Status</a>
+                                            </div>
+                                            <div class="filter-set-contents accordion-collapse collapse" id="status"
+                                                data-bs-parent="#accordionExample">
+                                                <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
+                                                    @foreach ($statuses as $key => $status)
+                                                        <div class="mb-1">
+                                                            <label class="dropdown-item px-2 d-flex align-items-center">
+                                                                <input class="form-check-input m-0 me-1" type="checkbox"
+                                                                    name="statuses[]" value="{{ $key }}"
+                                                                    {{ in_array($key, request('statuses', [])) ? 'checked' : '' }}>
+                                                                {{ $status['label'] }}
+                                                            </label>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Created Date Filter -->
+                                        <div class="filter-set-content">
+                                            <div class="filter-set-content-head">
+                                                <a href="#" class="collapsed" data-bs-toggle="collapse"
+                                                    data-bs-target="#date2" aria-expanded="false"
+                                                    aria-controls="date2">Created Date</a>
+                                            </div>
+                                            <div class="filter-set-contents accordion-collapse collapse" id="date2"
+                                                data-bs-parent="#accordionExample">
+                                                <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
+                                                    <div class="input-group w-auto input-group-flat">
+                                                        <input type="text" class="form-control" name="created_date"
+                                                            value="{{ request('created_date') }}"
+                                                            data-provider="flatpickr" data-date-format="d M, Y">
+                                                        <span class="input-group-text"><i
+                                                                class="ti ti-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Lead Owner (Consultant) Filter -->
+                                        <div class="filter-set-content">
+                                            <div class="filter-set-content-head">
+                                                <a href="#" class="collapsed" data-bs-toggle="collapse"
+                                                    data-bs-target="#owner" aria-expanded="false"
+                                                    aria-controls="owner">Lead Owner</a>
+                                            </div>
+                                            <div class="filter-set-contents accordion-collapse collapse" id="owner"
+                                                data-bs-parent="#accordionExample">
+                                                <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
+                                                    <div class="mb-2">
+                                                        <div class="input-icon-start input-icon position-relative">
+                                                            <span class="input-icon-addon fs-12"><i
+                                                                    class="ti ti-search"></i></span>
+                                                            <input type="text" class="form-control form-control-md"
+                                                                placeholder="Search" id="consultant-search">
+                                                        </div>
+                                                    </div>
+                                                    <ul class="mb-0" id="consultant-list">
+                                                        @foreach ($consultants as $consultant)
+                                                            <li class="mb-1 consultant-item">
+                                                                <label
+                                                                    class="dropdown-item px-2 d-flex align-items-center">
+                                                                    <input class="form-check-input m-0 me-1"
+                                                                        type="checkbox" name="consultant_ids[]"
+                                                                        value="{{ $consultant->id }}"
+                                                                        {{ in_array($consultant->id, request('consultant_ids', [])) ? 'checked' : '' }}>
+                                                                    <span class="avatar avatar-xs rounded-circle me-2">
+                                                                        <img src="{{ asset('assets/img/users/user-17.jpg') }}"
+                                                                            class="flex-shrink-0 rounded-circle"
+                                                                            alt="img">
+                                                                    </span>
+                                                                    {{ $consultant->name }}
+                                                                </label>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Filter Actions -->
+                                    <div class="d-flex align-items-center gap-2 mt-3">
+                                        <button type="button" class="btn btn-outline-light w-100"
+                                            id="reset-filters">Reset</button>
+                                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
                                     </div>
                                 </div>
-                                <ul class="mb-0">
-                                    @foreach($leads as $lead)
-                                        <li class="mb-1">
-                                            <label class="dropdown-item px-2 d-flex align-items-center">
-                                                <input class="form-check-input m-0 me-1 lead-name-checkbox" 
-                                                    type="checkbox" 
-                                                    name="lead_ids[]" 
-                                                    value="{{ $lead->id }}"
-                                                    {{ in_array($lead->id, request('lead_ids', [])) ? 'checked' : '' }}>
-                                                <span class="avatar avatar-xs rounded-circle me-2">
-                                                    <img src="{{ asset('assets/img/users/user-06.jpg') }}" 
-                                                        class="flex-shrink-0 rounded-circle" alt="img">
-                                                </span>
-                                                {{ $lead->full_name }}
-                                            </label>
-                                        </li>
-                                    @endforeach
-                                </ul>
                             </div>
                         </div>
+                    </form>
+
+                    <!-- Global Search Input (outside form, handled via JS) -->
+                    <div class="input-icon input-icon-start position-relative">
+                        <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
+                        <input type="text" class="form-control" placeholder="Search leads..." id="global-search"
+                            value="{{ request('search') }}">
                     </div>
-
-                    <!-- Lead Status Filter -->
-                    <div class="filter-set-content">
-                        <div class="filter-set-content-head">
-                            <a href="#" class="collapsed" data-bs-toggle="collapse"
-                                data-bs-target="#status" aria-expanded="false" aria-controls="status">Lead Status</a>
-                        </div>
-                        <div class="filter-set-contents accordion-collapse collapse" id="status"
-                            data-bs-parent="#accordionExample">
-                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                @foreach($statuses as $key => $status)
-                                    <div class="mb-1">
-                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                            <input class="form-check-input m-0 me-1" type="checkbox" 
-                                                name="statuses[]" 
-                                                value="{{ $key }}"
-                                                {{ in_array($key, request('statuses', [])) ? 'checked' : '' }}>
-                                            {{ $status['label'] }}
-                                        </label>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Created Date Filter -->
-                    <div class="filter-set-content">
-                        <div class="filter-set-content-head">
-                            <a href="#" class="collapsed" data-bs-toggle="collapse"
-                                data-bs-target="#date2" aria-expanded="false" aria-controls="date2">Created Date</a>
-                        </div>
-                        <div class="filter-set-contents accordion-collapse collapse" id="date2"
-                            data-bs-parent="#accordionExample">
-                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                <div class="input-group w-auto input-group-flat">
-                                    <input type="text" class="form-control" 
-                                        name="created_date"
-                                        value="{{ request('created_date') }}"
-                                        data-provider="flatpickr" 
-                                        data-date-format="d M, Y">
-                                    <span class="input-group-text"><i class="ti ti-calendar"></i></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Lead Owner (Consultant) Filter -->
-                    <div class="filter-set-content">
-                        <div class="filter-set-content-head">
-                            <a href="#" class="collapsed" data-bs-toggle="collapse"
-                                data-bs-target="#owner" aria-expanded="false" aria-controls="owner">Lead Owner</a>
-                        </div>
-                        <div class="filter-set-contents accordion-collapse collapse" id="owner"
-                            data-bs-parent="#accordionExample">
-                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                <div class="mb-2">
-                                    <div class="input-icon-start input-icon position-relative">
-                                        <span class="input-icon-addon fs-12"><i class="ti ti-search"></i></span>
-                                        <input type="text" class="form-control form-control-md" 
-                                            placeholder="Search" 
-                                            id="consultant-search">
-                                    </div>
-                                </div>
-                                <ul class="mb-0" id="consultant-list">
-                                    @foreach($consultants as $consultant)
-                                        <li class="mb-1 consultant-item">
-                                            <label class="dropdown-item px-2 d-flex align-items-center">
-                                                <input class="form-check-input m-0 me-1" type="checkbox" 
-                                                    name="consultant_ids[]" 
-                                                    value="{{ $consultant->id }}"
-                                                    {{ in_array($consultant->id, request('consultant_ids', [])) ? 'checked' : '' }}>
-                                                <span class="avatar avatar-xs rounded-circle me-2">
-                                                    <img src="{{ asset('assets/img/users/user-17.jpg') }}" 
-                                                        class="flex-shrink-0 rounded-circle" alt="img">
-                                                </span>
-                                                {{ $consultant->name }}
-                                            </label>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Filter Actions -->
-                <div class="d-flex align-items-center gap-2 mt-3">
-                    <button type="button" class="btn btn-outline-light w-100" id="reset-filters">Reset</button>
-                    <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</form>
-
-<!-- Global Search Input (outside form, handled via JS) -->
-<div class="input-icon input-icon-start position-relative">
-    <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
-    <input type="text" class="form-control" 
-        placeholder="Search leads..." 
-        id="global-search"
-        value="{{ request('search') }}">
-</div>
                     <div class="input-icon input-icon-start position-relative">
                         <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
                         <input type="text" class="form-control" placeholder="Search">
                     </div>
                 </div>
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    
+
                     @can('create-leads')
                         <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
                             data-bs-target="#offcanvas_add"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add Lead</a>
@@ -289,7 +292,7 @@
                             <div class="kanban-drag-wrap">
                                 <div class="container">
                                     <div class="row">
-                                        @foreach ($statusLeads->take(3) as $lead)
+                                        @foreach ($statusLeads as $lead)
                                             <div class="col-md-4 mb-3">
                                                 <div class="card kanban-card border mb-0 mt-3 shadow">
                                                     <div class="card-body">
@@ -652,8 +655,8 @@
     </div>
 
     <!-- ========================
-               End Page Content
-              ========================= -->
+                   End Page Content
+                  ========================= -->
 
     <!-- Add lead-->
     <div class="offcanvas offcanvas-end offcanvas-large" tabindex="-1" id="offcanvas_add">
@@ -1007,80 +1010,80 @@
             });
 
         });
-         // === Global Search with Debounce ===
-    const globalSearch = document.getElementById('global-search');
-    let searchTimeout;
-    
-    if (globalSearch) {
-        globalSearch.addEventListener('input', function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                const url = new URL(window.location);
-                if (this.value.trim()) {
-                    url.searchParams.set('search', this.value.trim());
-                } else {
-                    url.searchParams.delete('search');
-                }
-                // Remove page param to reset pagination
-                url.searchParams.delete('page');
-                window.location.href = url.toString();
-            }, 500);
-        });
-    }
+        // === Global Search with Debounce ===
+        const globalSearch = document.getElementById('global-search');
+        let searchTimeout;
 
-    // === Reset Filters ===
-    const resetBtn = document.getElementById('reset-filters');
-    if (resetBtn) {
-        resetBtn.addEventListener('click', function() {
-            // Clear all filter inputs
-            document.getElementById('leads-filter-form')?.reset();
-            // Redirect to clean URL
-            window.location.href = "{{ route('leads.index') }}";
-        });
-    }
-
-    // === Consultant Search within Filter ===
-    const consultantSearch = document.getElementById('consultant-search');
-    const consultantItems = document.querySelectorAll('.consultant-item');
-    
-    if (consultantSearch && consultantItems.length > 0) {
-        consultantSearch.addEventListener('input', function() {
-            const term = this.value.toLowerCase();
-            consultantItems.forEach(item => {
-                const text = item.textContent.toLowerCase();
-                item.style.display = text.includes(term) ? 'block' : 'none';
+        if (globalSearch) {
+            globalSearch.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const url = new URL(window.location);
+                    if (this.value.trim()) {
+                        url.searchParams.set('search', this.value.trim());
+                    } else {
+                        url.searchParams.delete('search');
+                    }
+                    // Remove page param to reset pagination
+                    url.searchParams.delete('page');
+                    window.location.href = url.toString();
+                }, 500);
             });
-        });
-    }
+        }
 
-    // === Lead Name Search within Filter ===
-    const leadNameSearch = document.querySelector('#collapseTwo input[type="text"]');
-    const leadNameItems = document.querySelectorAll('#collapseTwo ul li');
-    
-    if (leadNameSearch && leadNameItems.length > 0) {
-        leadNameSearch.addEventListener('input', function() {
-            const term = this.value.toLowerCase();
-            leadNameItems.forEach(item => {
-                if (item.querySelector('a')) return; // Skip "Load More"
-                const text = item.textContent.toLowerCase();
-                item.style.display = text.includes(term) ? 'block' : 'none';
+        // === Reset Filters ===
+        const resetBtn = document.getElementById('reset-filters');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function() {
+                // Clear all filter inputs
+                document.getElementById('leads-filter-form')?.reset();
+                // Redirect to clean URL
+                window.location.href = "{{ route('leads.index') }}";
             });
-        });
-    }
+        }
 
-    // === Preserve Scroll Position on Filter Submit ===
-    const filterForm = document.getElementById('leads-filter-form');
-    if (filterForm) {
-        filterForm.addEventListener('submit', function() {
-            sessionStorage.setItem('leadsScrollPos', window.scrollY);
-        });
-    }
-    
-    // Restore scroll position on page load
-    const scrollPos = sessionStorage.getItem('leadsScrollPos');
-    if (scrollPos) {
-        window.scrollTo(0, parseInt(scrollPos));
-        sessionStorage.removeItem('leadsScrollPos');
-    }
+        // === Consultant Search within Filter ===
+        const consultantSearch = document.getElementById('consultant-search');
+        const consultantItems = document.querySelectorAll('.consultant-item');
+
+        if (consultantSearch && consultantItems.length > 0) {
+            consultantSearch.addEventListener('input', function() {
+                const term = this.value.toLowerCase();
+                consultantItems.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    item.style.display = text.includes(term) ? 'block' : 'none';
+                });
+            });
+        }
+
+        // === Lead Name Search within Filter ===
+        const leadNameSearch = document.querySelector('#collapseTwo input[type="text"]');
+        const leadNameItems = document.querySelectorAll('#collapseTwo ul li');
+
+        if (leadNameSearch && leadNameItems.length > 0) {
+            leadNameSearch.addEventListener('input', function() {
+                const term = this.value.toLowerCase();
+                leadNameItems.forEach(item => {
+                    if (item.querySelector('a')) return; // Skip "Load More"
+                    const text = item.textContent.toLowerCase();
+                    item.style.display = text.includes(term) ? 'block' : 'none';
+                });
+            });
+        }
+
+        // === Preserve Scroll Position on Filter Submit ===
+        const filterForm = document.getElementById('leads-filter-form');
+        if (filterForm) {
+            filterForm.addEventListener('submit', function() {
+                sessionStorage.setItem('leadsScrollPos', window.scrollY);
+            });
+        }
+
+        // Restore scroll position on page load
+        const scrollPos = sessionStorage.getItem('leadsScrollPos');
+        if (scrollPos) {
+            window.scrollTo(0, parseInt(scrollPos));
+            sessionStorage.removeItem('leadsScrollPos');
+        }
     </script>
 @endpush

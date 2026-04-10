@@ -181,7 +181,8 @@ Route::post('/payment-requests/{request}/reject', [ConsultantPaymentRequestContr
 
 // ✅ Requested Payments - Admin (Detailed View)
 Route::get('/payment-requests/requested', [ConsultantPaymentRequestController::class, 'requestedPayments'])
-    ->name('payment-requests.requested');
+    ->name('payment-requests.requested')
+    ->middleware(['auth']); // ← Add this if missing
 
     // ✅ NEW: Actually make payment for approved request
     Route::post('/payment-requests/{request}/make-payment', [ConsultantPaymentRequestController::class, 'makePayment'])
