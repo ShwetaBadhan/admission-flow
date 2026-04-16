@@ -38,7 +38,7 @@
 	<link rel="stylesheet" href="{{url ('assets/plugins/daterangepicker/daterangepicker.css')}}">
 
      <!-- Choices CSS -->
-    <link rel="stylesheet" href="{{url ('assets/plugins/choicesjs/public/assets/styles/choices.min.css')}}">
+    <link rel="stylesheet" href="{{url ('assets/plugins/choicesjs/styles/choices.min.css')}}">
 
     <!-- Select2 CSS -->
 	<link rel="stylesheet" href="{{url ('assets/plugins/select2/css/select2.min.css')}}">
@@ -93,7 +93,7 @@
 	<script src="{{ url ('assets/plugins/select2/js/select2.min.js')}}" ></script>
 
     <!-- Choices Js -->	
-    <script src="{{ url ('assets/plugins/choicesjs/public/assets/scripts/choices.min.js')}}" ></script>
+    <script src="{{ url ('assets/plugins/choicesjs/scripts/choices.min.js')}}" ></script>
 
     <!-- Mobile Input -->
     <script src="{{ url ('assets/plugins/intltelinput/js/intlTelInput.js')}}" ></script>
