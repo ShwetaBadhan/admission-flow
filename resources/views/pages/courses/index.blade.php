@@ -224,12 +224,12 @@
         </div>
     </div>
 
-    <!-- Add New Source Modal -->
+    <!-- Add Courses Modal -->
     <div class="modal fade" id="add_source" role="dialog">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add New Source</h5>
+                    <h5 class="modal-title">Add Courses</h5>
                     <button class="btn-close custom-btn-close border p-1 me-0 text-dark" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
