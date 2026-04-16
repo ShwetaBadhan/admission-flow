@@ -83,14 +83,14 @@
                             <tbody>
                                 @foreach ($courses as $course)
                                     <tr>
-                                        <td>
+                                        {{-- <td>
                                             <div class="form-check form-check-md">
                                                 <input class="form-check-input item-checkbox" type="checkbox"
                                                     value="{{ $course->id }}">
                                             </div>
-                                        </td>
+                                        </td> --}}
                                         <td><span class="title-name">{{ $course->name }}</span></td>
-                                        <td>{{ $course->created_at->format('d M Y, h:i A') }}</td>
+                                        <td>{{ $course->created_at->format('d M Y') }}</td>
                                         <td>
                                             @if ($course->status == 1)
                                                 <span class="badge badge-pill badge-status bg-success">Active</span>

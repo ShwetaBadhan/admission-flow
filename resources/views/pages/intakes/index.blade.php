@@ -91,7 +91,7 @@
                                             </div>
                                         </td>
                                         <td><span class="title-name">{{ $intake->name }}</span></td>
-                                        <td>{{ $intake->created_at->format('d M Y, h:i A') }}</td>
+                                        <td>{{ $intake->created_at->format('d M Y') }}</td>
                                         <td>
                                             @if ($intake->status == 1)
                                                 <span class="badge badge-pill badge-status bg-success">Active</span>

@@ -31,8 +31,8 @@
 @endif
 @section('content')
     <!-- ========================
-                           Start Page Content
-                          ========================= -->
+                               Start Page Content
+                              ========================= -->
 
     <div class="page-wrapper">
 
@@ -58,14 +58,14 @@
                         <div class="dropdown-menu  dropdown-menu-end">
                             <ul>
                                 <li>
-                                    <a href="javascript:void(0);" class="dropdown-item"><i
-                                            class="ti ti-file-type-pdf me-1"></i>Export as
-                                        PDF</a>
+                                    <a href="{{ route('export.pdf', request()->query()) }}" class="dropdown-item">
+                                        <i class="ti ti-file-type-pdf me-1"></i>Export as PDF
+                                    </a>
                                 </li>
                                 <li>
-                                    <a href="javascript:void(0);" class="dropdown-item"><i
-                                            class="ti ti-file-type-xls me-1"></i>Export as
-                                        Excel </a>
+                                    <a href="{{ route('export.excel', request()->query()) }}" class="dropdown-item">
+                                        <i class="ti ti-file-type-xls me-1"></i>Export as Excel
+                                    </a>
                                 </li>
                             </ul>
                         </div>
@@ -83,357 +83,137 @@
             <!-- table header -->
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                 <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <!-- Replace the entire filter dropdown with this -->
                     <div class="dropdown">
                         <a href="javascript:void(0);" class="btn btn-outline-light shadow px-2" data-bs-toggle="dropdown"
                             data-bs-auto-close="outside"><i class="ti ti-filter me-2"></i>Filter<i
                                 class="ti ti-chevron-down ms-2"></i></a>
                         <div class="filter-dropdown-menu dropdown-menu dropdown-menu-lg p-0">
-                            <div class="filter-header d-flex align-items-center justify-content-between border-bottom">
-                                <h6 class="mb-0"><i class="ti ti-filter me-1"></i>Filter</h6>
-                                <button type="button" class="btn-close close-filter-btn" data-bs-dismiss="dropdown-menu"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="filter-set-view p-3">
-                                <div class="accordion" id="accordionExample">
-                                    <div class="filter-set-content">
-                                        <div class="filter-set-content-head">
-                                            <a href="#" data-bs-toggle="collapse" data-bs-target="#collapseTwo"
-                                                aria-expanded="true" aria-controls="collapseTwo">Owner</a>
+                            <form method="GET" action="{{ route('colleges.index') }}" id="filter-form">
+                                <div class="filter-header d-flex align-items-center justify-content-between border-bottom">
+                                    <h6 class="mb-0"><i class="ti ti-filter me-1"></i>Filter</h6>
+                                    <button type="button" class="btn-close close-filter-btn"
+                                        data-bs-dismiss="dropdown-menu" aria-label="Close"></button>
+                                </div>
+                                <div class="filter-set-view p-3">
+                                    <div class="accordion" id="accordionExample">
+
+                                        <!-- Status Filter -->
+                                        <div class="filter-set-content">
+                                            <div class="filter-set-content-head">
+                                                <a href="#" data-bs-toggle="collapse" data-bs-target="#Status"
+                                                    aria-expanded="true" aria-controls="Status">Status</a>
+                                            </div>
+                                            <div class="filter-set-contents accordion-collapse collapse show" id="Status"
+                                                data-bs-parent="#accordionExample">
+                                                <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
+                                                    <ul>
+                                                        <li>
+                                                            <label class="dropdown-item px-2 d-flex align-items-center">
+                                                                <input class="form-check-input m-0 me-1 filter-checkbox"
+                                                                    type="radio" name="status" value="active"
+                                                                    {{ request('status') == 'active' ? 'checked' : '' }}>
+                                                                Active
+                                                            </label>
+                                                        </li>
+                                                        <li>
+                                                            <label class="dropdown-item px-2 d-flex align-items-center">
+                                                                <input class="form-check-input m-0 me-1 filter-checkbox"
+                                                                    type="radio" name="status" value="inactive"
+                                                                    {{ request('status') == 'inactive' ? 'checked' : '' }}>
+                                                                Inactive
+                                                            </label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="filter-set-contents accordion-collapse collapse show" id="collapseTwo"
-                                            data-bs-parent="#accordionExample">
-                                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                                <div class="mb-2">
-                                                    <div class="input-icon-start input-icon position-relative">
-                                                        <span class="input-icon-addon fs-12">
-                                                            <i class="ti ti-search"></i>
-                                                        </span>
-                                                        <input type="text" class="form-control form-control-md"
-                                                            placeholder="Search">
+
+                                        <!-- Location Filter -->
+                                        <div class="filter-set-content">
+                                            <div class="filter-set-content-head">
+                                                <a href="#" class="collapsed" data-bs-toggle="collapse"
+                                                    data-bs-target="#collapseFive" aria-expanded="false"
+                                                    aria-controls="collapseFive">Location</a>
+                                            </div>
+                                            <div class="filter-set-contents accordion-collapse collapse" id="collapseFive"
+                                                data-bs-parent="#accordionExample">
+                                                <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
+                                                    <div class="mb-2">
+                                                        <select class="form-select form-select-sm" name="state_id"
+                                                            id="filter_state_id">
+                                                            <option value="">All States</option>
+                                                            @foreach ($states as $state)
+                                                                <option value="{{ $state->id }}"
+                                                                    {{ request('state_id') == $state->id ? 'selected' : '' }}>
+                                                                    {{ $state->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <select class="form-select form-select-sm" name="city_id"
+                                                            id="filter_city_id">
+                                                            <option value="">All Cities</option>
+                                                            @if (request('state_id'))
+                                                                @foreach (\App\Models\City::where('state_id', request('state_id'))->get() as $city)
+                                                                    <option value="{{ $city->id }}"
+                                                                        {{ request('city_id') == $city->id ? 'selected' : '' }}>
+                                                                        {{ $city->name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            @endif
+                                                        </select>
                                                     </div>
                                                 </div>
-                                                <ul class="mb-0">
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2">
-                                                                <img src="assets/img/users/user-06.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Elizabeth Morgan
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2">
-                                                                <img src="assets/img/users/user-40.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Katherine Brooks
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2">
-                                                                <img src="assets/img/users/user-05.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Sophia Lopez
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-10.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>John Michael
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-15.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Natalie Brooks
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-01.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>William Turner
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-13.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Ava Martinez
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-12.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Nathan Reed
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-03.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Lily Anderson
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xs rounded-circle me-2"><img
-                                                                    src="assets/img/users/user-18.jpg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Ryan Coleman
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0);"
-                                                            class="link-primary text-decoration-underline p-2 d-flex">Load
-                                                            More</a>
-                                                    </li>
-                                                </ul>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="filter-set-content">
-                                        <div class="filter-set-content-head">
-                                            <a href="#" class="collapsed" data-bs-toggle="collapse"
-                                                data-bs-target="#collapseThree" aria-expanded="false"
-                                                aria-controls="collapseThree">Tags</a>
-                                        </div>
-                                        <div class="filter-set-contents accordion-collapse collapse" id="collapseThree"
-                                            data-bs-parent="#accordionExample">
-                                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                                <ul>
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            Collab
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            Promotion
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            VIP
-                                                        </label>
-                                                    </li>
-                                                </ul>
+
+                                        <!-- Course Filter -->
+                                        <div class="filter-set-content">
+                                            <div class="filter-set-content-head">
+                                                <a href="#" class="collapsed" data-bs-toggle="collapse"
+                                                    data-bs-target="#collapseCourses" aria-expanded="false"
+                                                    aria-controls="collapseCourses">Courses</a>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="filter-set-content">
-                                        <div class="filter-set-content-head">
-                                            <a href="#" class="collapsed" data-bs-toggle="collapse"
-                                                data-bs-target="#collapseFive" aria-expanded="false"
-                                                aria-controls="collapseFive">Location</a>
-                                        </div>
-                                        <div class="filter-set-contents accordion-collapse collapse" id="collapseFive"
-                                            data-bs-parent="#accordionExample">
-                                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                                <div class="mb-1">
-                                                    <div class="input-icon-start input-icon position-relative">
-                                                        <span class="input-icon-addon fs-12">
-                                                            <i class="ti ti-search"></i>
-                                                        </span>
-                                                        <input type="text" class="form-control form-control-md"
-                                                            placeholder="Search">
-                                                    </div>
+                                            <div class="filter-set-contents accordion-collapse collapse"
+                                                id="collapseCourses" data-bs-parent="#accordionExample">
+                                                <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
+                                                    <select class="form-select form-select-sm" name="course_id">
+                                                        <option value="">All Courses</option>
+                                                        @foreach ($courses as $course)
+                                                            <option value="{{ $course->id }}"
+                                                                {{ request('course_id') == $course->id ? 'selected' : '' }}>
+                                                                {{ $course->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
-                                                <ul class="mb-0">
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xss rounded-circle me-1"><img
-                                                                    src="assets/img/flags/us.svg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>USA
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xss rounded-circle me-1"><img
-                                                                    src="assets/img/flags/ae.svg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>UAE
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xss rounded-circle me-1"><img
-                                                                    src="assets/img/flags/de.svg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>Germany
-                                                        </label>
-                                                    </li>
-                                                    <li class="mb-1">
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="avatar avatar-xss rounded-circle me-1"><img
-                                                                    src="assets/img/flags/fr.svg"
-                                                                    class="flex-shrink-0 rounded-circle"
-                                                                    alt="img"></span>France
-                                                        </label>
-                                                    </li>
-                                                </ul>
                                             </div>
                                         </div>
+
                                     </div>
-                                    <div class="filter-set-content">
-                                        <div class="filter-set-content-head">
-                                            <a href="#" class="collapsed" data-bs-toggle="collapse"
-                                                data-bs-target="#collapseOne" aria-expanded="false"
-                                                aria-controls="collapseOne">Rating</a>
-                                        </div>
-                                        <div class="filter-set-contents accordion-collapse collapse" id="collapseOne"
-                                            data-bs-parent="#accordionExample">
-                                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                                <ul>
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="rating">
-                                                                <i class="ti ti-star-filled text-warning"></i>
-                                                                <i class="ti ti-star-filled text-warning"></i>
-                                                                <i class="ti ti-star-filled text-warning"></i>
-                                                                <i class="ti ti-star-filled text-warning"></i>
-                                                                <i class="ti ti-star-filled text-warning"></i>
-                                                                <span class="ms-1">5.0</span>
-                                                            </span>
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="rating">
-                                                                <i class="ti ti-star-filled text-warning"></i>
-                                                                <i class="ti ti-star-filled text-warning"></i>
-                                                                <i class="ti ti-star-filled text-warning"></i>
-                                                                <i class="ti ti-star-filled text-warning"></i>
-                                                                <i class="ti ti-star-filled"></i>
-                                                                <span class="ms-1">4.0</span>
-                                                            </span>
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="rating">
-                                                                <i class="ti ti-star-filled text-warning"></i>
-                                                                <i class="ti ti-star-filled text-warning"></i>
-                                                                <i class="ti ti-star-filled text-warning"></i>
-                                                                <i class="ti ti-star-filled"></i>
-                                                                <i class="ti ti-star-filled"></i>
-                                                                <span class="ms-1">3.0</span>
-                                                            </span>
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="rating">
-                                                                <i class="ti ti-star-filled text-warning"></i>
-                                                                <i class="ti ti-star-filled text-warning"></i>
-                                                                <i class="ti ti-star-filled"></i>
-                                                                <i class="ti ti-star-filled"></i>
-                                                                <i class="ti ti-star-filled"></i>
-                                                                <span class="ms-1">2.0</span>
-                                                            </span>
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            <span class="rating">
-                                                                <i class="ti ti-star-filled text-warning"></i>
-                                                                <i class="ti ti-star-filled"></i>
-                                                                <i class="ti ti-star-filled"></i>
-                                                                <i class="ti ti-star-filled"></i>
-                                                                <i class="ti ti-star-filled"></i>
-                                                                <span class="ms-1">1.0</span>
-                                                            </span>
-                                                        </label>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="filter-set-content">
-                                        <div class="filter-set-content-head">
-                                            <a href="#" class="collapsed" data-bs-toggle="collapse"
-                                                data-bs-target="#Status" aria-expanded="false"
-                                                aria-controls="Status">Status</a>
-                                        </div>
-                                        <div class="filter-set-contents accordion-collapse collapse" id="Status"
-                                            data-bs-parent="#accordionExample">
-                                            <div class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                                <ul>
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            Active
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label class="dropdown-item px-2 d-flex align-items-center">
-                                                            <input class="form-check-input m-0 me-1" type="checkbox">
-                                                            Inactive
-                                                        </label>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
+
+                                    <!-- Filter Buttons -->
+                                    <div class="d-flex align-items-center gap-2 mt-3">
+                                        <a href="{{ route('colleges.index') }}"
+                                            class="btn btn-outline-light w-100">Reset</a>
+                                        <button type="submit" class="btn btn-primary w-100">Apply Filter</button>
                                     </div>
                                 </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <a href="javascript:void(0);" class="btn btn-outline-light w-100">Reset</a>
-                                    <a href="Colleges-list.html" class="btn btn-primary w-100">Filter</a>
-                                </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
-                    <div class="input-icon input-icon-start position-relative">
-                        <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Search">
-                    </div>
+
                 </div>
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <div class="d-flex align-items-center shadow p-1 rounded border view-icons bg-white">
-                        <a href="Colleges-list.html" class="btn btn-sm p-1 border-0 fs-14"><i
-                                class="ti ti-list-tree"></i></a>
-                        <a href="Colleges.html" class="flex-shrink-0 btn btn-sm p-1 border-0 ms-1 fs-14 active"><i
-                                class="ti ti-grid-dots"></i></a>
-                    </div>
+
                     @can('create-colleges')
-                         <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
-                        data-bs-target="#offcanvas_add"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add
-                        College</a>
+                        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvas_add"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add
+                            College</a>
                     @endcan
-                   
+
                 </div>
             </div>
             <!-- table header -->
@@ -489,21 +269,19 @@
                                         <div class="dropdown-menu dropdown-menu-end">
                                             @can('edit-colleges')
                                                 <a class="dropdown-item edit-college" href="javascript:void(0)"
-                                                data-bs-toggle="offcanvas"
-                                                data-bs-target="#offcanvas_edit_{{ $college->id }}">
-                                                <i class="ti ti-edit text-blue me-1"></i> Edit
-                                            </a>
+                                                    data-bs-toggle="offcanvas"
+                                                    data-bs-target="#offcanvas_edit_{{ $college->id }}">
+                                                    <i class="ti ti-edit text-blue me-1"></i> Edit
+                                                </a>
                                             @endcan
                                             @can('delete-colleges')
                                                 <a class="dropdown-item delete-college" href="#" data-bs-toggle="modal"
-                                                data-bs-target="#delete_contact{{ $college->id }}">
-                                                <i class="ti ti-trash text-danger me-1"></i> Delete
-                                            </a>
+                                                    data-bs-target="#delete_contact{{ $college->id }}">
+                                                    <i class="ti ti-trash text-danger me-1"></i> Delete
+                                                </a>
                                             @endcan
-                                            
-                                            <a class="dropdown-item" href="{{ route('colleges.index', $college->id) }}">
-                                                <i class="ti ti-eye text-blue-light me-1"></i> Preview
-                                            </a>
+
+
                                         </div>
                                     </div>
                                 </div>
@@ -860,8 +638,8 @@
     </div>
 
     <!-- ========================
-                               End Page Content
-                              ========================= -->
+                                   End Page Content
+                                  ========================= -->
 
     </div>
     <!-- End Wrapper -->
@@ -930,13 +708,15 @@
                                     <!-- Phone & Website -->
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label class="form-label">Phone</label>
+                                            <label class="form-label">Phone <span
+                                                    class="text-danger">*</span></label></label>
                                             <input type="text" class="form-control" name="phone" id="phone">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label class="form-label">Website</label>
+                                            <label class="form-label">Website <span
+                                                    class="text-danger">*</span></label></label>
                                             <input type="url" class="form-control" name="website" id="website">
                                         </div>
                                     </div>
@@ -960,14 +740,16 @@
                                     <!-- Deadline & Fees -->
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label class="form-label">Application Deadline</label>
+                                            <label class="form-label">Application Deadline <span
+                                                    class="text-danger">*</span></label></label>
                                             <input type="date" class="form-control" name="application_deadline"
                                                 id="application_deadline">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label class="form-label">Fees Range</label>
+                                            <label class="form-label">Fees Range <span
+                                                    class="text-danger">*</span></label></label>
                                             <input type="text" class="form-control" name="fees_range" id="fees_range"
                                                 placeholder="e.g. 50k - 1L">
                                         </div>
@@ -1086,6 +868,23 @@
             }
 
 
+        });
+        document.getElementById('filter_state_id')?.addEventListener('change', function() {
+            const citySelect = document.getElementById('filter_city_id');
+            const stateId = this.value;
+
+            if (stateId) {
+                fetch(`/get-cities/${stateId}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        citySelect.innerHTML = '<option value="">Select City</option>';
+                        data.forEach(city => {
+                            citySelect.innerHTML += `<option value="${city.id}">${city.name}</option>`;
+                        });
+                    });
+            } else {
+                citySelect.innerHTML = '<option value="">All Cities</option>';
+            }
         });
     </script>
 @endpush

@@ -36,19 +36,19 @@
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
                 <div>
-                    <h4 class="mb-1">priorities<span class="badge badge-soft-primary ms-2">{{ $priorities->total() }}</span>
+                    <h4 class="mb-1">Priority<span class="badge badge-soft-primary ms-2">{{ $priorities->total() }}</span>
                     </h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">priorities</li>
+                            <li class="breadcrumb-item active" aria-current="page">Priority</li>
                         </ol>
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
                     <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
                         data-bs-target="#add_Priority">
-                        <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New priorities
+                        <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Priority
                     </a>
                 </div>
             </div>
@@ -57,10 +57,10 @@
 
             <div class="card border-0 rounded-0">
                 <div class="card-header d-flex align-items-center justify-content-between gap-2 flex-wrap">
-                    <div class="input-icon input-icon-start position-relative">
+                    {{-- <div class="input-icon input-icon-start position-relative">
                         <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
                         <input type="text" class="form-control" placeholder="Search" id="searchInput">
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="card-body">
                     <div class="table-responsive custom-table">
@@ -88,7 +88,7 @@
                                             </div>
                                         </td>
                                         <td><span class="title-name">{{ $priority->name }}</span></td>
-                                        <td>{{ $priority->created_at->format('d M Y, h:i A') }}</td>
+                                        <td>{{ $priority->created_at->format('d M Y') }}</td>
                                         <td>
                                             @if ($priority->status == 1)
                                                 <span class="badge badge-pill badge-status bg-success">Active</span>

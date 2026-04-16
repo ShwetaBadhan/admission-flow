@@ -120,7 +120,7 @@
                             <div class="border-bottom mb-3 pb-3">
                                 <div class="d-flex align-items-center justify-content-between mb-2">
                                     <p class="mb-0">Date Created</p>
-                                    <p class="mb-0 text-dark">{{ $lead->created_at->format('d M Y, h:i A') }}</p>
+                                    <p class="mb-0 text-dark">{{ $lead->created_at->format('d M Y') }}</p>
                                 </div>
                                 @if ($lead->qualification)
                                     <div class="d-flex align-items-center justify-content-between mb-2">
@@ -199,7 +199,7 @@
 
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <p class="mb-0">Last Modified</p>
-                                <p class="mb-0 text-dark">{{ $lead->updated_at->format('d M Y, h:i A') }}</p>
+                                <p class="mb-0 text-dark">{{ $lead->updated_at->format('d M Y') }}</p>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mb-0">
                                 <p class="mb-0">Modified By</p>

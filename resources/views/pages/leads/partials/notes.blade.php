@@ -39,7 +39,7 @@
                                                             <h6 class="fw-medium fs-14 mb-1">
                                                                 {{ $note->createdBy->name ?? 'System' }}</h6>
                                                             <p class="mb-0 fs-13">
-                                                                {{ $note->created_at->format('d M Y, h:i A') }}</p>
+                                                                {{ $note->created_at->format('d M Y') }}</p>
                                                         </div>
                                                     </div>
                                                     <div class="mb-2">

@@ -127,7 +127,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="text-muted small d-block">Created</label>
-                                <p class="mb-0">{{ $payment->created_at->format('d M Y, h:i A') }}</p>
+                                <p class="mb-0">{{ $payment->created_at->format('d M Y') }}</p>
                             </div>
                             @if($payment->status === 'paid')
                                 @if($payment->payment_reference)

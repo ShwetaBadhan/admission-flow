@@ -57,10 +57,10 @@
            
             <div class="card border-0 rounded-0">
                 <div class="card-header d-flex align-items-center justify-content-between gap-2 flex-wrap">
-                    <div class="input-icon input-icon-start position-relative">
+                    {{-- <div class="input-icon input-icon-start position-relative">
                         <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
                         <input type="text" class="form-control" placeholder="Search" id="searchInput">
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="card-body">
                     <div class="table-responsive custom-table">
@@ -88,7 +88,7 @@
                                             </div>
                                         </td>
                                         <td><span class="title-name">{{ $qualification->name }}</span></td>
-                                        <td>{{ $qualification->created_at->format('d M Y, h:i A') }}</td>
+                                        <td>{{ $qualification->created_at->format('d M Y') }}</td>
                                         <td>
                                             @if ($qualification->status == 1)
                                                 <span class="badge badge-pill badge-status bg-success">Active</span>

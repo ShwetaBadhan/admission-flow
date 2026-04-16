@@ -209,7 +209,7 @@
                                                             <i class="ti ti-eye me-1"></i>View
                                                         </a>
                                                     </td>
-                                                    <td>{{ $kyc->created_at->format('d M Y, h:i A') }}</td>
+                                                    <td>{{ $kyc->created_at->format('d M Y') }}</td>
                                                     <td>
                                                         @if ($kyc->is_verified === null)
                                                             <span class="badge bg-warning text-dark">Pending</span>

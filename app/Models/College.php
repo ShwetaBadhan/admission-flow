@@ -64,4 +64,16 @@ public function getCourseNamesAttribute()
         ->pluck('name')
         ->toArray();
 }
+public function lockedConsultants()
+{
+    return $this->belongsToMany(Consultant::class, 'consultant_college')
+                ->withPivot('locked_at', 'locked_by', 'remarks')
+                ->withTimestamps();
+}
+
+// Helper: Check if college is locked to any consultant
+public function isLockedToConsultant($consultantId)
+{
+    return $this->lockedConsultants()->where('consultant_id', $consultantId)->exists();
+}
 }

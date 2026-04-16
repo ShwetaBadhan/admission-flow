@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Consultant;
 use App\Models\State;
 use App\Models\City;
+use App\Models\College;
 use App\Models\ConsultantKyc;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -25,9 +26,11 @@ class ConsultantController extends Controller
         ])->orderBy('created_at', 'desc')->paginate(10);
         $states = State::orderBy('name')->get();
         $cities = City::orderBy('name')->get(); // Load all cities for initial edit modals
+   // ✅ Add this: All active colleges for dropdown
+    $activeColleges = College::where('status', 'active')->select('id', 'name')->orderBy('name')->get();
 
 
-        return view('pages.consultants.index', compact('consultants', 'states', 'cities'));
+        return view('pages.consultants.index', compact('consultants', 'states', 'cities', 'activeColleges'));
     }
 
     public function show($id)
@@ -179,4 +182,36 @@ class ConsultantController extends Controller
         if ($bytes >= 1024) return round($bytes / 1024, 2) . ' KB';
         return $bytes . ' B';
     }
+    // ConsultantController.php
+
+// 🔹 Lock college - Simple form submission handler
+public function lockCollege(Request $request, $consultantId)
+{
+    $request->validate([
+        'college_id' => 'required|exists:colleges,id'
+    ]);
+    
+    $consultant = Consultant::findOrFail($consultantId);
+    
+    // Check if already locked
+    if ($consultant->lockedColleges()->where('college_id', $request->college_id)->exists()) {
+        return back()->with('error', 'This college is already locked!');
+    }
+    
+    // Lock it
+    $consultant->lockedColleges()->attach($request->college_id, [
+        'locked_by' => Auth::id()
+    ]);
+    
+    return back()->with('success', 'College locked successfully!');
+}
+
+// 🔹 Unlock college - GET route, simple redirect
+public function unlockCollege($consultantId, $collegeId)
+{
+    $consultant = Consultant::findOrFail($consultantId);
+    $consultant->lockedColleges()->detach($collegeId);
+    
+    return back()->with('success', 'College unlocked!');
+}
 }

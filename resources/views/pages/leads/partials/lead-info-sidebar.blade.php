@@ -27,7 +27,7 @@
             @endif
             <div class="d-flex align-items-center justify-content-between mb-2">
                 <p class="mb-0">Created</p>
-                <p class="mb-0 text-dark">{{ $lead->created_at->format('d M Y, h:i A') }}</p>
+                <p class="mb-0 text-dark">{{ $lead->created_at->format('d M Y') }}</p>
             </div>
         </div>
 

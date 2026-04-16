@@ -91,7 +91,7 @@
                                             </div>
                                         </td>
                                         <td><span class="title-name">{{ $setting->name }}</span></td>
-                                        <td>{{ $setting->created_at->format('d M Y, h:i A') }}</td>
+                                        <td>{{ $setting->created_at->format('d M Y') }}</td>
                                         <td>
                                             @if ($setting->status == 1)
                                                 <span class="badge badge-pill badge-status bg-success">Active</span>

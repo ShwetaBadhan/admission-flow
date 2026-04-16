@@ -258,9 +258,11 @@
                                       
                                     </td>
                                     <td class="text-end">
+                                     @can('view-lead-details')
                                         <a href="{{ route('lead-details', $admission->lead) }}" class="btn btn-sm btn-link text-primary p-0" title="View Lead">
                                             <i class="ti ti-eye me-1"></i>View
                                         </a>
+                                        @endcan
                                     </td>
                                 </tr>
                             @empty

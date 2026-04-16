@@ -48,13 +48,13 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
-                @can('create-consultants')
-                     <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#add_consultant">
-                        <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Consultants
-                    </a>
-                @endcan
-                   
+                    @can('create-consultants')
+                        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#add_consultant">
+                            <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Consultants
+                        </a>
+                    @endcan
+
                 </div>
             </div>
             <!-- End Page Header -->
@@ -105,39 +105,109 @@
                                                     <i class="ti ti-dots-vertical"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right">
-                                                @can('edit-consultants')
-                                                     <a class="dropdown-item edit-btn" href="javascript:void(0);"
-                                                        data-bs-toggle="modal" data-bs-target="#edit_consultant"
-                                                        data-id="{{ $consultant->id }}" data-name="{{ $consultant->name }}"
-                                                        data-email="{{ $consultant->email }}"
-                                                        data-phone="{{ $consultant->phone }}"
-                                                        data-state-id="{{ $consultant->state }}"
-                                                        data-city-id="{{ $consultant->city }}"
-                                                        data-address="{{ $consultant->address }}"
-                                                        data-status="{{ $consultant->status }}">
-                                                        <i class="ti ti-edit text-blue"></i> Edit
-                                                    </a>
-                                                @endcan
-                                                   
-                                                   @can('view-consultant-details')
-                                                         <a class="dropdown-item"
-                                                        href="{{ route('consultants.show', $consultant->id) }}">
-                                                        <i class="ti ti-id-badge me-1"></i> View Details
-                                                    </a>
-                                                   @endcan
-                                                  @can('delete-consultants')
-                                                       {{-- Delete Button --}}
-                                                    <a class="dropdown-item delete-btn" href="javascript:void(0);"
+                                                    @can('edit-consultants')
+                                                        <a class="dropdown-item edit-btn" href="javascript:void(0);"
+                                                            data-bs-toggle="modal" data-bs-target="#edit_consultant"
+                                                            data-id="{{ $consultant->id }}" data-name="{{ $consultant->name }}"
+                                                            data-email="{{ $consultant->email }}"
+                                                            data-phone="{{ $consultant->phone }}"
+                                                            data-state-id="{{ $consultant->state }}"
+                                                            data-city-id="{{ $consultant->city }}"
+                                                            data-address="{{ $consultant->address }}"
+                                                            data-status="{{ $consultant->status }}">
+                                                            <i class="ti ti-edit text-blue"></i> Edit
+                                                        </a>
+                                                    @endcan
+
+                                                    @can('view-consultant-details')
+                                                        <a class="dropdown-item"
+                                                            href="{{ route('consultants.show', $consultant->id) }}">
+                                                            <i class="ti ti-id-badge me-1"></i> View Details
+                                                        </a>
+                                                    @endcan
+                                                    @can('view-lock-colleges')
+                                                    {{-- 🔐 Lock Colleges Button --}}
+                                                    <a class="dropdown-item" href="javascript:void(0);"
                                                         data-bs-toggle="modal"
-                                                        data-bs-target="#delete_consultant{{ $consultant->id }}">
-                                                        <i class="ti ti-trash"></i> Delete
+                                                        data-bs-target="#lockModal{{ $consultant->id }}"
+                                                        data-name="{{ $consultant->name }}">
+                                                        <i class="ti ti-lock me-1 text-warning"></i> Lock Colleges
                                                     </a>
-                                                  @endcan
-                                                   
+                                                    @endcan
+                                                    @can('delete-consultants')
+                                                        {{-- Delete Button --}}
+                                                        <a class="dropdown-item delete-btn" href="javascript:void(0);"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#delete_consultant{{ $consultant->id }}">
+                                                            <i class="ti ti-trash"></i> Delete
+                                                        </a>
+                                                    @endcan
+
                                                 </div>
                                             </div>
                                         </td>
                                     </tr>
+                                    <!-- 🔐 Lock Modal - UNIQUE for each consultant (inside foreach) -->
+                                    <div class="modal fade" id="lockModal{{ $consultant->id }}" tabindex="-1">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <form method="POST"
+                                                    action="{{ route('consultants.lock-college', $consultant->id) }}">
+                                                    @csrf
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Lock College for {{ $consultant->name }}
+                                                        </h5>
+                                                        <button type="button" class="btn-close"
+                                                            data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+
+                                                        <!-- Already Locked Colleges -->
+                                                        <div class="mb-3">
+                                                            <label class="form-label small fw-bold">Already Locked:</label>
+                                                            <div class="d-flex flex-wrap gap-1">
+                                                                @forelse($consultant->lockedColleges as $locked)
+                                                                    <span class="badge bg-warning text-dark">
+                                                                        {{ $locked->name }}
+
+                                                                        {{-- ✅ Unlock with Swal confirmation --}}
+                                                                        <a href="javascript:void(0);"
+                                                                            class="text-dark ms-1 unlock-btn"
+                                                                            data-unlock-url="{{ route('consultants.unlock-college', [$consultant->id, $locked->id]) }}"
+                                                                            data-college-name="{{ addslashes($locked->name) }}"
+                                                                            title="Unlock">✕</a>
+                                                                    </span>
+                                                                @empty
+                                                                    <small class="text-muted">None</small>
+                                                                @endforelse
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Lock New College -->
+                                                        <div class="mb-3">
+                                                            <label class="form-label small">Select College to Lock</label>
+                                                            <select name="college_id" class="select form-select-sm"
+                                                                required>
+                                                                <option value="">-- Select College --</option>
+                                                                @foreach ($activeColleges as $college)
+                                                                    @if (!$consultant->lockedColleges->contains('id', $college->id))
+                                                                        <option value="{{ $college->id }}">
+                                                                            {{ $college->name }}</option>
+                                                                    @endif
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-sm btn-light"
+                                                            data-bs-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-sm btn-warning">🔒
+                                                            Lock</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <!-- Delete Consultant Modal -->
                                     <div class="modal fade" id="delete_consultant{{ $consultant->id }}" role="dialog">
                                         <div class="modal-dialog modal-dialog-centered modal-sm">
@@ -452,7 +522,30 @@
             }
 
 
+            // Unlock confirmation with Swal (simple redirect after confirm)
+            document.querySelectorAll('.unlock-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
 
+                    const url = this.dataset.unlockUrl;
+                    const name = this.dataset.collegeName;
+
+                    Swal.fire({
+                        title: 'Unlock College?',
+                        text: `Remove "${name}" from this consultant's access?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, Unlock',
+                        cancelButtonText: 'Cancel',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Simple redirect - controller will handle + show success message
+                            window.location.href = url;
+                        }
+                    });
+                });
+            });
 
         });
     </script>

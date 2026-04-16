@@ -37,19 +37,19 @@
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
                 <div>
-                    <h4 class="mb-1">Sources<span class="badge badge-soft-primary ms-2">{{ $stages->total() }}</span></h4>
+                    <h4 class="mb-1">Contact Stages<span class="badge badge-soft-primary ms-2">{{ $stages->total() }}</span></h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Sources</li>
+                            <li class="breadcrumb-item active" aria-current="page">Contact Stages</li>
                         </ol>
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
-                @can('create-sources')
+                @can('create-contact-stages')
                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
                         data-bs-target="#add_source">
-                        <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Sources
+                        <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Contact Stages
                     </a> 
                 @endcan
                     
@@ -60,14 +60,14 @@
            
             <div class="card border-0 rounded-0">
                 <div class="card-header d-flex align-items-center justify-content-between gap-2 flex-wrap">
-                    <div class="input-icon input-icon-start position-relative">
+                    {{-- <div class="input-icon input-icon-start position-relative">
                         <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
                         <input type="text" class="form-control" placeholder="Search" id="searchInput">
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="card-body">
                     <div class="table-responsive custom-table">
-                        <table class="table table-nowrap datatable" id="sourcesTable">
+                        <table class="table table-nowrap datatable" id="Contact StagesTable">
                             <thead class="table-light">
                                 <tr>
                                     <th class="no-sort">
@@ -91,7 +91,7 @@
                                             </div>
                                         </td>
                                         <td><span class="title-name">{{ $stage->name }}</span></td>
-                                        <td>{{ $stage->created_at->format('d M Y, h:i A') }}</td>
+                                        <td>{{ $stage->created_at->format('d M Y') }}</td>
                                         <td>
                                             @if ($stage->status == 1)
                                                 <span class="badge badge-pill badge-status bg-success">Active</span>
@@ -107,13 +107,13 @@
                                                     <i class="ti ti-dots-vertical"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right">
-                                                @can('edit-sources')
+                                                @can('edit-contact-stages')
                                                    <a class="dropdown-item edit-btn" href="#" data-bs-toggle="modal"
                                                         data-bs-target="#edit_source{{ $stage->id }}">
                                                         <i class="ti ti-edit text-blue"></i> Edit
                                                     </a>   
                                                 @endcan
-                                                @can('delete-sources')
+                                                @can('delete-contact-stages')
                                                      <a class="dropdown-item delete-btn" href="#"
                                                         data-bs-toggle="modal" data-bs-target="#delete_source"
                                                         data-id="{{ $stage->id }}" data-name="{{ $stage->name }}">

@@ -108,7 +108,8 @@ Route::get('/colleges', [CollegeController::class, 'index'])->middleware(middlew
 Route::post('/colleges', [CollegeController::class, 'store'])->middleware(middleware: 'auth')->name('colleges.store');
 Route::put('/colleges/{college}', [CollegeController::class, 'update'])->middleware(middleware: 'auth')->name('colleges.update');
 Route::delete('/colleges/{college}', [CollegeController::class, 'destroy'])->middleware(middleware: 'auth')->name('colleges.destroy');
-
+ Route::get('/export/pdf', [CollegeController::class, 'exportPdf'])->name('export.pdf');
+    Route::get('/export/excel', [CollegeController::class, 'exportExcel'])->name('export.excel');
 // AJAX endpoint for cities
 Route::get('/get-cities/{stateId}', [CollegeController::class, 'getCities'])->middleware(middleware: 'auth')->name('colleges.cities');
 
@@ -265,6 +266,14 @@ Route::put('/consultants/{id}', [ConsultantController::class, 'update'])->name('
 Route::delete('/consultants/{id}', [ConsultantController::class, 'destroy'])->name('consultants.destroy');
 Route::post('/consultants/{id}/toggle', [ConsultantController::class, 'toggleStatus'])->name('consultants.toggle');
 
+// routes/web.php
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/consultants/{consultant}/lock-college', [ConsultantController::class, 'lockCollege'])
+        ->name('consultants.lock-college');
+    Route::get('/consultants/{consultant}/unlock-college/{college}', [ConsultantController::class, 'unlockCollege'])
+        ->name('consultants.unlock-college');
+});
 // ✅ KYC Routes - Matching your convention
 Route::get('/consultants/{id}', [ConsultantController::class, 'show'])->name('consultants.show');
 Route::post('/consultants/{id}/kyc/upload', [ConsultantController::class, 'uploadKyc'])->name('consultants.kyc.upload');

@@ -88,7 +88,7 @@
                                             </div>
                                         </td>
                                         <td><span class="title-name">{{ $log->name }}</span></td>
-                                        <td>{{ $log->created_at->format('d M Y, h:i A') }}</td>
+                                        <td>{{ $log->created_at->format('d M Y') }}</td>
                                         <td>
                                             @if ($log->status == 1)
                                                 <span class="badge badge-pill badge-status bg-success">Active</span>

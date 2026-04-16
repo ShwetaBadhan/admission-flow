@@ -50,7 +50,7 @@
                     @can('create-users')
                         <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
                             data-bs-target="#offcanvas_add">
-                            <i class="ti ti-square-rounded-plus-filled me-1"></i>Add User
+                            <i class="ti ti-square-rounded-plus-filled me-1"></i>Add Users
                         </a>
                     @endcan
 
@@ -61,10 +61,10 @@
             <!-- card start -->
             <div class="card border-0 rounded-0">
                 <div class="card-header d-flex align-items-center justify-content-between gap-2 flex-wrap">
-                    <div class="input-icon input-icon-start position-relative">
+                    {{-- <div class="input-icon input-icon-start position-relative">
                         <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
                         <input type="text" class="form-control" placeholder="Search" id="searchInput">
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="card-body">
                     <!-- Contact List -->
@@ -121,7 +121,7 @@
                                                 <span class="badge badge-soft-primary">{{ $role }}</span>
                                             @endforeach
                                         </td>
-                                        <td>{{ $user->created_at->format('d M Y, h:i a') }}</td>
+                                        <td>{{ $user->created_at->format('d M Y') }}</td>
                                         <td>
                                             @if ($user->status)
                                                 <span class="badge badge-pill badge-status bg-success">Active</span>

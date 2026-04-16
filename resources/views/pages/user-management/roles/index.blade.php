@@ -242,7 +242,7 @@
                                     <!-- Permissions Modal (UPDATED WITH MULTI-SELECT) -->
                                     <div class="modal fade" id="permissionsModal_{{ $role->id }}" tabindex="-1"
                                         aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered modal-sm">
+                                        <div class="modal-dialog modal-dialog-centered modal-xl">
                                             <div class="modal-content">
                                                 <form action="{{ route('roles.permissions.assign', $role->id) }}"
                                                     method="POST">

@@ -245,10 +245,7 @@
                         <input type="text" class="form-control" placeholder="Search leads..." id="global-search"
                             value="{{ request('search') }}">
                     </div>
-                    <div class="input-icon input-icon-start position-relative">
-                        <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Search">
-                    </div>
+                  
                 </div>
                 <div class="d-flex align-items-center gap-2 flex-wrap">
 
@@ -393,10 +390,7 @@
                                                                     class="d-flex align-items-center justify-content-center me-1">
                                                                     <i class="ti ti-message-circle-2"></i>
                                                                 </a>
-                                                                <a href="{{ route('leads.update', $lead) }}"
-                                                                    class="d-flex align-items-center justify-content-center">
-                                                                    <i class="ti ti-color-swatch"></i>
-                                                                </a>
+                                                              
                                                             </div>
                                                         </div>
                                                     </div>

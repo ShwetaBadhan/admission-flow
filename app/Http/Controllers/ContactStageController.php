@@ -34,7 +34,7 @@ class ContactStageController extends Controller
             'status' => $request->status,
         ]);
 
-        return redirect()->back()->with('success', 'Lead Stage created successfully!');
+        return redirect()->back()->with('success', 'Contact Stage created successfully!');
     }
 
 

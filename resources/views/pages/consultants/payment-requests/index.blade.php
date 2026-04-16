@@ -149,7 +149,7 @@
                                                         <div class="col-md-6">
                                                             <label class="text-muted small">Submitted</label>
                                                             <p class="mb-0">
-                                                                {{ $request->created_at->format('d M Y, h:i A') }}</p>
+                                                                {{ $request->created_at->format('d M Y') }}</p>
                                                         </div>
                                                     </div>
                                                     @if ($request->notes)

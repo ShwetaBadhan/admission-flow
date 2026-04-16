@@ -18,7 +18,7 @@
                 @can('create-permissions')
                     <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
                         data-bs-target="#add_permission">
-                        <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Permission
+                        <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Permissions
                     </a>
                 @endcan
             </div>

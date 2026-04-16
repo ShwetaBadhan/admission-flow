@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Support\Facades\Auth;
 class Consultant extends Model
 {
     use HasFactory;
@@ -64,4 +64,26 @@ class Consultant extends Model
     {
         return $this->hasMany(Lead::class, 'consultant_id');
     }
+    public function lockedColleges()
+{
+    return $this->belongsToMany(College::class, 'consultant_college')
+                ->withPivot('locked_at', 'locked_by', 'remarks')
+                ->withTimestamps();
+}
+
+// Helper: Check if college is locked for this consultant
+public function isCollegeLocked($collegeId)
+{
+    return $this->lockedColleges()->where('college_id', $collegeId)->exists();
+}
+
+// Helper: Get accessible colleges (for lead creation)
+public function getAccessibleColleges()
+{
+    
+    if (Auth::user()->is_admin ?? false) {
+        return College::where('status', 'active')->get();
+    }
+    return $this->lockedColleges()->where('colleges.status', 'active')->get();
+}
 }

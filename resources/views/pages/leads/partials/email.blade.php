@@ -31,7 +31,7 @@
                                 <div class="flex-grow-1">
                                     <div class="d-flex align-items-center justify-content-between mb-1">
                                         <h6 class="fw-semibold mb-0">{{ ucfirst($comm->type) }}</h6>
-                                        <small class="text-muted">{{ $comm->created_at->format('d M Y, h:i A') }}</small>
+                                        <small class="text-muted">{{ $comm->created_at->format('d M Y') }}</small>
                                     </div>
                                     @if($comm->type == 'email' && $comm->subject)
                                         <p class="mb-1 text-muted small">Subject: {{ $comm->subject }}</p>
