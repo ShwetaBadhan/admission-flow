@@ -48,7 +48,7 @@
         </a>
     </li>
 
-    <!-- Financial Settings -->
+    <!-- Financial Settingsssss -->
     <li class="nav-item me-3">
         <a href="{{ route('payment-gateway-settings') }}" 
            class="nav-link p-2 {{ request()->routeIs([
