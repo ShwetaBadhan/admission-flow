@@ -41,8 +41,8 @@
         <a href="{{ route('email-settings') }}" 
            class="nav-link p-2 {{ request()->routeIs([
                 'email-settings*',
-                'sms-settings*',
-                'system-settings*'
+                'cookies*'
+                
            ]) ? 'active' : '' }}">
             <i class="ti ti-device-laptop me-2"></i>System Settings
         </a>
