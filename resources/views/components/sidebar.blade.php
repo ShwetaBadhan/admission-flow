@@ -203,10 +203,10 @@
                                       class="menu-arrow"></span>
                               </a>
                               <ul>
-                                  <li><a href="profile-settings.html">Profile</a></li>
-                                  <li><a href="security-settings.html">Security</a></li>
-                                  <li><a href="notifications-settings.html">Notifications</a></li>
-                                  <li><a href="connected-apps.html">Connected Apps</a></li>
+                                  <li><a href="{{ route ('profile-settings')}}">Profile</a></li>
+                                  <li><a href="{{ route ('security-settings')}}">Security</a></li>
+                                  <li><a href="{{ route ('notification-settings')}}">Notifications</a></li>
+                                  <li><a href="{{ route ('connected-apps-settings')}}">Connected Apps</a></li>
                               </ul>
                           </li>
                           <li class="submenu">
@@ -215,12 +215,12 @@
                                       class="menu-arrow"></span>
                               </a>
                               <ul>
-                                  <li><a href="company-settings.html">Company Settings</a></li>
-                                  <li><a href="localization-settings.html">Localization</a></li>
-                                  <li><a href="prefixes-settings.html">Prefixes</a></li>
-                                  <li><a href="preference-settings.html">Preference</a></li>
-                                  <li><a href="appearance-settings.html">Appearance</a></li>
-                                  <li><a href="language-settings.html">Language</a></li>
+                                  <li><a href="{{ route ('company-settings')}}">Company Settings</a></li>
+                                  <li><a href="{{ route ('localization-settings')}}">Localization</a></li>
+                                  {{-- <li><a href="{{ route ('prefix-settings')}}">Prefixes</a></li> --}}
+                                  {{-- <li><a href="{{ route ('preference-settings')}}">Preference</a></li> --}}
+                                  {{-- <li><a href="{{ route ('appearance-settings')}}">Appearance</a></li> --}}
+                                  {{-- <li><a href="{{ route ('language-settings')}}">Language</a></li> --}}
                               </ul>
                           </li>
                           <li class="submenu">
@@ -228,9 +228,9 @@
                                   <i class="ti ti-apps"></i><span>App Settings</span><span class="menu-arrow"></span>
                               </a>
                               <ul>
-                                  <li><a href="invoice-settings.html">Invoice Settings</a></li>
-                                  <li><a href="printers-settings.html">Printers</a></li>
-                                  <li><a href="custom-fields-setting.html">Custom Fields</a></li>
+                                  <li><a href="{{ route ('invoice-settings')}}">Invoice Settings</a></li>
+                                  {{-- <li><a href="{{ route ('printers')}}">Printers</a></li> --}}
+                                  {{-- <li><a href="{{ route ('custom-fields')}}">Custom Fields</a></li> --}}
                               </ul>
                           </li>
                           <li class="submenu">
@@ -239,9 +239,9 @@
                                       class="menu-arrow"></span>
                               </a>
                               <ul>
-                                  <li><a href="email-settings.html">Email Settings</a></li>
-                                  <li><a href="sms-gateways.html">SMS Gateways</a></li>
-                                  <li><a href="gdpr-cookies.html">GDPR Cookies</a></li>
+                                  <li><a href="{{ route ('email-settings')}}">Email Settings</a></li>
+                                  {{-- <li><a href="{{ route ('sms-settings')}}">SMS Gateways</a></li> --}}
+                                  <li><a href="{{ route('cookies') }}">GDPR Cookies</a></li>
                               </ul>
                           </li>
                           <li class="submenu">
@@ -250,10 +250,10 @@
                                       class="menu-arrow"></span>
                               </a>
                               <ul>
-                                  <li><a href="payment-gateways.html">Payment Gateways</a></li>
-                                  <li><a href="bank-accounts.html">Bank Accounts</a></li>
-                                  <li><a href="tax-rates.html">Tax Rates</a></li>
-                                  <li><a href="currencies.html">Currencies</a></li>
+                                  <li><a href="{{ route ('payment-gateway-settings')}}">Payment Gateways</a></li>
+                                  <li><a href="{{ route ('bank-account-settings')}}">Bank Accounts</a></li>
+                                  <li><a href="{{ route ('tax-rate-settings')}}">Tax Rates</a></li>
+                                  <li><a href="{{ route ('currency-settings')}}">Currencies</a></li>
                               </ul>
                           </li>
                           <li class="submenu">
@@ -262,14 +262,13 @@
                                       class="menu-arrow"></span>
                               </a>
                               <ul>
-                                  <li><a href="sitemap.html">Sitemap</a></li>
-                                  <li><a href="clear-cache.html">Clear Cache</a></li>
-                                  <li><a href="storage.html">Storage</a></li>
-                                  <li><a href="cronjob.html">Cronjob</a></li>
-                                  <li><a href="ban-ip-address.html">Ban IP Address</a></li>
-                                  <li><a href="system-backup.html">System Backup</a></li>
-                                  <li><a href="database-backup.html">Database Backup</a></li>
-                                  <li><a href="system-update.html">System Update</a></li>
+                                  <li><a href="{{ route ('sitemap-settings')}}">Sitemap</a></li>
+                                  <li><a href="{{ route ('clear-cache-settings')}}">Clear Cache</a></li>
+                                  {{-- <li><a href="{{ route ('storage-settings')}}">Storage</a></li>
+                                  <li><a href="{{ route ('cronjob-settings')}}">Cronjob</a></li>
+                                  <li><a href="{{ route ('ban-ip-settings')}}">Ban IP Address</a></li>
+                                  <li><a href="{{ route ('database-backup-settings')}}">Database Backup</a></li>
+                                  <li><a href="{{ route ('system-update-settings')}}">System Update</a></li> --}}
                               </ul>
                           </li>
                       </ul>

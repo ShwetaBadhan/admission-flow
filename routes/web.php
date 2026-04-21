@@ -284,6 +284,140 @@ Route::post('/consultants/{id}/kyc/{kyc_id}/reject', [ConsultantController::clas
 Route::get('/api/cities/{stateId}', [ConsultantController::class, 'getCitiesByState'])
     ->name('api.cities.byState');
 
+    // settings
+    
+// general settings
+Route::get('/profile-settings', function () {
+    return view('pages.settings.general-settings.profile-settings');
+})->name('profile-settings');
+
+Route::get('/security-settings', function () {
+    return view('pages.settings.general-settings.security-settings');
+})->name('security-settings');
+
+
+Route::get('/notification-settings', function () {
+    return view('pages.settings.general-settings.notification-settings');
+})->name('notification-settings');
+
+
+Route::get('/connected-apps-settings', function () {
+    return view('pages.settings.general-settings.connected-apps-settings');
+})->name('connected-apps-settings');
+
+
+// website settings
+Route::get('/appearance-settings', function () {
+    return view('pages.settings.website-settings.appearance-settings');
+})->name('appearance-settings');
+
+Route::get('/company-settings', function () {
+    return view('pages.settings.website-settings.company-settings');
+})->name('company-settings');
+
+Route::get('/language-settings', function () {
+    return view('pages.settings.website-settings.language-settings');
+})->name('language-settings');
+
+
+Route::get('/localization-settings', function () {
+    return view('pages.settings.website-settings.localization-settings');
+})->name('localization-settings');
+
+
+Route::get('/preference-settings', function () {
+    return view('pages.settings.website-settings.preference-settings');
+})->name('preference-settings');
+
+
+Route::get('/prefix-settings', function () {
+    return view('pages.settings.website-settings.prefix-settings');
+})->name('prefix-settings');
+
+// app settings
+
+Route::get('/custom-fields', function () {
+    return view('pages.settings.app-settings.custom-fields');
+})->name('custom-fields');
+
+
+Route::get('/invoice-settings', function () {
+    return view('pages.settings.app-settings.invoice-settings');
+})->name('invoice-settings');
+
+
+Route::get('/printers', function () {
+    return view('pages.settings.app-settings.printers');
+})->name('printers');
+
+// system settings
+
+Route::get('/cookies', function () {
+    return view('pages.settings.system-settings.cookies');
+})->name('cookies');
+
+
+Route::get('/email-settings', function () {
+    return view('pages.settings.system-settings.email-settings');
+})->name('email-settings');
+
+
+Route::get('/sms-settings', function () {
+    return view('pages.settings.system-settings.sms-settings');
+})->name('sms-settings');
+
+// financial settings
+
+Route::get('/bank-account-settings', function () {
+    return view('pages.settings.financial-settings.bank-account-settings');
+})->name('bank-account-settings');
+
+
+Route::get('/currency-settings', function () {
+    return view('pages.settings.financial-settings.currency-settings');
+})->name('currency-settings');
+
+Route::get('/payment-gateway-settings', function () {
+    return view('pages.settings.financial-settings.payment-gateway-settings');
+})->name('payment-gateway-settings');
+
+
+Route::get('tax-rate-settings', function () {
+    return view('pages.settings.financial-settings.tax-rate-settings');
+})->name('tax-rate-settings');
+
+// other settings
+
+Route::get('ban-ip-settings', function () {
+    return view('pages.settings.other-settings.ban-ip-settings');
+})->name('ban-ip-settings');
+
+Route::get('clear-cache-settings', function () {
+    return view('pages.settings.other-settings.clear-cache-settings');
+})->name('clear-cache-settings');
+
+Route::get('cronjob-settings', function () {
+    return view('pages.settings.other-settings.cronjob-settings');
+})->name('cronjob-settings');
+
+Route::get('database-backup-settings', function () {
+    return view('pages.settings.other-settings.database-backup-settings');
+})->name('database-backup-settings');
+
+Route::get('sitemap-settings', function () {
+    return view('pages.settings.other-settings.sitemap-settings');
+})->name('sitemap-settings');
+
+
+Route::get('storage-settings', function () {
+    return view('pages.settings.other-settings.storage-settings');
+})->name('storage-settings');
+
+
+Route::get('system-update-settings', function () {
+    return view('pages.settings.other-settings.system-update-settings');
+})->name('system-update-settings');
+
 // user-management
 Route::prefix('user-management')->group(function () {
 
@@ -322,4 +456,26 @@ Route::prefix('user-management')->group(function () {
 
 
     Route::resource('slab-rules', SlabRuleController::class)->except(['show']);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 });

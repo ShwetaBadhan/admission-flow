@@ -93,7 +93,7 @@
                       </div>
 
                       <!-- Item-->
-                      <a href="profile-settings.html" class="dropdown-item">
+                      <a href="javascript:void(0)" class="dropdown-item">
                           <i class="ti ti-user-circle me-1 align-middle"></i>
                           <span class="align-middle">Profile Settings</span>
                       </a>
@@ -112,7 +112,7 @@
                       </a>
 
                       <!-- Item-->
-                      <a href="profile-settings.html" class="dropdown-item">
+                      <a href="javascript:void(0)" class="dropdown-item">
                           <i class="ti ti-settings me-1 align-middle"></i>
                           <span class="align-middle">Settings</span>
                       </a>

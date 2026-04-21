@@ -120,6 +120,11 @@
     <script src="{{ url ('assets/plugins/sweetalert2/sweetalert2.min.js')}}"></script>
     <script src="{{ url ('assets/js/sweetalerts.js')}}"></script>
 
+    	<!-- Sticky Sidebar JS -->
+	<script src="{{ url ('assets/plugins/theia-sticky-sidebar/ResizeSensor.js')}}"></script>
+	<script src="{{ url ('assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js')}}"></script>
+
+
     <!-- Main JS -->
     <script src="{{ url ('assets/js/script.js')}}" ></script>
 @stack('scripts')
