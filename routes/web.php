@@ -21,6 +21,11 @@ use App\Http\Controllers\CommissionPaymentController;
 use App\Http\Controllers\ConsultantPaymentRequestController;
 use App\Models\LeadSource;
 use App\Http\Controllers\SlabRuleController;
+use App\Http\Controllers\SecuritySettingsController;
+use App\Http\Controllers\ProfileSettingsController;
+use App\Http\Controllers\LocalizationSettingController;
+use App\Http\Controllers\LanguageSettingController;
+use App\Http\Controllers\InvoiceSettingController;
 
 // auth pages
 
@@ -287,14 +292,24 @@ Route::get('/api/cities/{stateId}', [ConsultantController::class, 'getCitiesBySt
     // settings
     
 // general settings
-Route::get('/profile-settings', function () {
-    return view('pages.settings.general-settings.profile-settings');
-})->name('profile-settings');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile-settings', [ProfileSettingsController::class, 'index'])->name('profile-settings');
+    Route::post('/profile-settings', [ProfileSettingsController::class, 'update'])->name('profile-settings.update');
+});
+Route::middleware(['auth'])->group(function () {
+    // Main View (Your exact route)
+    Route::get('/security-settings', [SecuritySettingsController::class, 'index'])
+        ->name('security-settings');
 
-Route::get('/security-settings', function () {
-    return view('pages.settings.general-settings.security-settings');
-})->name('security-settings');
-
+    // Action Routes
+    Route::put('/security/password', [SecuritySettingsController::class, 'updatePassword'])->name('security.password');
+    Route::post('/security/two-factor', [SecuritySettingsController::class, 'toggleTwoFactor'])->name('security.twofactor');
+    Route::put('/security/phone', [SecuritySettingsController::class, 'updatePhone'])->name('security.phone');
+    Route::put('/security/email', [SecuritySettingsController::class, 'updateEmail'])->name('security.email');
+    Route::post('/security/device/{id}/logout', [SecuritySettingsController::class, 'logoutDevice'])->name('security.device.logout');
+    Route::post('/security/deactivate', [SecuritySettingsController::class, 'deactivateAccount'])->name('security.deactivate');
+    Route::delete('/security/delete', [SecuritySettingsController::class, 'deleteAccount'])->name('security.delete');
+});
 
 Route::get('/notification-settings', function () {
     return view('pages.settings.general-settings.notification-settings');
@@ -315,15 +330,40 @@ Route::get('/company-settings', function () {
     return view('pages.settings.website-settings.company-settings');
 })->name('company-settings');
 
-Route::get('/language-settings', function () {
-    return view('pages.settings.website-settings.language-settings');
-})->name('language-settings');
 
 
-Route::get('/localization-settings', function () {
-    return view('pages.settings.website-settings.localization-settings');
-})->name('localization-settings');
+Route::get('/language-settings', [LanguageSettingController::class, 'index'])
+    ->name('language-settings');
 
+Route::post('/language-settings', [LanguageSettingController::class, 'store'])
+    ->name('language-settings.store');
+
+Route::put('/language-settings/{id}', [LanguageSettingController::class, 'update'])
+    ->name('language-settings.update');
+
+Route::delete('/language-settings/{id}', [LanguageSettingController::class, 'destroy'])
+    ->name('language-settings.destroy');
+
+// AJAX Routes
+Route::post('/language-settings/{id}/toggle-status', [LanguageSettingController::class, 'toggleStatus'])
+    ->name('language-settings.toggle-status');
+
+Route::post('/language-settings/{id}/toggle-rtl', [LanguageSettingController::class, 'toggleRTL'])
+    ->name('language-settings.toggle-rtl');
+
+Route::post('/language-settings/{id}/set-default', [LanguageSettingController::class, 'setDefault'])
+    ->name('language-settings.set-default');
+
+Route::post('/language-settings/{id}/toggle-platform/{platform}', [LanguageSettingController::class, 'togglePlatform'])
+    ->name('language-settings.toggle-platform');
+
+
+
+// Show the page
+Route::get('/localization-settings', [LocalizationSettingController::class, 'index'])->name("localization-settings");
+
+// Handle form submission
+Route::post('/localization-settings', [LocalizationSettingController::class, 'update'])->name("localization-settings.update");
 
 Route::get('/preference-settings', function () {
     return view('pages.settings.website-settings.preference-settings');
@@ -341,9 +381,11 @@ Route::get('/custom-fields', function () {
 })->name('custom-fields');
 
 
-Route::get('/invoice-settings', function () {
-    return view('pages.settings.app-settings.invoice-settings');
-})->name('invoice-settings');
+Route::get('/invoice-settings', [InvoiceSettingController::class, 'index'])
+    ->name('invoice-settings');
+
+Route::post('/invoice-settings', [InvoiceSettingController::class, 'store'])
+    ->name('invoice-settings.store');
 
 
 Route::get('/printers', function () {

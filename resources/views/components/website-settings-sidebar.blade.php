@@ -5,10 +5,10 @@
 
             <div class="list-group list-group-flush settings-sidebar">
 
-                <a href="{{ route('company-settings') }}" 
+                {{-- <a href="{{ route('company-settings') }}" 
                    class="d-block p-2 fw-medium {{ request()->routeIs('company-settings*') ? 'active' : '' }}">
                    Company Settings
-                </a>
+                </a> --}}
 
                 <a href="{{ route('localization-settings') }}" 
                    class="d-block p-2 fw-medium {{ request()->routeIs('localization-settings*') ? 'active' : '' }}">

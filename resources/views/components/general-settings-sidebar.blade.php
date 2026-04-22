@@ -8,12 +8,12 @@
    Security
 </a>
 
-<a href="{{ route('notification-settings') }}" 
+{{-- <a href="{{ route('notification-settings') }}" 
    class="d-block p-2 fw-medium {{ request()->routeIs('notification-settings') ? 'active' : '' }}">
    Notifications
-</a>
-
+</a> --}}
+{{-- 
 <a href="{{ route('connected-apps-settings') }}" 
    class="d-block p-2 fw-medium {{ request()->routeIs('connected-apps-settings') ? 'active' : '' }}">
    Connected Apps
-</a>
+</a> --}}

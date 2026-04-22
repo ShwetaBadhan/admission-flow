@@ -205,8 +205,8 @@
                               <ul>
                                   <li><a href="{{ route ('profile-settings')}}">Profile</a></li>
                                   <li><a href="{{ route ('security-settings')}}">Security</a></li>
-                                  <li><a href="{{ route ('notification-settings')}}">Notifications</a></li>
-                                  <li><a href="{{ route ('connected-apps-settings')}}">Connected Apps</a></li>
+                                  {{-- <li><a href="{{ route ('notification-settings')}}">Notifications</a></li> --}}
+                                  {{-- <li><a href="{{ route ('connected-apps-settings')}}">Connected Apps</a></li> --}}
                               </ul>
                           </li>
                           <li class="submenu">
@@ -215,7 +215,7 @@
                                       class="menu-arrow"></span>
                               </a>
                               <ul>
-                                  <li><a href="{{ route ('company-settings')}}">Company Settings</a></li>
+                                  {{-- <li><a href="{{ route ('company-settings')}}">Company Settings</a></li> --}}
                                   <li><a href="{{ route ('localization-settings')}}">Localization</a></li>
                                   {{-- <li><a href="{{ route ('prefix-settings')}}">Prefixes</a></li> --}}
                                   {{-- <li><a href="{{ route ('preference-settings')}}">Preference</a></li> --}}
