@@ -8,10 +8,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use App\Models\UserProfile;
 
 class ProfileSettingsController extends Controller
 {
-    public function index()
+   public function index()
     {
         $user = Auth::user();
         $profile = $user->profile()->firstOrNew(['user_id' => $user->id]);
@@ -36,26 +37,35 @@ class ProfileSettingsController extends Controller
             'state_id'   => 'nullable|exists:states,id',
             'city_id'    => 'nullable|exists:cities,id',
             'postal_code'=> 'nullable|string|max:20',
-            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'white_logo'    => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:1024',
-            'black_logo'    => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:1024',
-            'favicon'       => 'nullable|image|mimes:png,ico|max:512',
-            'cover_image'   => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'white_logo'    => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:1024',
+            'black_logo'    => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:1024',
+            'favicon'       => 'nullable|image|mimes:png,ico,jpg|max:512',
+            'cover_image'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
 
-        // Handle File Uploads & Delete Old Files
+        // Handle File Uploads
         $imageFields = ['profile_image', 'white_logo', 'black_logo', 'favicon', 'cover_image'];
+        
         foreach ($imageFields as $field) {
             if ($request->hasFile($field)) {
+                // Delete old file if exists
                 if ($profile->$field && Storage::disk('public')->exists($profile->$field)) {
                     Storage::disk('public')->delete($profile->$field);
                 }
-                $validated[$field] = $request->file($field)->store('profiles/' . $user->id, 'public');
+                
+                // Store new file with unique name
+                $file = $request->file($field);
+                $filename = time() . '_' . $field . '.' . $file->getClientOriginalExtension();
+                $validated[$field] = $file->storeAs('profiles/' . $user->id, $filename, 'public');
             }
         }
 
         $profile->fill($validated);
         $profile->save();
+
+        // ✅ Clear cached profile data so sidebar updates immediately
+        cache()->forget("user_profile_{$user->id}");
 
         return back()->with('success', 'Profile updated successfully.');
     }

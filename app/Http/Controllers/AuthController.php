@@ -5,13 +5,30 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller; // ← Ensure this import exists
-
+use App\Models\UserProfile;
 class AuthController extends Controller
 {
     // 👉 GET login page
     public function login()
     {
         return view('pages.auth.login');
+    }
+
+    public function showLoginForm()
+    {
+        
+        $branding = UserProfile::where('is_system', true)->first();
+        
+       
+        // $branding = UserProfile::where('is_active', true)->first();
+        
+      
+        // $branding = \App\Models\Setting::first();
+
+        return view('auth.login', [
+            'logo' => $branding?->black_logo ?? null,
+            'cover' => $branding?->cover_image ?? null,
+        ]);
     }
 
     // 👉 POST login form

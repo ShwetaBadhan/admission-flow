@@ -3,9 +3,9 @@
 								<div class="settings-sidebar">
 									<h5 class="mb-3 fs-17">System Settings</h5>
 									<div class="list-group list-group-flush settings-sidebar">
-										<a href="{{ route('email-settings') }}" class="d-block p-2 fw-medium active">Email Settings</a>
+										<a href="{{ route('email-settings.index') }}" class="d-block p-2 fw-medium active">Email Settings</a>
 										{{-- <a href="sms-gateways.html" class="d-block p-2 fw-medium">SMS Gateways</a> --}}
-										<a href="{{ route('cookies') }}" class="d-block p-2 fw-medium">GDPR Cookies</a>
+										<a href="{{ route('cookies.index') }}" class="d-block p-2 fw-medium">GDPR Cookies</a>
 									</div>
 								</div>
 							</div> <!-- end card body -->

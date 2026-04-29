@@ -27,7 +27,7 @@
 
     <!-- App Settings -->
     <li class="nav-item me-3">
-        <a href="{{ route('invoice-settings') }}" 
+        <a href="{{ route('invoice-settings.index') }}" 
            class="nav-link p-2 {{ request()->routeIs([
                 'invoice-settings*',
                 'app-settings*'
@@ -38,7 +38,7 @@
 
     <!-- System Settings -->
     <li class="nav-item me-3">
-        <a href="{{ route('email-settings') }}" 
+        <a href="{{ route('email-settings.index') }}" 
            class="nav-link p-2 {{ request()->routeIs([
                 'email-settings*',
                 'cookies*'
@@ -50,7 +50,7 @@
 
     <!-- Financial Settingsssss -->
     <li class="nav-item me-3">
-        <a href="{{ route('payment-gateway-settings') }}" 
+        <a href="{{ route('payment-gateway-settings.index') }}" 
            class="nav-link p-2 {{ request()->routeIs([
                 'payment-gateway-settings*',
                 'bank-account-settings*',
@@ -62,7 +62,7 @@
     </li>
 
     <!-- Other Settings -->
-    <li class="nav-item">
+    {{-- <li class="nav-item">
         <a href="{{ route('sitemap-settings') }}" 
            class="nav-link p-2 {{ request()->routeIs([
                 'sitemap-settings*',
@@ -70,6 +70,6 @@
            ]) ? 'active' : '' }}">
             <i class="ti ti-flag-cog me-2"></i>Other Settings
         </a>
-    </li>
+    </li> --}}
 
 </ul>

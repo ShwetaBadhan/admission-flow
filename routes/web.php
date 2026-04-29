@@ -26,6 +26,12 @@ use App\Http\Controllers\ProfileSettingsController;
 use App\Http\Controllers\LocalizationSettingController;
 use App\Http\Controllers\LanguageSettingController;
 use App\Http\Controllers\InvoiceSettingController;
+use App\Http\Controllers\EmailSettingController;
+use App\Http\Controllers\GdprCookieController;
+use App\Http\Controllers\PaymentMethodController;
+use App\Http\Controllers\BankAccountController;
+use App\Http\Controllers\TaxController;
+use App\Http\Controllers\CurrencyController;
 
 // auth pages
 
@@ -380,29 +386,60 @@ Route::get('/custom-fields', function () {
     return view('pages.settings.app-settings.custom-fields');
 })->name('custom-fields');
 
-
-Route::get('/invoice-settings', [InvoiceSettingController::class, 'index'])
-    ->name('invoice-settings');
-
-Route::post('/invoice-settings', [InvoiceSettingController::class, 'store'])
-    ->name('invoice-settings.store');
-
-
+Route::middleware(['auth'])->group(function () {
+    Route::get('/invoice-settings', [InvoiceSettingController::class, 'index'])
+        ->name('invoice-settings.index');
+    
+    Route::put('/invoice-settings', [InvoiceSettingController::class, 'update'])
+        ->name('invoice-settings.update');
+});
 Route::get('/printers', function () {
     return view('pages.settings.app-settings.printers');
 })->name('printers');
 
 // system settings
+Route::middleware(['auth'])->group(function () {
+    
+    // GDPR Cookies Settings Page
+    Route::get('/cookies', [GdprCookieController::class, 'index'])
+        ->name('cookies.index');
+    
+    // Save/Update settings
+    Route::post('/cookies', [GdprCookieController::class, 'update'])
+        ->name('cookies.update');
+    
+    // Toggle active status
+    Route::patch('/cookies/toggle', [GdprCookieController::class, 'toggleStatus'])
+        ->name('cookies.toggle');
+});
 
-Route::get('/cookies', function () {
-    return view('pages.settings.system-settings.cookies');
-})->name('cookies');
 
-
-Route::get('/email-settings', function () {
-    return view('pages.settings.system-settings.email-settings');
-})->name('email-settings');
-
+Route::middleware(['auth'])->group(function () {
+    
+    // Email Settings Page
+    Route::get('/email-settings', [EmailSettingController::class, 'index'])
+        ->name('email-settings.index');
+    
+    // Create new email provider
+    Route::post('/email-settings', [EmailSettingController::class, 'store'])
+        ->name('email-settings.store');
+    
+    // Update existing provider
+    Route::put('/email-settings/{id}', [EmailSettingController::class, 'update'])
+        ->name('email-settings.update');
+    
+    // Toggle active status
+    Route::patch('/email-settings/{id}/toggle', [EmailSettingController::class, 'toggleStatus'])
+        ->name('email-settings.toggle');
+    
+    // Send test email
+    Route::post('/email-settings/{id}/test', [EmailSettingController::class, 'sendTestEmail'])
+        ->name('email-settings.test');
+    
+    // Delete provider
+    Route::delete('/email-settings/{id}', [EmailSettingController::class, 'destroy'])
+        ->name('email-settings.destroy');
+});
 
 Route::get('/sms-settings', function () {
     return view('pages.settings.system-settings.sms-settings');
@@ -410,23 +447,105 @@ Route::get('/sms-settings', function () {
 
 // financial settings
 
-Route::get('/bank-account-settings', function () {
-    return view('pages.settings.financial-settings.bank-account-settings');
-})->name('bank-account-settings');
+// Route::get('/bank-account-settings', function () {
+//     return view('pages.settings.financial-settings.bank-account-settings');
+// })->name('bank-account-settings');
+
+Route::middleware(['auth'])->group(function () {
+    
+    // Bank Accounts Page
+    Route::get('/bank-account-settings', [BankAccountController::class, 'index'])
+        ->name('bank-account-settings.index');
+    
+    // Store new account
+    Route::post('/bank-account-settings', [BankAccountController::class, 'store'])
+        ->name('bank-account-settings.store');
+    
+    // Update existing account
+    Route::put('/bank-account-settings/{id}', [BankAccountController::class, 'update'])
+        ->name('bank-account-settings.update');
+    
+    // Delete account
+    Route::delete('/bank-account-settings/{id}', [BankAccountController::class, 'destroy'])
+        ->name('bank-account-settings.destroy');
+    
+    // Toggle active status (optional)
+    Route::patch('/bank-account-settings/{id}/toggle', [BankAccountController::class, 'toggleStatus'])
+        ->name('bank-account-settings.toggle');
+});
 
 
-Route::get('/currency-settings', function () {
-    return view('pages.settings.financial-settings.currency-settings');
-})->name('currency-settings');
+// Route::get('/currency-settings', function () {
+//     return view('pages.settings.financial-settings.currency-settings');
+// })->name('currency-settings');
+Route::middleware(['auth'])->group(function () {
+    
+    Route::get('/currency-settings', [CurrencyController::class, 'index'])
+        ->name('currency-settings.index');
+    
+    Route::post('/currency-settings', [CurrencyController::class, 'store'])
+        ->name('currency-settings.store');
+    
+    Route::put('/currency-settings/{id}', [CurrencyController::class, 'update'])
+        ->name('currency-settings.update');
+    
+    Route::delete('/currency-settings/{id}', [CurrencyController::class, 'destroy'])
+        ->name('currency-settings.destroy');
+    
+    Route::patch('/currency-settings/{id}/toggle', [CurrencyController::class, 'toggleStatus'])
+        ->name('currency-settings.toggle');
+    
+    Route::post('/currency-settings/{id}/set-default', [CurrencyController::class, 'setDefault'])
+        ->name('currency-settings.default');
+});
 
-Route::get('/payment-gateway-settings', function () {
-    return view('pages.settings.financial-settings.payment-gateway-settings');
-})->name('payment-gateway-settings');
+// Route::get('/payment-gateway-settings', function () {
+//     return view('pages.settings.financial-settings.payment-gateway-settings');
+// })->name('payment-gateway-settings');
 
 
-Route::get('tax-rate-settings', function () {
-    return view('pages.settings.financial-settings.tax-rate-settings');
-})->name('tax-rate-settings');
+Route::middleware(['auth'])->group(function () {
+    
+    Route::get('/payment-gateway-settings', [PaymentMethodController::class, 'index'])
+        ->name('payment-gateway-settings.index');
+    
+    Route::post('/payment-gateway-settings', [PaymentMethodController::class, 'store'])
+        ->name('payment-gateway-settings.store');
+    
+    Route::put('/payment-gateway-settings/{id}', [PaymentMethodController::class, 'update'])
+        ->name('payment-gateway-settings.update');
+    
+    Route::patch('/payment-gateway-settings/{id}/toggle', [PaymentMethodController::class, 'toggleStatus'])
+        ->name('payment-gateway-settings.toggle');
+    
+    Route::delete('/payment-gateway-settings/{id}', [PaymentMethodController::class, 'destroy'])
+        ->name('payment-gateway-settings.destroy');
+    
+    Route::post('/payment-gateway-settings/{id}/test-connection', [PaymentMethodController::class, 'testConnection'])
+        ->name('payment-gateway-settings.test-connection');
+});
+Route::middleware(['auth'])->group(function () {
+    
+    // Main page
+    Route::get('/tax-rate-settings', [TaxController::class, 'index'])
+        ->name('tax-rate-settings.index');
+    
+    // Tax Rates CRUD
+    Route::post('/tax-rate-settings', [TaxController::class, 'storeRate'])
+        ->name('tax-rate-settings.store');
+    Route::put('/tax-rate-settings/{id}', [TaxController::class, 'updateRate'])
+        ->name('tax-rate-settings.update');
+    Route::delete('/tax-rate-settings/{id}', [TaxController::class, 'destroyRate'])
+        ->name('tax-rate-settings.destroy');
+    
+    // Tax Groups CRUD
+    Route::post('/tax-groups', [TaxController::class, 'storeGroup'])
+        ->name('tax-groups.store');
+    Route::put('/tax-groups/{id}', [TaxController::class, 'updateGroup'])
+        ->name('tax-groups.update');
+    Route::delete('/tax-groups/{id}', [TaxController::class, 'destroyGroup'])
+        ->name('tax-groups.destroy');
+});
 
 // other settings
 

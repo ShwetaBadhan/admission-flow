@@ -34,90 +34,93 @@
 
     <!-- Begin Wrapper -->
     <div class="main-wrapper">
-
-       <div class="overflow-hidden p-3 acc-vh">
+    <div class="row g-0 min-vh-100">
+                            @php
+    // Safe fallback: agar variable null/empty ho toh default asset use karega
+    $logoUrl = !empty($logo) ? asset('storage/' . $logo) : asset('assets/img/logo.svg');
+    $coverUrl = !empty($cover) ? asset('storage/' . $cover) : asset('assets/img/authentication/login-bg.jpg');
+@endphp
             
-            <!-- start row -->
-            <div class="row vh-100 w-100 g-0"> 
+        <!-- LEFT SIDE: Login Form -->
+        <div class="col-lg-6 d-flex align-items-center justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <form action="{{ route('login.submit') }}" method="POST" class="vh-100 d-flex justify-content-between flex-column p-4 pb-0">
+                    @csrf
+        <!-- Dynamic Logo -->
+                  <!-- Logo -->
+<div class="text-center mb-4 auth-logo">
+    <img src="{{ $logoUrl }}" class="img-fluid" alt="Logo" 
+         onerror="this.onerror=null;this.src='{{ asset('assets/img/logo.svg') }}';">
+</div>
 
-                <div class="col-lg-6 vh-100 overflow-y-auto overflow-x-hidden">
+                    <div>
+                        <div class="mb-3">
+                            <h3 class="mb-2">Sign In</h3>
+                            <p class="mb-0">Access the CRMS panel using your email and passcode.</p>
+                        </div>
 
-                     <!-- start row -->
-                    <div class="row">
+                        {{-- Error Message --}}
+                        @if ($errors->any())
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ $errors->first() }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        @endif
 
-                        <div class="col-md-10 mx-auto">
-                         <form action="{{ route('login.submit') }}" method="POST"
-                            class=" vh-100 d-flex justify-content-between flex-column p-4 pb-0">
-                            @csrf
-                           
-                                <div class="text-center mb-4 auth-logo">
-                                    <img src="assets/img/logo.svg" class="img-fluid" alt="Logo">
-                                </div>
-                                <div>
-                                    <div class="mb-3">
-                                        <h3 class="mb-2">Sign In</h3>
-                                        <p class="mb-0">Access the CRMS panel using your email and passcode.</p>
-                                    </div>
-                                    {{-- 🔴 ERROR MESSAGE --}}
-                                        @if ($errors->any())
-                                            <div class="alert alert-danger">
-                                                {{ $errors->first() }}
-                                            </div>
-                                        @endif
-                                    <div class="mb-3">
-                                        <label class="form-label">Email Address</label>
-                                        <div class="input-group input-group-flat">
-                                            <input type="email" name="email" value="{{ old('email') }}" class="form-control">
-                                            <span class="input-group-text">
-                                                <i class="ti ti-mail"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Password</label>
-                                        <div class="input-group input-group-flat pass-group">
-                                            <input type="password" name="password" class="form-control pass-input">
-                                            <span class="input-group-text toggle-password ">
-                                                <i class="ti ti-eye-off"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center justify-content-between mb-3">
-                                        <div class="form-check form-check-md d-flex align-items-center">
-                                            <input class="form-check-input mt-0" type="checkbox" value="" name="remember" id="checkebox-md" checked="">
-                                            <label class="form-check-label text-dark ms-1" for="checkebox-md">
-                                                Remember Me
-                                            </label>
-                                        </div>
-                                        <div class="text-end">
-                                            <a href="{{ route('forgot-password') }}" class="link-danger fw-medium link-hover">Forgot Password?</a>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <button type="submit" class="btn btn-primary w-100">Sign In</button>
-                                    </div>
-                                   
-                                    
-                                </div>
-                                <div class="text-center pb-4">
-                                    <p class="text-dark mb-0">Copyright &copy; <script >document.write(new Date().getFullYear())</script> - Vibrantick Infotech Solutions</p>
-                                </div>
-                            </form>
-                        </div> <!-- end col -->
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <div class="input-group input-group-flat">
+                                <input type="email" name="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" placeholder="Enter email">
+                                <span class="input-group-text"><i class="ti ti-mail"></i></span>
+                            </div>
+                            @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
 
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <div class="input-group input-group-flat pass-group">
+                                <input type="password" name="password" class="form-control pass-input @error('password') is-invalid @enderror" placeholder="Enter password">
+                                <span class="input-group-text toggle-password"><i class="ti ti-eye-off"></i></span>
+                            </div>
+                            @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+
+                        <!-- Remember Me & Forgot Password -->
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="form-check form-check-md d-flex align-items-center">
+                                <input class="form-check-input mt-0" type="checkbox" name="remember" id="remember_me" value="1" {{ old('remember') ? 'checked' : '' }}>
+                                <label class="form-check-label text-dark ms-1" for="remember_me">Remember Me</label>
+                            </div>
+                            <div class="text-end">
+                                <a href="{{ route('forgot-password') }}" class="link-danger fw-medium link-hover">Forgot Password?</a>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="mb-3">
+                            <button type="submit" class="btn btn-primary w-100">Sign In</button>
+                        </div>
                     </div>
-                    <!-- end row -->
 
-                </div>
-
-                <div class="col-lg-6 account-bg-01"></div> <!-- end col -->
-
+                    <!-- Footer -->
+                    <div class="text-center pb-4">
+                        <p class="text-dark mb-0">
+                            Copyright &copy; {{ date('Y') }} - Vibrantick Infotech Solutions
+                        </p>
+                    </div>
+                </form>
             </div>
-            <!-- end row -->
-
         </div>
 
+       <!-- Cover Image (Right Side) -->
+<div class="col-lg-6 d-none d-lg-block">
+    <div class="login-cover-bg" style="background-image: url('{{ $coverUrl }}');"></div>
+</div>
+
     </div>
+</div>
     <!-- End Wrapper -->
 
     <!-- jQuery -->

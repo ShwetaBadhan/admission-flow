@@ -33,8 +33,8 @@
 
 @section('content')
     <!-- ========================
-                   Start Page Content
-                  ========================= -->
+                       Start Page Content
+                      ========================= -->
 
     <div class="page-wrapper">
 
@@ -72,8 +72,9 @@
                         </div>
                     </div>
                     <a href="javascript:void(0);" class="btn btn-icon btn-outline-light shadow" data-bs-toggle="tooltip"
-                        data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh"><i
-                            class="ti ti-refresh"></i></a>
+                        data-bs-placement="top" title="Refresh" onclick="location.reload();">
+                        <i class="ti ti-refresh"></i>
+                    </a>
                     <a href="javascript:void(0);" class="btn btn-icon btn-outline-light shadow" data-bs-toggle="tooltip"
                         data-bs-placement="top" aria-label="Collapse" data-bs-original-title="Collapse"
                         id="collapse-header"><i class="ti ti-transition-top"></i></a>
@@ -245,7 +246,7 @@
                         <input type="text" class="form-control" placeholder="Search leads..." id="global-search"
                             value="{{ request('search') }}">
                     </div>
-                  
+
                 </div>
                 <div class="d-flex align-items-center gap-2 flex-wrap">
 
@@ -390,7 +391,7 @@
                                                                     class="d-flex align-items-center justify-content-center me-1">
                                                                     <i class="ti ti-message-circle-2"></i>
                                                                 </a>
-                                                              
+
                                                             </div>
                                                         </div>
                                                     </div>
@@ -649,8 +650,8 @@
     </div>
 
     <!-- ========================
-                   End Page Content
-                  ========================= -->
+                       End Page Content
+                      ========================= -->
 
     <!-- Add lead-->
     <div class="offcanvas offcanvas-end offcanvas-large" tabindex="-1" id="offcanvas_add">

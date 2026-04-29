@@ -4,20 +4,33 @@
       <!-- Start Logo -->
       <div class="sidebar-logo">
           <div>
-              <!-- Logo Normal -->
-              <a href="{{ route('dashboard') }}" class="logo logo-normal">
-                  <img src="{{ url('assets/img/logo.svg') }}" alt="Logo">
-              </a>
+@php
+    // ✅ Fallback: Get profile directly if View Composer didn't run
+    if (!isset($userProfile) && auth()->check()) {
+        $userProfile = auth()->user()->profile ?? null;
+    }
+@endphp
 
-              <!-- Logo Small -->
-              <a href="{{ route('dashboard') }}" class="logo-small">
-                  <img src="{{ url('assets/img/logo-small.svg') }}" alt="Logo">
-              </a>
+<!-- Logo Normal (Light Background) -->
+<a href="{{ route('dashboard') }}" class="logo logo-normal">
+    <img src="{{ $userProfile?->black_logo && file_exists(storage_path('app/public/' . $userProfile->black_logo)) ? asset('storage/' . $userProfile->black_logo) : asset('assets/img/logo.svg') }}" 
+         alt="Logo"
+         onerror="this.src='{{ asset('assets/img/logo.svg') }}'">
+</a>
 
-              <!-- Logo Dark -->
-              <a href="{{ route('dashboard') }}" class="dark-logo">
-                  <img src="{{ url('assets/img/logo-white.svg') }}" alt="Logo">
-              </a>
+<!-- Logo Small -->
+<a href="{{ route('dashboard') }}" class="logo-small">
+    <img src="{{ $userProfile?->black_logo && file_exists(storage_path('app/public/' . $userProfile->black_logo)) ? asset('storage/' . $userProfile->black_logo) : asset('assets/img/logo-small.svg') }}" 
+         alt="Logo"
+         onerror="this.src='{{ asset('assets/img/logo-small.svg') }}'">
+</a>
+
+<!-- Logo Dark (Dark Background) -->
+<a href="{{ route('dashboard') }}" class="dark-logo">
+    <img src="{{ $userProfile?->white_logo && file_exists(storage_path('app/public/' . $userProfile->white_logo)) ? asset('storage/' . $userProfile->white_logo) : asset('assets/img/logo-white.svg') }}" 
+         alt="Logo"
+         onerror="this.src='{{ asset('assets/img/logo-white.svg') }}'">
+</a>
           </div>
           <button class="sidenav-toggle-btn btn border-0 p-0 active" id="toggle_btn">
               <i class="ti ti-arrow-bar-to-left"></i>
@@ -217,6 +230,7 @@
                               <ul>
                                   {{-- <li><a href="{{ route ('company-settings')}}">Company Settings</a></li> --}}
                                   <li><a href="{{ route ('localization-settings')}}">Localization</a></li>
+                                  <li><a href="{{ route ('language-settings')}}">Language</a></li>
                                   {{-- <li><a href="{{ route ('prefix-settings')}}">Prefixes</a></li> --}}
                                   {{-- <li><a href="{{ route ('preference-settings')}}">Preference</a></li> --}}
                                   {{-- <li><a href="{{ route ('appearance-settings')}}">Appearance</a></li> --}}
@@ -228,7 +242,7 @@
                                   <i class="ti ti-apps"></i><span>App Settings</span><span class="menu-arrow"></span>
                               </a>
                               <ul>
-                                  <li><a href="{{ route ('invoice-settings')}}">Invoice Settings</a></li>
+                                  <li><a href="{{ route ('invoice-settings.index')}}">Invoice Settings</a></li>
                                   {{-- <li><a href="{{ route ('printers')}}">Printers</a></li> --}}
                                   {{-- <li><a href="{{ route ('custom-fields')}}">Custom Fields</a></li> --}}
                               </ul>
@@ -239,9 +253,9 @@
                                       class="menu-arrow"></span>
                               </a>
                               <ul>
-                                  <li><a href="{{ route ('email-settings')}}">Email Settings</a></li>
+                                  <li><a href="{{ route ('email-settings.index')}}">Email Settings</a></li>
                                   {{-- <li><a href="{{ route ('sms-settings')}}">SMS Gateways</a></li> --}}
-                                  <li><a href="{{ route('cookies') }}">GDPR Cookies</a></li>
+                                  <li><a href="{{ route('cookies.index') }}">GDPR Cookies</a></li>
                               </ul>
                           </li>
                           <li class="submenu">
@@ -250,13 +264,13 @@
                                       class="menu-arrow"></span>
                               </a>
                               <ul>
-                                  <li><a href="{{ route ('payment-gateway-settings')}}">Payment Gateways</a></li>
-                                  <li><a href="{{ route ('bank-account-settings')}}">Bank Accounts</a></li>
-                                  <li><a href="{{ route ('tax-rate-settings')}}">Tax Rates</a></li>
-                                  <li><a href="{{ route ('currency-settings')}}">Currencies</a></li>
+                                  <li><a href="{{ route ('payment-gateway-settings.index')}}">Payment Gateways</a></li>
+                                  <li><a href="{{ route ('bank-account-settings.index')}}">Bank Accounts</a></li>
+                                  <li><a href="{{ route ('tax-rate-settings.index')}}">Tax Rates</a></li>
+                                  <li><a href="{{ route ('currency-settings.index')}}">Currencies</a></li>
                               </ul>
                           </li>
-                          <li class="submenu">
+                          {{-- <li class="submenu">
                               <a href="javascript:void(0);">
                                   <i class="ti ti-settings-2"></i><span>Other Settings</span><span
                                       class="menu-arrow"></span>
@@ -264,13 +278,13 @@
                               <ul>
                                   <li><a href="{{ route ('sitemap-settings')}}">Sitemap</a></li>
                                   <li><a href="{{ route ('clear-cache-settings')}}">Clear Cache</a></li>
-                                  {{-- <li><a href="{{ route ('storage-settings')}}">Storage</a></li>
+                                  <li><a href="{{ route ('storage-settings')}}">Storage</a></li>
                                   <li><a href="{{ route ('cronjob-settings')}}">Cronjob</a></li>
                                   <li><a href="{{ route ('ban-ip-settings')}}">Ban IP Address</a></li>
                                   <li><a href="{{ route ('database-backup-settings')}}">Database Backup</a></li>
-                                  <li><a href="{{ route ('system-update-settings')}}">System Update</a></li> --}}
+                                  <li><a href="{{ route ('system-update-settings')}}">System Update</a></li>
                               </ul>
-                          </li>
+                          </li> --}}
                       </ul>
                   </li>
 
