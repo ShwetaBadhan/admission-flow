@@ -13,11 +13,19 @@
 	<meta name="author" content="Dreams Technologies">
 	<meta name="robots" content="index, follow">
 	
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="{{ url ('assets/img/favicon.png')}}">
+      @php
+        // ✅ Get profile for favicon (fallback if View Composer didn't run)
+        if (!isset($userProfile) && auth()->check()) {
+            $userProfile = auth()->user()->profile ?? null;
+        }
+    @endphp
 
-    <!-- Apple Icon -->
-    <link rel="apple-touch-icon" href="{{ url ('assets/img/apple-icon.png')}}">
+    <!-- Dynamic Favicon -->
+    <link rel="shortcut icon" type="image/png" 
+          href="{{ $userProfile?->favicon && file_exists(storage_path('app/public/' . $userProfile->favicon)) 
+                ? asset('storage/' . $userProfile->favicon) 
+                : asset('assets/img/favicon.png') }}">
+
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="{{ url ('assets/css/bootstrap.min.css')}}">
