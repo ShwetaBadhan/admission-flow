@@ -31,8 +31,8 @@
 @endif
 @section('content')
     <!-- ========================
-                               Start Page Content
-                              ========================= -->
+                                   Start Page Content
+                                  ========================= -->
 
     <div class="page-wrapper">
 
@@ -42,7 +42,7 @@
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
                 <div>
-                    <h4 class="mb-1">Colleges<span class="badge badge-soft-primary ms-2">{{ $colleges->total() }}</span>
+                    <h4 class="mb-1">Colleges<span class="badge badge-soft-primary ms-2">{{ count($colleges) }}</span>
                     </h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
@@ -307,10 +307,18 @@
                                                 <i class="ti ti-cash text-dark me-1"></i>{{ $college->fees_range }}
                                             </p>
                                         @endif
+                                        @if ($college->website)
+                                            <p class="text-default d-inline-flex align-items-center mb-2 small">
+                                                <i class="ti ti-world text-dark me-1"></i>
+                                                <a href="mailto:{{ $college->website }}"
+                                                    class="text-decoration-none">{{ Str::limit($college->website, 25) }}</a>
+                                            </p>
+                                        @endif
                                         <p class="text-default d-inline-flex align-items-center small">
                                             <i class="ti ti-map-pin text-dark me-1"></i>
                                             {{ $college->city->name ?? 'N/A' }}, {{ $college->state->name ?? 'N/A' }}
                                         </p>
+
 
                                     </div>
 
@@ -349,31 +357,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Footer: Social + Avatar -->
-                                <div
-                                    class="d-flex justify-content-between align-items-center flex-wrap row-gap-2 border-top pt-3 mt-3">
-                                    <div class="d-flex align-items-center grid-social-links">
-                                        @if ($college->email)
-                                            <a href="mailto:{{ $college->email }}"
-                                                class="avatar avatar-xs text-dark rounded-circle me-1" title="Email">
-                                                <i class="ti ti-mail fs-14"></i>
-                                            </a>
-                                        @endif
-                                        @if ($college->phone)
-                                            <a href="tel:{{ $college->phone }}"
-                                                class="avatar avatar-xs text-dark rounded-circle me-1" title="Call">
-                                                <i class="ti ti-phone-check fs-14"></i>
-                                            </a>
-                                        @endif
-                                        @if ($college->website)
-                                            <a href="{{ $college->website }}" target="_blank"
-                                                class="avatar avatar-xs text-dark rounded-circle me-1" title="Website">
-                                                <i class="ti ti-world fs-14"></i>
-                                            </a>
-                                        @endif
-                                    </div>
 
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -628,8 +612,7 @@
             </div>
             <!-- /College Grid -->
 
-            <!-- ✅ Custom Load More Pagination -->
-            {{ $colleges->links('vendor.pagination.load-more') }}
+          
 
         </div>
         <!-- End Content -->
@@ -637,9 +620,7 @@
 
     </div>
 
-    <!-- ========================
-                                   End Page Content
-                                  ========================= -->
+    <!-- ======================== End Page Content ========================= -->
 
     </div>
     <!-- End Wrapper -->

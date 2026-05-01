@@ -36,7 +36,7 @@
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
                 <div>
-                    <h4 class="mb-1">Documents<span class="badge badge-soft-primary ms-2">{{ $documentsettings->total() }}</span>
+                    <h4 class="mb-1">Documents<span class="badge badge-soft-primary ms-2">{{ count($documentsettings)}}</span>
                     </h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
@@ -59,22 +59,13 @@
 
 
             <div class="card border-0 rounded-0">
-                <div class="card-header d-flex align-items-center justify-content-between gap-2 flex-wrap">
-                    <div class="input-icon input-icon-start position-relative">
-                        <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Search" id="searchInput">
-                    </div>
-                </div>
+               
                 <div class="card-body">
                     <div class="table-responsive custom-table">
                         <table class="table table-nowrap datatable" id="DocumentsTable">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="no-sort">
-                                        <div class="form-check form-check-md">
-                                            <input class="form-check-input" type="checkbox" id="select-all">
-                                        </div>
-                                    </th>
+                                    <th class="no-sort">Sr. No.</th>
                                     <th>Title</th>
                                     <th>Created Date</th>
                                     <th>Status</th>
@@ -82,14 +73,10 @@
                                 </tr>
                             </thead>
                             <tbody>
+                             @php $serial = 1; @endphp
                                 @foreach ($documentsettings as $setting)
                                     <tr>
-                                        <td>
-                                            <div class="form-check form-check-md">
-                                                <input class="form-check-input item-checkbox" type="checkbox"
-                                                    value="{{ $setting->id }}">
-                                            </div>
-                                        </td>
+                                       <td>{{ $serial++ }}</td>
                                         <td><span class="title-name">{{ $setting->name }}</span></td>
                                         <td>{{ $setting->created_at->format('d M Y') }}</td>
                                         <td>
@@ -217,10 +204,7 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-end mt-3">
-                        {{ $documentsettings->withQueryString()->links() }}
-                    </div>
+                    
                 </div>
             </div>
 

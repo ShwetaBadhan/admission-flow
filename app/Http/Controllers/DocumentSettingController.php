@@ -9,7 +9,7 @@ class DocumentSettingController extends Controller
 {
       public function index()
     {
-        $documentsettings = DocumentSetting::orderBy('created_at', 'desc')->paginate(10);
+        $documentsettings = DocumentSetting::orderBy('created_at', 'desc')->get();
         return view('pages.document-settings.index', compact('documentsettings'));
     }
 

@@ -37,7 +37,7 @@
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
                 <div>
-                    <h4 class="mb-1">Sources<span class="badge badge-soft-primary ms-2">{{ $sources->total() }}</span></h4>
+                    <h4 class="mb-1">Sources<span class="badge badge-soft-primary ms-2">{{ count($sources) }}</span></h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
@@ -67,11 +67,7 @@
                         <table class="table table-nowrap datatable" id="sourcesTable">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="no-sort">
-                                        <div class="form-check form-check-md">
-                                            <input class="form-check-input" type="checkbox" id="select-all">
-                                        </div>
-                                    </th>
+                                    <th class="no-sort">Sr. No.</th>
                                     <th>Title</th>
                                     <th>Created Date</th>
                                     <th>Status</th>
@@ -79,14 +75,10 @@
                                 </tr>
                             </thead>
                             <tbody>
+                             @php $serial = 1; @endphp
                                 @foreach ($sources as $source)
                                     <tr>
-                                        <td>
-                                            <div class="form-check form-check-md">
-                                                <input class="form-check-input item-checkbox" type="checkbox"
-                                                    value="{{ $source->id }}">
-                                            </div>
-                                        </td>
+                                       <td>{{ $serial++ }}</td>
                                         <td><span class="title-name">{{ $source->name }}</span></td>
                                         <td>{{ $source->created_at->format('d M Y') }}</td>
                                         <td>
@@ -207,10 +199,7 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-end mt-3">
-                        {{ $sources->withQueryString()->links() }}
-                    </div>
+                   
                 </div>
             </div>
 

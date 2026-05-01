@@ -65,7 +65,7 @@ class CollegeController extends Controller
             $query->whereJsonContains('course_ids', (int)$request->course_id);
         }
 
-        $colleges = $query->latest()->paginate(10)->withQueryString(); // ✅ Keeps filters in pagination
+        $colleges = $query->latest()->get(); // ✅ Keeps filters in pagination
         $states = State::all();
         $courses = Course::all();
         
@@ -140,6 +140,7 @@ class CollegeController extends Controller
         'course_ids' => 'nullable|array',
         'course_ids.*' => 'exists:courses,id',
         'status' => 'nullable|in:active,inactive',
+         'fees_range' => 'required|string|max:255',
     ]);
 
     $data = $request->except(['college_image', 'course_ids']);
@@ -177,6 +178,8 @@ class CollegeController extends Controller
             'course_ids' => 'nullable|array',
             'course_ids.*' => 'exists:courses,id',
             'status' => 'nullable|in:active,inactive',
+            'fees_range' => 'required|string|max:255',
+            
         ]);
 
         $data = $request->except(['college_image', 'course_ids']);

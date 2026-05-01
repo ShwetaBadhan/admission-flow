@@ -24,7 +24,7 @@ class BankAccountController extends Controller
             });
         }
 
-        $bankAccounts = $query->latest()->paginate(10)->withQueryString();
+        $bankAccounts = $query->latest()->get()->withQueryString();
 
         return view('pages.settings.financial-settings.bank-account-settings', compact('bankAccounts'));
     }

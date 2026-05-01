@@ -32,6 +32,7 @@ use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\CurrencyController;
+use App\Http\Controllers\DashboardController;
 
 // auth pages
 
@@ -49,10 +50,7 @@ Route::get('/forgot-password', function () {
 })->name('forgot-password');
 
 
-Route::get('/dashboard', function () {
-    return view('pages.dashboard');
-})->middleware(middleware: 'auth')->name('dashboard');
-
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 // leads
 // routes/web.php
@@ -626,8 +624,9 @@ Route::prefix('user-management')->group(function () {
 
 
 
-
-
+Route::delete('admin/{resource}/bulk-delete', [\App\Http\Controllers\Admin\BulkController::class, 'delete'])
+    ->name('global.bulk-delete')
+    ->middleware('auth');
 
 
 

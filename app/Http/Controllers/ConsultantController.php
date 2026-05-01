@@ -23,7 +23,7 @@ class ConsultantController extends Controller
             'kycDocuments' => function ($query) {
                 $query->whereNull('is_verified')->orderBy('created_at', 'desc'); // Only pending
             }
-        ])->orderBy('created_at', 'desc')->paginate(10);
+        ])->orderBy('created_at', 'desc')->get();
         $states = State::orderBy('name')->get();
         $cities = City::orderBy('name')->get(); // Load all cities for initial edit modals
    // ✅ Add this: All active colleges for dropdown

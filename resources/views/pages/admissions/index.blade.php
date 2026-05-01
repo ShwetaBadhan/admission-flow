@@ -34,14 +34,15 @@
     <div class="content pb-0">
         <!-- Page Header -->
         <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
-            <div>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0 p-0">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
-                        <li class="breadcrumb-item active">Admission Requests</li>
-                    </ol>
-                </nav>
-            </div>
+           <div>
+                    <h4 class="mb-1">Admissions<span class="badge badge-soft-primary ms-2">{{ $admissions->total() }}</span></h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 p-0">
+                            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Admissions</li>
+                        </ol>
+                    </nav>
+                </div>
         </div>
 
         <!-- card start -->
@@ -88,22 +89,7 @@
                     </div>
 
                     <div class="d-flex align-items-center gap-2 flex-wrap">
-                        <!-- Search -->
-                        <form method="GET" action="{{ route('admissions.index') }}" class="d-flex">
-                            <input type="hidden" name="sort" value="{{ request('sort') }}">
-                            <input type="hidden" name="order" value="{{ request('order') }}">
-                            <input type="hidden" name="start_date" value="{{ request('start_date') }}">
-                            <input type="hidden" name="end_date" value="{{ request('end_date') }}">
-                            <input type="hidden" name="status" value="{{ request('status') }}">
-                            
-                            <div class="input-group">
-                                <input type="text" name="search" class="form-control form-control-sm" 
-                                       placeholder="Search..." value="{{ request('search') }}">
-                                <button type="submit" class="btn btn-sm btn-primary">
-                                    <i class="ti ti-search"></i>
-                                </button>
-                            </div>
-                        </form>
+                     
 
                         <!-- Filter Dropdown -->
                         <div class="dropdown">
@@ -169,14 +155,10 @@
 
                 <!-- Admissions Table -->
                 <div class="table-responsive table-nowrap custom-table">
-                    <table class="table table-nowrap">
+                    <table class="table table-nowrap datatable">
                         <thead class="table-light">
                             <tr>
-                                <th class="no-sort">
-                                    <div class="form-check form-check-md">
-                                        <input class="form-check-input" type="checkbox" id="select-all">
-                                    </div>
-                                </th>
+                                <th class="no-sort">Sr. No.</th> <!-- ✅ Replaced checkbox -->
                                 <th>Student</th>
                                 <th>College</th>
                                 <th>Course</th>
@@ -189,11 +171,7 @@
                         <tbody>
                             @forelse($admissions as $admission)
                                 <tr>
-                                    <td>
-                                        <div class="form-check form-check-md">
-                                            <input class="form-check-input" type="checkbox" name="admission_ids[]" value="{{ $admission->id }}">
-                                        </div>
-                                    </td>
+                                    <td>{{ ($admissions->currentPage() - 1) * $admissions->perPage() + $loop->iteration }}</td> <!-- ✅ Pagination-aware Sr. No. -->
                                     <td>
                                         @if($admission->lead)
                                             <a href="{{ route('lead-details', $admission->lead) }}" class="text-decoration-none fw-medium">

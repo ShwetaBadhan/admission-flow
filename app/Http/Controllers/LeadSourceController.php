@@ -13,7 +13,7 @@ class LeadSourceController extends Controller
      */
     public function index()
     {
-        $sources = LeadSource::orderBy('created_at', 'desc')->paginate(10);
+        $sources = LeadSource::orderBy('created_at', 'desc')->get();
         return view('pages.sources.index', compact('sources'));
     }
 

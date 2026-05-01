@@ -9,7 +9,7 @@ class PriorityController extends Controller
 {
      public function index()
     {
-        $priorities = Priority::orderBy('created_at', 'desc')->paginate(10);
+        $priorities = Priority::orderBy('created_at', 'desc')->get();
         return view('pages.priorities.index', compact('priorities'));
     }
 

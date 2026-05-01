@@ -746,7 +746,7 @@ class LeadController extends Controller
             'document_type' => [
                 'required',
                 'string',
-                Rule::unique('documents', 'document_type')
+                Rule::unique('lead_documents', 'document_type')
                     ->where('lead_id', $lead->id)
                     // Optional: Only block if previous doc is still pending/verified
                     // Remove the where() if you want to block regardless of status
@@ -1210,7 +1210,7 @@ class LeadController extends Controller
             ->when($request->filled('lead_owners'), function ($q) use ($request) {
                 $q->whereIn('consultant_id', $request->lead_owners);
             })
-            // 🔐 Role-based filter (same as your index method)
+            // 🔐 Role-based filter (Consultants see only their leads)
             ->when(function () {
                 $user = Auth::user();
                 return $user && $user->hasRole('consultant');

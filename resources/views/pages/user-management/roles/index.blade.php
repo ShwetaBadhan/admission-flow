@@ -38,12 +38,12 @@
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
                 <div>
-                    <h4 class="mb-1">Roles & Permissions <span
-                            class="badge badge-soft-primary ms-2">{{ $roles->total() }}</span></h4>
+                    <h4 class="mb-1">Roles <span
+                            class="badge badge-soft-primary ms-2">{{ count($roles)}}</span></h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Roles & Permissions</li>
+                            <li class="breadcrumb-item active" aria-current="page">Roles</li>
                         </ol>
                     </nav>
                 </div>
@@ -51,7 +51,7 @@
                     @can('create-roles')
                         <a href="{{ route('roles.create') }}" class="btn btn-primary" data-bs-toggle="modal"
                             data-bs-target="#add_role">
-                            <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Role
+                            <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Roles
                         </a>
                     @endcan
 
@@ -61,22 +61,13 @@
 
             <!-- card start -->
             <div class="card border-0 rounded-0">
-                <div class="card-header d-flex align-items-center justify-content-between gap-2 flex-wrap">
-                    <div class="input-icon input-icon-start position-relative">
-                        <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Search" id="searchInput">
-                    </div>
-                </div>
+               
                 <div class="card-body">
                     <div class="table-responsive custom-table">
                         <table class="table table-nowrap datatable" id="rolesTable">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="no-sort">
-                                        <div class="form-check form-check-md">
-                                            <input class="form-check-input" type="checkbox" id="select-all">
-                                        </div>
-                                    </th>
+                                    <th class="no-sort">Sr. No.</th>
                                     <th>Role Name</th>
                                     <th>Status</th>
                                     <th>Created</th>
@@ -84,14 +75,10 @@
                                 </tr>
                             </thead>
                             <tbody>
+                             @php $serial = 1; @endphp
                                 @foreach ($roles as $role)
                                     <tr>
-                                        <td>
-                                            <div class="form-check form-check-md">
-                                                <input class="form-check-input row-check" type="checkbox"
-                                                    value="{{ $role->id }}">
-                                            </div>
-                                        </td>
+                                       <td>{{ $serial++ }}</td>
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="ms-2">
@@ -302,10 +289,7 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-end mt-3">
-                        {{ $roles->links() }}
-                    </div>
+                 
                 </div>
             </div>
             <!-- card end -->

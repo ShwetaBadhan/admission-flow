@@ -15,8 +15,14 @@ class LocalizationSettingController extends Controller
     {
         // Fetch the existing settings if they exist
         $settings = LocalizationSetting::first();
-        
-        return view('pages.settings.website-settings.localization-settings', compact('settings'));
+         $availableLanguages = \App\Models\Language::where('is_active', true)
+        ->orderBy('is_default', 'desc')
+        ->orderBy('name')
+        ->get();
+    
+         return view('pages.settings.website-settings.localization-settings', 
+        compact('settings', 'availableLanguages')
+    );
     }
 
     /**
@@ -48,14 +54,25 @@ class LocalizationSettingController extends Controller
     // Update or create
     $setting = LocalizationSetting::first();
     
-    if ($setting) {
-        $setting->update($validated);
-        $message = 'Settings updated successfully.';
-    } else {
-        LocalizationSetting::create($validated);
-        $message = 'Settings created successfully.';
-    }
+   if ($setting) {
+    $setting->update($validated);
+    $message = 'Settings updated successfully.';
+} else {
+    LocalizationSetting::create($validated);
+    $message = 'Settings created successfully.';
+}
 
-    return redirect()->back()->with('success', $message);
+// ✅ Clear cached locale so change takes effect immediately
+cache()->forget('localization_settings');
+if (class_exists(\Illuminate\Support\Facades\App::class)) {
+    // Optional: Reload locale immediately
+    $newLocale = $validated['default_language'] ?? $setting?->default_language;
+    if ($newLocale && \App\Models\Language::where('code', $newLocale)->where('is_active', true)->exists()) {
+        app()->setLocale($newLocale);
+        session()->put('locale', $newLocale); // Optional: persist in session
+    }
+}
+
+return redirect()->back()->with('success', $message);
 }
 }

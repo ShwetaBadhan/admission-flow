@@ -177,11 +177,13 @@ document.addEventListener('DOMContentLoaded', function() {
                                                     data-admin="{{ $language->admin_enabled ? '1' : '0' }}">
                                                 <i class="ti ti-edit text-blue"></i>
                                             </button>
-                                            <button class="btn btn-xs btn-icon btn-outline-light delete-language" 
-                                                    data-id="{{ $language->id }}"
-                                                    data-name="{{ $language->name }}">
-                                                <i class="ti ti-trash text-danger"></i>
-                                            </button>
+                                          <button class="btn btn-xs btn-icon btn-outline-light delete-language" 
+        data-bs-toggle="modal" 
+        data-bs-target="#delete_lang"
+        data-id="{{ $language->id }}"
+        data-name="{{ $language->name }}">
+    <i class="ti ti-trash text-danger"></i>
+</button>
                                         </td>
                                     </tr>
                                     @empty

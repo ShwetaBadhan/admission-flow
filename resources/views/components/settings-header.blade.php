@@ -15,9 +15,9 @@
 
     <!-- Website Settings -->
     <li class="nav-item me-3">
-        <a href="{{ route('company-settings') }}" 
+        <a href="{{ route('localization-settings') }}" 
            class="nav-link p-2 {{ request()->routeIs([
-                'company-settings*',
+                
                 'localization-settings*',
                 'language-settings*'
            ]) ? 'active' : '' }}">

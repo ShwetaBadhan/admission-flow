@@ -9,7 +9,7 @@ class CommunicationLogController extends Controller
 {
     public function index()
     {
-        $logs = CommunicationLog::orderBy('created_at', 'desc')->paginate(10);
+        $logs = CommunicationLog::orderBy('created_at', 'desc')->get();
         return view('pages.communication-logs.index', compact('logs'));
     }
 

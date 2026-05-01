@@ -62,7 +62,7 @@ class SlabRuleController extends Controller
     };
 
     // 📄 Pagination with preserved query params
-    $slabRules = $query->paginate(15)->withQueryString();
+    $slabRules = $query->orderBy('created_at', 'desc')->get();
     
     $consultants = Consultant::where('status', 1)->orderBy('name')->get();
     $colleges = College::where('status', 1)->orderBy('name')->get();

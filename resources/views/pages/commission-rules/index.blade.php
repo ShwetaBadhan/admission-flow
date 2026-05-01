@@ -32,8 +32,8 @@
 @endif
 @section('content')
     <!-- ========================
-           Start Page Content
-          ========================= -->
+               Start Page Content
+              ========================= -->
 
     <div class="page-wrapper">
 
@@ -44,7 +44,7 @@
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
                 <div>
                     <h4 class="mb-1">Commission Rules<span
-                            class="badge badge-soft-primary ms-2">{{ $commissionRules->total() }}</span></h4>
+                            class="badge badge-soft-primary ms-2">{{ count($commissionRules) }}</span></h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
@@ -53,10 +53,8 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
-                    
-                    {{-- <a href="javascript:void(0);" class="btn btn-icon btn-outline-light shadow" data-bs-toggle="tooltip"
-                        data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh"><i
-                            class="ti ti-refresh"></i></a> --}}
+
+
                     <a href="javascript:void(0);" class="btn btn-icon btn-outline-light shadow" data-bs-toggle="tooltip"
                         data-bs-placement="top" aria-label="Collapse" data-bs-original-title="Collapse"
                         id="collapse-header"><i class="ti ti-transition-top"></i></a>
@@ -71,10 +69,7 @@
             <!-- card start -->
             <div class="card border-0 rounded-0">
                 <div class="card-header d-flex align-items-center justify-content-between gap-2 flex-wrap">
-                    {{-- <div class="input-icon input-icon-start position-relative">
-                        <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Search">
-                    </div> --}}
+
                     @can('create-commission-rules')
                         <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
                             data-bs-target="#offcanvas_add"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add New
@@ -84,19 +79,15 @@
                 </div>
                 <div class="card-body">
 
-                  
+
 
                     <!-- Commission Rules List -->
                     <div class="table-responsive table-nowrap custom-table">
                         <table class="table table-nowrap datatable" id="Commission Rules-list">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="no-sort">
-                                        <div class="form-check form-check-md">
-                                            <input class="form-check-input" type="checkbox" id="select-all">
-                                        </div>
-                                    </th>
-                                    <th class="no-sort"></th>
+
+                                    <th class="no-sort">Sr. No.</th>
                                     <th>Consultant</th>
                                     <th>College</th>
                                     <th>Course</th>
@@ -107,14 +98,11 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php $serial = 1; @endphp
                                 @foreach ($commissionRules as $rule)
                                     <tr>
-                                        <td>
-                                            <div class="form-check form-check-md">
-                                                <input class="form-check-input" type="checkbox">
-                                            </div>
-                                        </td>
-                                        <td></td>
+                                        <td>{{ $serial++ }}</td>
+
                                         <td>{{ $rule->consultant->name ?? 'N/A' }}</td>
                                         <td>{{ $rule->college->name ?? 'N/A' }}</td>
                                         <td>{{ $rule->course_name }}</td>
@@ -346,15 +334,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="row align-items-center">
-                        <div class="col-md-6">
-                            <div class="datatable-length"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="datatable-paginate"></div>
-                        </div>
-                    </div>
-                    <!-- /Commission Rules List -->
+
 
                 </div>
             </div>
@@ -368,8 +348,8 @@
     </div>
 
     <!-- ========================
-           End Page Content
-          ========================= -->
+               End Page Content
+              ========================= -->
 
     <!-- Add Commission Rule -->
     <div class="offcanvas offcanvas-end offcanvas-large" tabindex="-1" id="offcanvas_add">
@@ -385,27 +365,28 @@
                 @csrf
                 <div>
                     <div class="row">
-                       <!-- Consultant ID Field -->
-<div class="col-md-6">
-    <div class="mb-3">
-        <label class="form-label">Consultant <span class="text-danger">*</span></label>
-        
-        @if(auth()->user()?->hasRole('consultant') || (auth()->user()?->role ?? '') === 'consultant')
-            {{-- Consultant: Auto-select, readonly --}}
-            <input type="hidden" name="consultant_id" value="{{ auth()->id() }}">
-            <input type="text" class="form-control" value="{{ auth()->user()->name ?? 'You' }}" disabled>
-            <small class="text-muted">Rules will be assigned to your account</small>
-        @else
-            {{-- Admin: Full dropdown --}}
-            <select name="consultant_id" class="form-select select" required>
-                <option value="">Choose Consultant</option>
-                @foreach($consultants as $c)
-                    <option value="{{ $c->id }}">{{ $c->name }}</option>
-                @endforeach
-            </select>
-        @endif
-    </div>
-</div>
+                        <!-- Consultant ID Field -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Consultant <span class="text-danger">*</span></label>
+
+                                @if (auth()->user()?->hasRole('consultant') || (auth()->user()?->role ?? '') === 'consultant')
+                                    {{-- Consultant: Auto-select, readonly --}}
+                                    <input type="hidden" name="consultant_id" value="{{ auth()->id() }}">
+                                    <input type="text" class="form-control"
+                                        value="{{ auth()->user()->name ?? 'You' }}" disabled>
+                                    <small class="text-muted">Rules will be assigned to your account</small>
+                                @else
+                                    {{-- Admin: Full dropdown --}}
+                                    <select name="consultant_id" class="form-select select" required>
+                                        <option value="">Choose Consultant</option>
+                                        @foreach ($consultants as $c)
+                                            <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                        @endforeach
+                                    </select>
+                                @endif
+                            </div>
+                        </div>
 
                         <div class="col-md-6">
                             <div class="mb-3">

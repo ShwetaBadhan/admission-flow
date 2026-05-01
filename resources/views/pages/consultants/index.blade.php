@@ -38,8 +38,8 @@
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
                 <div>
-                    <h4 class="mb-1">Consultants<span
-                            class="badge badge-soft-primary ms-2">{{ $consultants->total() }}</span></h4>
+                    <h4 class="mb-1">Consultants<span class="badge badge-soft-primary ms-2">{{ count($consultants) }}</span>
+                    </h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
@@ -65,11 +65,7 @@
                         <table class="table table-nowrap datatable">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="no-sort">
-                                        <div class="form-check form-check-md">
-                                            <input class="form-check-input" type="checkbox" id="select-all">
-                                        </div>
-                                    </th>
+                                    <th class="no-sort">Sr. No.</th>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
@@ -79,13 +75,10 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php $serial = 1; @endphp
                                 @foreach ($consultants as $consultant)
                                     <tr>
-                                        <td>
-                                            <div class="form-check form-check-md">
-                                                <input class="form-check-input" type="checkbox">
-                                            </div>
-                                        </td>
+                                        <td>{{ $serial++ }}</td>
                                         <td><span class="title-name">{{ $consultant->name }}</span></td>
                                         <td>{{ $consultant->email }}</td>
                                         <td>{{ $consultant->phone }}</td>
@@ -126,13 +119,13 @@
                                                         </a>
                                                     @endcan
                                                     @can('view-lock-colleges')
-                                                    {{-- 🔐 Lock Colleges Button --}}
-                                                    <a class="dropdown-item" href="javascript:void(0);"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#lockModal{{ $consultant->id }}"
-                                                        data-name="{{ $consultant->name }}">
-                                                        <i class="ti ti-lock me-1 text-warning"></i> Lock Colleges
-                                                    </a>
+                                                        {{-- 🔐 Lock Colleges Button --}}
+                                                        <a class="dropdown-item" href="javascript:void(0);"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#lockModal{{ $consultant->id }}"
+                                                            data-name="{{ $consultant->name }}">
+                                                            <i class="ti ti-lock me-1 text-warning"></i> Lock Colleges
+                                                        </a>
                                                     @endcan
                                                     @can('delete-consultants')
                                                         {{-- Delete Button --}}
@@ -240,9 +233,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="mt-3">
-                        {{ $consultants->links() }}
-                    </div>
+
                 </div>
             </div>
 

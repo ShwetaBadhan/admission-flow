@@ -76,46 +76,35 @@
               <div class="dropdown profile-dropdown d-flex align-items-center justify-content-center">
                   <a href="javascript:void(0);" class="topbar-link dropdown-toggle drop-arrow-none position-relative"
                       data-bs-toggle="dropdown" data-bs-offset="0,22" aria-haspopup="false" aria-expanded="false">
-                      <img src="{{ url('assets/img/users/user-40.jpg') }}" width="38" class="rounded-1 d-flex"
-                          alt="user-image">
+                      <img src="{{ auth()->user()->profile_photo ? asset('storage/' . auth()->user()->profile_photo) : url('assets/img/profiles/avatar-19.jpg') }}"
+                          width="38" class="rounded-1 d-flex" alt="user-image">
                       <span class="online text-success"><i
                               class="ti ti-circle-filled d-flex bg-white rounded-circle border border-1 border-white"></i></span>
                   </a>
                   <div class="dropdown-menu dropdown-menu-end dropdown-menu-md p-2">
 
                       <div class="d-flex align-items-center bg-light rounded-3 p-2 mb-2">
-                          <img src="{{ url('assets/img/users/user-40.jpg') }}" class="rounded-circle" width="42"
-                              height="42" alt="Img">
+                          <img src="{{ auth()->user()->profile_photo ? asset('storage/' . auth()->user()->profile_photo) : url('assets/img/profiles/avatar-19.jpg') }}"
+                              class="rounded-circle" width="42" height="42" alt="{{ auth()->user()->name }}"
+                              onerror="this.src='{{ url('assets/img/profiles/avatar-19.jpg') }}'">
+
                           <div class="ms-2">
-                              <p class="fw-medium text-dark mb-0">Katherine Brooks</p>
-                              <span class="d-block fs-13">Installer</span>
+                              <p class="fw-medium text-dark mb-0">{{ auth()->user()->name }}</p>
+                              <span class="d-block fs-13">
+                                  {{ auth()->user()->getRoleNames()->implode(', ') ?? 'No Role' }}
+                              </span>
                           </div>
                       </div>
 
                       <!-- Item-->
-                      <a href="javascript:void(0)" class="dropdown-item">
+                      <a href="{{ route('profile-settings') }}" class="dropdown-item">
                           <i class="ti ti-user-circle me-1 align-middle"></i>
                           <span class="align-middle">Profile Settings</span>
                       </a>
 
-                      <!-- item -->
-                      <div
-                          class="form-check form-switch form-check-reverse d-flex align-items-center justify-content-between dropdown-item mb-0">
-                          <label class="form-check-label" for="notify"><i class="ti ti-bell"></i>Notifications</label>
-                          <input class="form-check-input me-0" type="checkbox" role="switch" id="notify">
-                      </div>
 
-                      <!-- Item-->
-                      <a href="javascript:void(0);" class="dropdown-item">
-                          <i class="ti ti-help-circle me-1 align-middle"></i>
-                          <span class="align-middle">Help & Support</span>
-                      </a>
 
-                      <!-- Item-->
-                      <a href="javascript:void(0)" class="dropdown-item">
-                          <i class="ti ti-settings me-1 align-middle"></i>
-                          <span class="align-middle">Settings</span>
-                      </a>
+
 
                       <!-- Item-->
                       <div class="pt-2 mt-2 border-top">

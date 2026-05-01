@@ -36,7 +36,7 @@
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
                 <div>
-                    <h4 class="mb-1">courses<span class="badge badge-soft-primary ms-2">{{ $courses->total() }}</span></h4>
+                    <h4 class="mb-1">courses<span class="badge badge-soft-primary ms-2">{{ count($courses) }}</span></h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
@@ -58,22 +58,13 @@
 
 
             <div class="card border-0 rounded-0">
-                <div class="card-header d-flex align-items-center justify-content-between gap-2 flex-wrap">
-                    <div class="input-icon input-icon-start position-relative">
-                        <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Search" id="searchInput">
-                    </div>
-                </div>
+
                 <div class="card-body">
                     <div class="table-responsive custom-table">
                         <table class="table table-nowrap datatable" id="coursesTable">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="no-sort">
-                                        <div class="form-check form-check-md">
-                                            <input class="form-check-input" type="checkbox" id="select-all">
-                                        </div>
-                                    </th>
+                                    <th class="no-sort">Sr. No.</th>
                                     <th>Title</th>
                                     <th>Created Date</th>
                                     <th>Status</th>
@@ -81,48 +72,44 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php $serial = 1; @endphp
                                 @foreach ($courses as $course)
                                     <tr>
-                                        <td>
-                                            <div class="form-check form-check-md">
-                                                <input class="form-check-input item-checkbox" type="checkbox"
-                                                    value="{{ $course->id }}">
-                                            </div>
-                                        </td>
-                                        <td><span class="title-name">{{ $course->name }}</span></td>
-                                        <td>{{ $course->created_at->format('d M Y') }}</td>
-                                        <td>
-                                            @if ($course->status == 1)
-                                                <span class="badge badge-pill badge-status bg-success">Active</span>
-                                            @else
-                                                <span class="badge badge-pill badge-status bg-danger">Inactive</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <div class="dropdown table-action">
-                                                <a href="#"
-                                                    class="action-icon btn btn-xs shadow btn-icon btn-outline-light"
-                                                    data-bs-toggle="dropdown">
-                                                    <i class="ti ti-dots-vertical"></i>
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-right">
-                                                    @can('edit-courses')
-                                                        <a class="dropdown-item edit-btn" href="#" data-bs-toggle="modal"
-                                                            data-bs-target="#edit_source{{ $course->id }}">
-                                                            <i class="ti ti-edit text-blue"></i> Edit
-                                                        </a>
-                                                    @endcan
-                                                    @can('delete-courses')
-                                                        <a class="dropdown-item delete-btn" href="#"
-                                                            data-bs-toggle="modal" data-bs-target="#delete_source"
-                                                            data-id="{{ $course->id }}" data-name="{{ $course->name }}">
-                                                            <i class="ti ti-trash"></i> Delete
-                                                        </a>
-                                                    @endcan
-
+                                        <td>{{ $serial++ }}</td>
+                                            <td><span class="title-name">{{ $course->name }}</span></td>
+                                            <td>{{ $course->created_at->format('d M Y') }}</td>
+                                            <td>
+                                                @if ($course->status == 1)
+                                                    <span class="badge badge-pill badge-status bg-success">Active</span>
+                                                @else
+                                                    <span class="badge badge-pill badge-status bg-danger">Inactive</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <div class="dropdown table-action">
+                                                    <a href="#"
+                                                        class="action-icon btn btn-xs shadow btn-icon btn-outline-light"
+                                                        data-bs-toggle="dropdown">
+                                                        <i class="ti ti-dots-vertical"></i>
+                                                    </a>
+                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                        @can('edit-courses')
+                                                            <a class="dropdown-item edit-btn" href="#"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#edit_source{{ $course->id }}">
+                                                                <i class="ti ti-edit text-blue"></i> Edit
+                                                            </a>
+                                                        @endcan
+                                                        @can('delete-courses')
+                                                            <a class="dropdown-item delete-btn" href="#"
+                                                                data-bs-toggle="modal" data-bs-target="#delete_source"
+                                                                data-id="{{ $course->id }}" data-name="{{ $course->name }}">
+                                                                <i class="ti ti-trash"></i> Delete
+                                                            </a>
+                                                        @endcan
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
+                                            </td>
                                     </tr>
 
                                     <!-- Edit Source Modal -->
@@ -130,16 +117,15 @@
                                         <div class="modal-dialog modal-dialog-centered">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title">Edit Source</h5>
+                                                    <h5 class="modal-title">Edit Course</h5>
                                                     <button class="btn-close custom-btn-close border p-1 me-0 text-dark"
                                                         data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <form action="{{ route('courses.update', $course->id) }}" method="POST">
-                                                    @csrf
-                                                    @method('PUT')
+                                                    @csrf @method('PUT')
                                                     <div class="modal-body">
                                                         <div class="mb-3">
-                                                            <label class="form-label">Source Name <span
+                                                            <label class="form-label">Course Name <span
                                                                     class="text-danger">*</span></label>
                                                             <input type="text" name="name"
                                                                 value="{{ $course->name }}" class="form-control" required>
@@ -167,12 +153,9 @@
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <div class="d-flex align-items-center justify-content-end m-0">
-                                                            <a href="#" class="btn btn-light me-2"
-                                                                data-bs-dismiss="modal">Cancel</a>
-                                                            <button type="submit" class="btn btn-primary">Save
-                                                                Changes</button>
-                                                        </div>
+                                                        <button type="button" class="btn btn-light me-2"
+                                                            data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-primary">Save Changes</button>
                                                     </div>
                                                 </form>
                                             </div>
@@ -186,8 +169,7 @@
                                                 <div class="modal-body">
                                                     <form action="{{ route('courses.destroy', $course->id) }}"
                                                         method="POST">
-                                                        @csrf
-                                                        @method('DELETE')
+                                                        @csrf @method('DELETE')
                                                         <div class="text-center">
                                                             <div
                                                                 class="avatar avatar-xl bg-danger-light rounded-circle mb-3">
@@ -214,10 +196,7 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-end mt-3">
-                        {{ $courses->withQueryString()->links() }}
-                    </div>
+
                 </div>
             </div>
 

@@ -10,7 +10,7 @@ class IntakeController extends Controller
 {
     public function index()
     {
-        $intakes = Intake::orderBy('created_at', 'desc')->paginate(10);
+        $intakes = Intake::orderBy('created_at', 'desc')->get();
         return view('pages.intakes.index', compact('intakes'));
     }
 

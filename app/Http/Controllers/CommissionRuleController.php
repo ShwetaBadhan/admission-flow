@@ -47,7 +47,7 @@ private function getAuthenticatedConsultant()
     }
     // ✅ Admin/Superadmin? Sab rules dikhengi (no filter)
     
-    $commissionRules = $query->orderBy('created_at', 'desc')->paginate(10);
+    $commissionRules = $query->orderBy('created_at', 'desc')->get();
 
     // Dropdown data (consultant ke liye bhi safe)
     $consultants = Consultant::where('status', 1)->orderBy('name')->get();

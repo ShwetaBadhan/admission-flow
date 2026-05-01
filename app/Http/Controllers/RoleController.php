@@ -10,7 +10,7 @@ class RoleController extends Controller
 {
     public function index()
     {
-        $roles = Role::orderBy('created_at', 'desc')->paginate(10);
+        $roles = Role::orderBy('created_at', 'desc')->get();
         // Return the view path matching your folder structure
         return view('pages.user-management.roles.index', compact('roles'));
     }

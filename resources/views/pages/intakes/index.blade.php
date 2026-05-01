@@ -30,14 +30,13 @@
     </script>
 @endif
 @section('content')
-
     <div class="page-wrapper">
         <div class="content pb-0">
 
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
                 <div>
-                    <h4 class="mb-1">Intakes<span class="badge badge-soft-primary ms-2">{{ $intakes->total() }}</span></h4>
+                    <h4 class="mb-1">Intakes<span class="badge badge-soft-primary ms-2">{{ count($intakes) }}</span></h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
@@ -46,35 +45,26 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
-                @can('create-intakes')
-                      <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#add_Intake">
-                        <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Intakes
-                    </a>
-                @endcan
-                  
+                    @can('create-intakes')
+                        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#add_Intake">
+                            <i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Intakes
+                        </a>
+                    @endcan
+
                 </div>
             </div>
             <!-- End Page Header -->
 
-           
+
             <div class="card border-0 rounded-0">
-                <div class="card-header d-flex align-items-center justify-content-between gap-2 flex-wrap">
-                    <div class="input-icon input-icon-start position-relative">
-                        <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Search" id="searchInput">
-                    </div>
-                </div>
+               
                 <div class="card-body">
                     <div class="table-responsive custom-table">
                         <table class="table table-nowrap datatable" id="IntakesTable">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="no-sort">
-                                        <div class="form-check form-check-md">
-                                            <input class="form-check-input" type="checkbox" id="select-all">
-                                        </div>
-                                    </th>
+                                    <th class="no-sort">Sr. No.</th>
                                     <th>Title</th>
                                     <th>Created Date</th>
                                     <th>Status</th>
@@ -82,14 +72,11 @@
                                 </tr>
                             </thead>
                             <tbody>
+                             @php $serial = 1; @endphp
                                 @foreach ($intakes as $intake)
                                     <tr>
-                                        <td>
-                                            <div class="form-check form-check-md">
-                                                <input class="form-check-input item-checkbox" type="checkbox"
-                                                    value="{{ $intake->id }}">
-                                            </div>
-                                        </td>
+                                       
+<td>{{ $serial++ }}</td>
                                         <td><span class="title-name">{{ $intake->name }}</span></td>
                                         <td>{{ $intake->created_at->format('d M Y') }}</td>
                                         <td>
@@ -107,20 +94,20 @@
                                                     <i class="ti ti-dots-vertical"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right">
-                                                @can('edit-intakes')
-                                                     <a class="dropdown-item edit-btn" href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#edit_Intake{{ $intake->id }}">
-                                                        <i class="ti ti-edit text-blue"></i> Edit
-                                                    </a> 
-                                                @endcan
-                                                  @can('delete-intakes')
+                                                    @can('edit-intakes')
+                                                        <a class="dropdown-item edit-btn" href="#" data-bs-toggle="modal"
+                                                            data-bs-target="#edit_Intake{{ $intake->id }}">
+                                                            <i class="ti ti-edit text-blue"></i> Edit
+                                                        </a>
+                                                    @endcan
+                                                    @can('delete-intakes')
                                                         <a class="dropdown-item delete-btn" href="#"
-                                                        data-bs-toggle="modal" data-bs-target="#delete_Intake{{ $intake->id }}"
-                                                        >
-                                                        <i class="ti ti-trash"></i> Delete
-                                                    </a>
-                                                  @endcan
-                                                  
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#delete_Intake{{ $intake->id }}">
+                                                            <i class="ti ti-trash"></i> Delete
+                                                        </a>
+                                                    @endcan
+
                                                 </div>
                                             </div>
                                         </td>
@@ -142,16 +129,16 @@
                                                         <div class="mb-3">
                                                             <label class="form-label">Intake Name <span
                                                                     class="text-danger">*</span></label>
-                                                            <input type="text" name="name"
-                                                                value="{{ $intake->name }}" class="form-control" required>
+                                                            <input type="text" name="name" value="{{ $intake->name }}"
+                                                                class="form-control" required>
                                                         </div>
                                                         <div class="mb-0">
                                                             <label class="form-label">Status</label>
                                                             <div class="d-flex align-items-center">
                                                                 <div class="me-2">
                                                                     <input type="radio" class="status-radio"
-                                                                        id="edit-active-{{ $intake->id }}"
-                                                                        name="status" value="1"
+                                                                        id="edit-active-{{ $intake->id }}" name="status"
+                                                                        value="1"
                                                                         {{ $intake->status == 1 ? 'checked' : '' }}>
                                                                     <label
                                                                         for="edit-active-{{ $intake->id }}">Active</label>
@@ -215,10 +202,6 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-end mt-3">
-                        {{ $intakes->withQueryString()->links() }}
-                    </div>
                 </div>
             </div>
 
@@ -268,11 +251,4 @@
             </div>
         </div>
     </div>
-
-
-
-
-
-
-
 @endsection

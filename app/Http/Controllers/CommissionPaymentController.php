@@ -528,7 +528,7 @@ public function apiIndex(Request $request)
         ]);
     }
 
-    $payments = $query->paginate(10);
+    $payments = $query->get();
  $colleges = College::where('status', 1)->orderBy('name')->get(); // ✅ Add this
     return response()->json([
         'data' => $payments->items(),

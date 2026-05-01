@@ -37,7 +37,7 @@
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
                 <div>
-                    <h4 class="mb-1">Manage Users <span class="badge badge-soft-primary ms-2">{{ $users->total() }}</span>
+                    <h4 class="mb-1">Manage Users <span class="badge badge-soft-primary ms-2">{{ count($users) }}</span>
                     </h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
@@ -60,23 +60,14 @@
 
             <!-- card start -->
             <div class="card border-0 rounded-0">
-                <div class="card-header d-flex align-items-center justify-content-between gap-2 flex-wrap">
-                    {{-- <div class="input-icon input-icon-start position-relative">
-                        <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Search" id="searchInput">
-                    </div> --}}
-                </div>
+
                 <div class="card-body">
                     <!-- Contact List -->
                     <div class="table-responsive custom-table">
                         <table class="table table-nowrap datatable" id="usersTable">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="no-sort">
-                                        <div class="form-check form-check-md">
-                                            <input class="form-check-input" type="checkbox" id="select-all">
-                                        </div>
-                                    </th>
+                                    <th class="no-sort">Sr. No.</th>
                                     <th class="no-sort"></th>
                                     <th>Name</th>
                                     <th>Phone</th>
@@ -88,13 +79,10 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php $serial = 1; @endphp
                                 @foreach ($users as $user)
                                     <tr>
-                                        <td>
-                                            <div class="form-check form-check-md">
-                                                <input class="form-check-input" type="checkbox" value="{{ $user->id }}">
-                                            </div>
-                                        </td>
+                                        <td>{{ $serial++ }}</td>
                                         <td>
                                             <div class="set-star rating-select">
                                                 <i class="ti ti-star-filled fs-16"></i>
@@ -180,16 +168,35 @@
                                                                     class="avatar avatar-xxl border border-dashed me-3 flex-shrink-0">
                                                                     <div
                                                                         class="position-relative d-flex align-items-center">
-                                                                        <i class="ti ti-photo text-dark fs-16"></i>
+                                                                        {{-- Show existing image if available, else hide preview --}}
+                                                                        @if ($user->profile_photo)
+                                                                            <img id="edit_image_preview_{{ $user->id }}"
+                                                                                src="{{ asset('storage/' . $user->profile_photo) }}"
+                                                                                style="width: 100%; height: 100%; object-fit: cover;"
+                                                                                class="rounded" alt="{{ $user->name }}">
+                                                                            <i id="edit_image_icon_{{ $user->id }}"
+                                                                                class="ti ti-photo text-dark fs-16"
+                                                                                style="display: none;"></i>
+                                                                        @else
+                                                                            <img id="edit_image_preview_{{ $user->id }}"
+                                                                                src=""
+                                                                                style="display: none; width: 100%; height: 100%; object-fit: cover;"
+                                                                                class="rounded">
+                                                                            <i id="edit_image_icon_{{ $user->id }}"
+                                                                                class="ti ti-photo text-dark fs-16"></i>
+                                                                        @endif
                                                                     </div>
                                                                 </div>
                                                                 <div class="d-inline-flex flex-column align-items-start">
                                                                     <div
                                                                         class="drag-upload-btn btn btn-sm btn-primary position-relative mb-2">
                                                                         <i class="ti ti-file-broken me-1"></i>Upload file
+                                                                        {{-- Unique ID for each edit form --}}
                                                                         <input type="file"
                                                                             class="form-control image-sign"
-                                                                            name="profile_photo">
+                                                                            name="profile_photo"
+                                                                            id="edit_profile_photo_{{ $user->id }}"
+                                                                            accept="image/*">
                                                                     </div>
                                                                     <span>JPG, GIF or PNG. Max size of 800K</span>
                                                                 </div>
@@ -330,9 +337,7 @@
                     </div>
 
                     <!-- Pagination -->
-                    <div class="d-flex justify-content-end mt-3">
-                        {{ $users->links() }}
-                    </div>
+
                 </div>
             </div>
             <!-- card end -->
@@ -358,13 +363,20 @@
                             <div class="d-flex align-items-center mb-3">
                                 <div class="avatar avatar-xxl border border-dashed me-3 flex-shrink-0">
                                     <div class="position-relative d-flex align-items-center">
-                                        <i class="ti ti-photo text-dark fs-16"></i>
+                                        {{-- Preview Image (hidden by default) --}}
+                                        <img id="add_image_preview" src=""
+                                            style="display: none; width: 100%; height: 100%; object-fit: cover;"
+                                            class="rounded">
+                                        {{-- Default Icon --}}
+                                        <i id="add_image_icon" class="ti ti-photo text-dark fs-16"></i>
                                     </div>
                                 </div>
                                 <div class="d-inline-flex flex-column align-items-start">
                                     <div class="drag-upload-btn btn btn-sm btn-primary position-relative mb-2">
                                         <i class="ti ti-file-broken me-1"></i>Upload file
-                                        <input type="file" class="form-control image-sign" name="profile_photo">
+                                        {{-- Added ID to file input --}}
+                                        <input type="file" class="form-control image-sign" name="profile_photo"
+                                            id="add_profile_photo" accept="image/*">
                                     </div>
                                     <span>JPG, GIF or PNG. Max size of 800K</span>
                                 </div>
@@ -471,3 +483,60 @@
     </div>
     <!-- /Add User -->
 @endsection
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // 🔹 Helper: Setup preview for a file input + preview elements
+            function setupImagePreview(fileInputId, previewImgId, iconId) {
+                const fileInput = document.getElementById(fileInputId);
+                const previewImg = document.getElementById(previewImgId);
+                const icon = document.getElementById(iconId);
+
+                if (!fileInput || !previewImg || !icon) return;
+
+                fileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            previewImg.src = event.target.result;
+                            previewImg.style.display = 'block';
+                            icon.style.display = 'none';
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        // Reset if invalid file or cancelled
+                        previewImg.style.display = 'none';
+                        icon.style.display = 'block';
+                        if (previewImg.src) previewImg.src = '';
+                    }
+                });
+            }
+
+            // 🔹 Setup Add User Preview
+            setupImagePreview('add_profile_photo', 'add_image_preview', 'add_image_icon');
+
+            // 🔹 Setup Edit User Previews (Loop through all users)
+            @foreach ($users as $user)
+                setupImagePreview(
+                    'edit_profile_photo_{{ $user->id }}',
+                    'edit_image_preview_{{ $user->id }}',
+                    'edit_image_icon_{{ $user->id }}'
+                );
+            @endforeach
+
+            // 🔹 Optional: Password Toggle (if not already implemented)
+            document.querySelectorAll('.toggle-password').forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const input = this.closest('.pass-group').querySelector('.pass-input');
+                    const isPassword = input.type === 'password';
+                    input.type = isPassword ? 'text' : 'password';
+                    this.innerHTML = isPassword ?
+                        '<i class="ti ti-eye"></i>' :
+                        '<i class="ti ti-eye-off"></i>';
+                });
+            });
+        });
+    </script>
+@endpush

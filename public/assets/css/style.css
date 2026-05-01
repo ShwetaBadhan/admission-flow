@@ -14151,4 +14151,30 @@ th.fc-day-header {
  {
     background-image: var(--info-gradient-100);
 }
+/* Hide Google Translate top bar */
+.goog-te-banner-frame.skiptranslate {
+    display: none !important;
+}
+
+/* Remove top space added by Google */
+body {
+    top: 0px !important;
+}
+
+/* Hide the "Translated" tooltip */
+.goog-tooltip {
+    display: none !important;
+}
+
+.goog-tooltip:hover {
+    display: none !important;
+}
+
+.goog-text-highlight {
+    background: none !important;
+    box-shadow: none !important;
+}
+.VIpgJd-ZVi9od-ORHb-OEVmcd {
+display: none !important;
+}
 /*# sourceMappingURL=style.css.map */

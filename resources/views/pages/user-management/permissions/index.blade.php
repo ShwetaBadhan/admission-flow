@@ -30,11 +30,7 @@
                         <table class="table table-nowrap datatable">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="no-sort">
-                                        <div class="form-check form-check-md">
-                                            <input class="form-check-input" type="checkbox" id="select-all">
-                                        </div>
-                                    </th>
+                                    <th class="no-sort">Sr. No.</th>
                                     <th>Permission Name</th>
                                     <th>Status</th>
                                     <th>Created</th>
@@ -42,14 +38,10 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php $serial = 1; @endphp
                                 @foreach ($permissions as $permission)
                                     <tr>
-                                        <td>
-                                            <div class="form-check form-check-md">
-                                                <input class="form-check-input row-check" type="checkbox"
-                                                    value="{{ $permission->id }}">
-                                            </div>
-                                        </td>
+                                        <td>{{ $serial++ }}</td>
                                         <td><strong>{{ $permission->name }}</strong></td>
                                         <td>
                                             @if ($permission->status)

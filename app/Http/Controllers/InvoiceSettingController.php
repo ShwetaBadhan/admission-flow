@@ -17,12 +17,6 @@ class InvoiceSettingController extends Controller
 
   public function update(Request $request)
 {
-    // 🔍 DEBUG: Log raw request data
-    Log::info('=== Invoice Settings Debug ===');
-    Log::info('Request data:', $request->all());
-    Log::info('Has enable_round_off:', [$request->has('enable_round_off')]);
-    Log::info('Has show_company_details:', [$request->has('show_company_details')]);
-    Log::info('Files:', $request->file() ? array_keys($request->file()) : 'none');
 
     try {
         $validated = $request->validate([

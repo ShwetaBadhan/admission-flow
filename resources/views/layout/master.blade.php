@@ -131,7 +131,7 @@
 	<script src="{{ url ('assets/plugins/theia-sticky-sidebar/ResizeSensor.js')}}"></script>
 	<script src="{{ url ('assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js')}}"></script>
 
-
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <!-- Main JS -->
     <script src="{{ url ('assets/js/script.js')}}" ></script>
 @stack('scripts')

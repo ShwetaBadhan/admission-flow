@@ -12,7 +12,7 @@ class ContactStageController extends Controller
      */
     public function index()
     {
-       $stages = ContactStage::orderBy('created_at', 'desc')->paginate(10);
+       $stages = ContactStage::orderBy('created_at', 'desc')->get();
         return view('pages.contact-stage.index', compact('stages'));
     }
 

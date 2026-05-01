@@ -370,7 +370,7 @@
                                                             </p>
                                                         </div>
 
-                                                        <!-- Card Footer -->
+                                                        {{-- <!-- Card Footer -->
                                                         <div
                                                             class="d-flex align-items-center justify-content-between border-top pt-3">
                                                             <span
@@ -393,7 +393,7 @@
                                                                 </a>
 
                                                             </div>
-                                                        </div>
+                                                        </div> --}}
                                                     </div>
                                                 </div>
                                             </div>

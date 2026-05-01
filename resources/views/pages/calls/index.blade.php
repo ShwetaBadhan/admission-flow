@@ -65,11 +65,7 @@
                         <table class="table table-nowrap datatable">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="no-sort">
-                                        <div class="form-check form-check-md">
-                                            <input class="form-check-input" type="checkbox" id="select-all">
-                                        </div>
-                                    </th>
+                                    <th class="no-sort">Sr. No.</th>
                                     <th>Title</th>
                                     <th>Created at</th>
                                     <th>Status</th>
