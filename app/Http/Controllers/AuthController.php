@@ -9,17 +9,19 @@ use App\Models\UserProfile; // ✅ Import UserProfile model
 class AuthController extends Controller
 {
     // 👉 GET login page
-    public function login()
-    {
-        // ✅ Fetch branding from UserProfile (Profile Settings)
-        $profile = UserProfile::first(); // Or: auth()->user()->profile if user-specific
-        
-        return view('pages.auth.login', [
-            // ✅ Use correct field names from UserProfile
-            'logo' =>  $profile?->black_logo ?? null,
-            'cover' => $profile?->cover_image ?? null,
-        ]);
-    }
+   public function login()
+{
+    // ✅ Fetch branding from UserProfile (global settings)
+    $profile = \App\Models\UserProfile::first();
+    
+    return view('pages.auth.login', [
+        // ✅ Pass ALL variables that blade might use
+        'logo' => $profile?->white_logo ?? $profile?->black_logo ?? null,
+        'cover' => $profile?->cover_image ?? null,
+        'favicon' => $profile?->favicon ?? null,
+        'userProfile' => $profile, // ✅ Add this to prevent "undefined variable" error
+    ]);
+}
 
     // 👉 POST login form
     public function authenticate(Request $request)
