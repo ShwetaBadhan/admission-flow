@@ -380,7 +380,7 @@
                     statusBadge.textContent = data.status.charAt(0).toUpperCase() + data.status
                         .slice(1);
                     statusBadge.className = 'badge bg-' + (statusColors[data.status] ||
-                    'secondary');
+                        'secondary');
 
                     // Notes
                     const notesBox = document.getElementById('modalNotesBox');

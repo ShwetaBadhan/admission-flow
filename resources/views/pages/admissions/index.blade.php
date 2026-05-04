@@ -169,7 +169,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($admissions as $admission)
+                            @foreach($admissions as $admission)
                                 <tr>
                                     <td>{{ ($admissions->currentPage() - 1) * $admissions->perPage() + $loop->iteration }}</td> <!-- ✅ Pagination-aware Sr. No. -->
                                     <td>
@@ -243,17 +243,8 @@
                                         @endcan
                                     </td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="8" class="text-center py-5">
-                                        <div class="avatar avatar-lg bg-soft-secondary rounded-circle mb-3 mx-auto">
-                                            <i class="ti ti-file-text text-secondary fs-24"></i>
-                                        </div>
-                                        <h6 class="fw-semibold mb-1">No admission requests found</h6>
-                                        <p class="text-muted mb-0">Admission requests will appear here once created.</p>
-                                    </td>
-                                </tr>
-                            @endforelse
+                           
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

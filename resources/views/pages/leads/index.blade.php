@@ -33,8 +33,8 @@
 
 @section('content')
     <!-- ========================
-                       Start Page Content
-                      ========================= -->
+                           Start Page Content
+                          ========================= -->
 
     <div class="page-wrapper">
 
@@ -650,8 +650,8 @@
     </div>
 
     <!-- ========================
-                       End Page Content
-                      ========================= -->
+                           End Page Content
+                          ========================= -->
 
     <!-- Add lead-->
     <div class="offcanvas offcanvas-end offcanvas-large" tabindex="-1" id="offcanvas_add">
@@ -842,6 +842,8 @@
 @endsection
 
 @push('scripts')
+    <!-- Ensure SweetAlert2 is loaded BEFORE your custom script -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 

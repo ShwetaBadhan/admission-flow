@@ -49,12 +49,12 @@
           
 
           <!-- start row -->
-				<div class="row">
+				{{-- <div class="row">
 
 				@include('components.dashboard.consultants-dashboard')
 					
 
-				</div>
+				</div> --}}
 				<!-- end row -->
 
 

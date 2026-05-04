@@ -211,7 +211,7 @@
                             </thead>
                             <tbody>
                                 @php $serial = 1; @endphp
-                                @forelse($documents as $doc)
+                                @foreach($documents as $doc)
                                     <tr>
                                         <td>{{ $serial++ }}</td>
 
@@ -297,17 +297,8 @@
                                             @endif
                                         </td>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="7" class="text-center py-5">
-                                            <div class="avatar avatar-lg bg-soft-secondary rounded-circle mb-3 mx-auto">
-                                                <i class="ti ti-file text-secondary fs-24"></i>
-                                            </div>
-                                            <h6 class="fw-semibold mb-1">No documents found</h6>
-                                            <p class="text-muted mb-0">Upload documents from individual lead pages.</p>
-                                        </td>
-                                    </tr>
-                                @endforelse
+                              
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

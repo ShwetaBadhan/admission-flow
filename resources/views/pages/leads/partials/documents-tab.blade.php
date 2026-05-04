@@ -89,7 +89,7 @@
                                 @endif
 
                                 <!-- External Link Icon (Shows for ALL documents) -->
-                                <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" class="text-muted">
+                                <a href="{{ asset($doc->file_path) }}" target="_blank" class="text-muted">
                                     <i class="ti ti-external-link fs-5"></i>
                                 </a>
                             </div>
@@ -125,23 +125,24 @@
                         <div class="col-md-12">
                             <div class="mb-3">
                                 <label class="form-label">Document Type <span class="text-danger">*</span></label>
-                              <select name="document_type" class="select" required>
-    <option value="" disabled selected>Select Document Type</option>
-    @foreach ($documentTypes as $documentType)
-        @php
-            $alreadyUploaded = $lead->documents()
-                ->where('document_type', $documentType->id)
-                ->where('is_verified', '!=', false) // Adjust logic as needed
-                ->exists();
-        @endphp
-        <option value="{{ $documentType->id }}"
-                {{ old('document_type') == $documentType->id ? 'selected' : '' }}
-                {{ $alreadyUploaded ? 'disabled' : '' }}>
-            {{ $documentType->name }} 
-            {{ $alreadyUploaded ? '(Already Uploaded)' : '' }}
-        </option>
-    @endforeach
-</select>
+                                <select name="document_type" class="select" required>
+                                    <option value="" disabled selected>Select Document Type</option>
+                                    @foreach ($documentTypes as $documentType)
+                                        @php
+                                            $alreadyUploaded = $lead
+                                                ->documents()
+                                                ->where('document_type', $documentType->id)
+                                                ->where('is_verified', '!=', false) // Adjust logic as needed
+                                                ->exists();
+                                        @endphp
+                                        <option value="{{ $documentType->id }}"
+                                            {{ old('document_type') == $documentType->id ? 'selected' : '' }}
+                                            {{ $alreadyUploaded ? 'disabled' : '' }}>
+                                            {{ $documentType->name }}
+                                            {{ $alreadyUploaded ? '(Already Uploaded)' : '' }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-12">

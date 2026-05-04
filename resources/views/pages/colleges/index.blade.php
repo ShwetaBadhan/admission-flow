@@ -372,8 +372,7 @@
                                 data-bs-dismiss="offcanvas" aria-label="Close"></button>
                         </div>
                         <div class="offcanvas-body">
-                            <form action="{{ route('colleges.update', $college->id) }}" method="POST"
-                                enctype="multipart/form-data">
+                            <form action="{{ route('colleges.update', $college->id) }}" method="POST" enctype="multipart/form-data" class="ajax-form" id="edit-college-form-{{ $college->id }}">
                                 @csrf
                                 @method('PUT')
 
@@ -633,7 +632,7 @@
                 data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-            <form action="{{ route('colleges.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('colleges.store') }}" method="POST" enctype="multipart/form-data" class="ajax-form" id="add-college-form">
                 @csrf
                 <div class="accordion accordion-bordered" id="main_accordion">
                     <!-- Basic Info -->
@@ -795,77 +794,227 @@
     </div>
 @endsection
 @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+<script>
+document.addEventListener('DOMContentLoaded', function() {
 
+    // === 🍞 SweetAlert Toast ===
+    const Toast = Swal.mixin({
+        toast: true, position: 'top-end', showConfirmButton: false,
+        timer: 3000, timerProgressBar: true,
+        didOpen: (t) => { t.addEventListener('mouseenter', Swal.stopTimer); t.addEventListener('mouseleave', Swal.resumeTimer); }
+    });
 
+    // === 🔄 Get CSRF Token ===
+    function getCSRF() {
+        return document.querySelector('meta[name="csrf-token"]')?.content 
+            || document.querySelector('input[name="_token"]')?.value 
+            || '';
+    }
 
+    // === 🎯 AJAX Form Handler ===
+    function initAjaxForms() {
+        document.querySelectorAll('form.ajax-form').forEach(form => {
+            if (form.dataset.ajaxDone) return;
+            form.dataset.ajaxDone = '1';
 
-            // 3. Image Preview Logic
-            const imageInput = document.getElementById('college_image');
-            const imagePreview = document.getElementById('image_preview');
-            const imageIcon = document.getElementById('image_icon');
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                console.log('🔄 AJAX submit:', form.id);
 
-            if (imageInput) {
-                imageInput.addEventListener('change', function() {
-                    const file = this.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            imagePreview.src = e.target.result;
-                            imagePreview.style.display = 'block';
-                            imageIcon.style.display = 'none';
-                        }
-                        reader.readAsDataURL(file);
-                    }
-                });
-            }
+                const btn = form.querySelector('button[type="submit"]');
+                const originalBtn = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving...';
 
-            // 4. Dynamic State/City Dropdown
-            const stateSelect = document.getElementById('state_id');
-            const citySelect = document.getElementById('city_id');
+                // Clear old errors
+                form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                form.querySelectorAll('.invalid-feedback, .text-danger.small').forEach(el => el?.remove());
 
-            if (stateSelect) {
-                stateSelect.addEventListener('change', function() {
-                    const stateId = this.value;
-                    citySelect.innerHTML = '<option value="">Loading...</option>';
+                const formData = new FormData(form);
+                const method = form.querySelector('input[name="_method"]')?.value?.toUpperCase() || 'POST';
 
-                    if (stateId) {
-                        fetch(`/get-cities/${stateId}`)
-                            .then(response => response.json())
-                            .then(data => {
-                                citySelect.innerHTML = '<option value="">Select City</option>';
-                                data.forEach(city => {
-                                    const option = document.createElement('option');
-                                    option.value = city.id;
-                                    option.text = city.name;
-                                    citySelect.appendChild(option);
-                                });
-                            });
-                    } else {
-                        citySelect.innerHTML = '<option value="">Select City</option>';
-                    }
-                });
-            }
-
-
-        });
-        document.getElementById('filter_state_id')?.addEventListener('change', function() {
-            const citySelect = document.getElementById('filter_city_id');
-            const stateId = this.value;
-
-            if (stateId) {
-                fetch(`/get-cities/${stateId}`)
-                    .then(r => r.json())
-                    .then(data => {
-                        citySelect.innerHTML = '<option value="">Select City</option>';
-                        data.forEach(city => {
-                            citySelect.innerHTML += `<option value="${city.id}">${city.name}</option>`;
-                        });
+                try {
+                    const response = await fetch(form.action, {
+                        method: ['PUT','PATCH','DELETE'].includes(method) ? 'POST' : method,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': getCSRF()
+                        },
+                        body: formData
                     });
-            } else {
-                citySelect.innerHTML = '<option value="">All Cities</option>';
+
+                    const contentType = response.headers.get('content-type');
+                    let data = {};
+                    if (contentType?.includes('application/json')) {
+                        data = await response.json();
+                    }
+
+                    console.log('📡 Response:', response.status, data);
+
+                    if (response.ok) {
+                        // ✅ Success
+                        Toast.fire({ icon: 'success', title: data.message || 'Saved successfully!' });
+                        setTimeout(() => {
+                            const offcanvas = form.closest('.offcanvas');
+                            if (offcanvas && typeof bootstrap !== 'undefined') {
+                                bootstrap.Offcanvas.getInstance(offcanvas)?.hide();
+                            }
+                            window.location.reload();
+                        }, 1200);
+                    } 
+                    else if (response.status === 422 && data.errors) {
+                        // ❌ Validation errors - show inline
+                        Object.entries(data.errors).forEach(([field, msgs]) => {
+                            const input = form.querySelector(`[name="${field}"], [name="${field}[]"]`);
+                            if (input) {
+                                input.classList.add('is-invalid');
+                                const err = document.createElement('small');
+                                err.className = 'text-danger small d-block mt-1';
+                                err.textContent = msgs[0];
+                                // Insert after input or its wrapper
+                                const target = input.closest('.mb-3') || input.parentNode;
+                                target.appendChild(err);
+                            }
+                        });
+                        // Show first error in Swal
+                        const firstMsg = Object.values(data.errors)[0]?.[0] || 'Validation failed';
+                        Swal.fire({ icon: 'error', title: 'Validation Error', text: firstMsg, confirmButtonColor: '#0d6efd' });
+                    } 
+                    else {
+                        // ❌ Server error
+                        Swal.fire({ icon: 'error', title: 'Error', text: data.message || 'Something went wrong' });
+                    }
+                } catch (err) {
+                    console.error('💥 AJAX Error:', err);
+                    Swal.fire({ icon: 'error', title: 'Connection Error', text: err.message });
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = originalBtn;
+                }
+            });
+        });
+    }
+
+    initAjaxForms();
+
+    // === 🖼️ Image Preview (Add Form) ===
+    const imageInput = document.getElementById('college_image');
+    const imagePreview = document.getElementById('image_preview');
+    const imageIcon = document.getElementById('image_icon');
+    if (imageInput && imagePreview && imageIcon) {
+        imageInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                    imageIcon.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
             }
         });
-    </script>
+    }
+
+    // === 🌍 Dynamic City Load (Add Form) ===
+    const stateSelect = document.getElementById('state_id');
+    const citySelect = document.getElementById('city_id');
+    if (stateSelect && citySelect) {
+        stateSelect.addEventListener('change', async function() {
+            citySelect.innerHTML = '<option value="">Loading...</option>';
+            citySelect.disabled = true;
+            if (!this.value) {
+                citySelect.innerHTML = '<option value="">Select City</option>';
+                citySelect.disabled = false;
+                return;
+            }
+            try {
+                const res = await fetch(`/get-cities/${this.value}`);
+                const cities = await res.json();
+                citySelect.innerHTML = '<option value="">Select City</option>';
+                cities.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id; opt.textContent = c.name;
+                    citySelect.appendChild(opt);
+                });
+            } catch(e) { console.error('City load error:', e); }
+            citySelect.disabled = false;
+        });
+    }
+
+    // === 🌍 Dynamic City Load (Edit Forms - Loop) ===
+    document.querySelectorAll('[id^="state_id_edit_"]').forEach(stateSel => {
+        const id = stateSel.id.replace('state_id_edit_', '');
+        const citySel = document.getElementById(`city_id_edit_${id}`);
+        if (!citySel) return;
+        
+        stateSel.addEventListener('change', async function() {
+            citySel.innerHTML = '<option value="">Loading...</option>';
+            citySel.disabled = true;
+            if (!this.value) {
+                citySel.innerHTML = '<option value="">Select City</option>';
+                citySel.disabled = false;
+                return;
+            }
+            try {
+                const res = await fetch(`/get-cities/${this.value}`);
+                const cities = await res.json();
+                citySel.innerHTML = '<option value="">Select City</option>';
+                // Preserve existing selection if any
+                const current = citySel.dataset.current || '';
+                cities.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id; opt.textContent = c.name;
+                    if (c.id == current) opt.selected = true;
+                    citySel.appendChild(opt);
+                });
+            } catch(e) { console.error('City load error:', e); }
+            citySel.disabled = false;
+        });
+    });
+
+    // === 🔍 Filter: State/City Dynamic ===
+    const filterState = document.getElementById('filter_state_id');
+    const filterCity = document.getElementById('filter_city_id');
+    if (filterState && filterCity) {
+        filterState.addEventListener('change', async function() {
+            filterCity.innerHTML = '<option value="">Loading...</option>';
+            if (!this.value) {
+                filterCity.innerHTML = '<option value="">All Cities</option>';
+                return;
+            }
+            try {
+                const res = await fetch(`/get-cities/${this.value}`);
+                const cities = await res.json();
+                filterCity.innerHTML = '<option value="">All Cities</option>';
+                cities.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id; opt.textContent = c.name;
+                    filterCity.appendChild(opt);
+                });
+            } catch(e) { console.error('Filter city error:', e); }
+        });
+    }
+
+    // === 🎨 Close Filter Dropdown on Apply ===
+    const applyFilter = document.querySelector('#filter-form button[type="submit"]');
+    if (applyFilter) {
+        applyFilter.addEventListener('click', function() {
+            const dropdown = document.querySelector('.filter-dropdown-menu');
+            if (dropdown) {
+                const bs = bootstrap.Dropdown.getInstance(dropdown.closest('.dropdown'));
+                bs?.hide();
+            }
+        });
+    }
+
+});
+</script>
+
+<style>
+    .is-invalid { border-color: #dc3545 !important; }
+    .text-danger.small.d-block { display: block; color: #dc3545; font-size: 0.875em; margin-top: 0.25rem; }
+    .invalid-feedback { display: block; width: 100%; font-size: 0.875em; color: #dc3545; margin-top: 0.25rem; }
+</style>
 @endpush

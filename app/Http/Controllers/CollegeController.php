@@ -131,81 +131,77 @@ class CollegeController extends Controller
 
    public function store(Request $request)
 {
-    $request->validate([
+    $validated = $request->validate([
         'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'phone' => 'nullable|string|max:20',
+        'website' => 'nullable|url|max:255',
         'state_id' => 'required|exists:states,id',
         'city_id' => 'required|exists:cities,id',
-        'email' => 'required|email',
-        'college_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:800',
-        'course_ids' => 'nullable|array',
+        'course_ids' => 'required|array|min:1',
         'course_ids.*' => 'exists:courses,id',
+        'application_deadline' => 'nullable|date',
+        'fees_range' => 'nullable|string|max:100',
         'status' => 'nullable|in:active,inactive',
-         'fees_range' => 'required|string|max:255',
+        'college_image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:800',
     ]);
 
-    $data = $request->except(['college_image', 'course_ids']);
-    $data['status'] = $request->get('status', 'active');
-
-    // Handle image upload
     if ($request->hasFile('college_image')) {
-        $data['college_image'] = $request->file('college_image')->store('colleges', 'public');
+        $validated['college_image'] = $request->file('college_image')->store('colleges', 'public');
     }
 
-    // ✅ Handle course_ids - Debug this
-    Log::info('Course IDs received:', ['course_ids' => $request->course_ids]);
-    
-    if ($request->has('course_ids') && is_array($request->course_ids)) {
-        $data['course_ids'] = $request->course_ids;
-        Log::info('Course IDs added to data:', ['data' => $data['course_ids']]);
-    } else {
-    Log::info('No course_ids in request or not an array');
+    // ✅ Create college (course_ids is already in $validated as array)
+    $college = College::create($validated);
+
+    // ✅ Return JSON for AJAX
+    if ($request->ajax() || $request->wantsJson()) {
+        return response()->json([
+            'message' => 'College created successfully!',
+            'college' => $college
+        ], 201);
     }
 
-    $college = College::create($data);
-    
-    Log::info('College created:', ['id' => $college->id, 'course_ids' => $college->course_ids]);
-
-    return redirect()->route('colleges.index')->with('success', 'College added successfully!');
+    return redirect()->route('colleges.index')->with('success', 'College created successfully!');
 }
-    public function update(Request $request, College $college)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'state_id' => 'required|exists:states,id',
-            'city_id' => 'required|exists:cities,id',
-            'email' => 'required|email',
-            'college_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:800',
-            'course_ids' => 'nullable|array',
-            'course_ids.*' => 'exists:courses,id',
-            'status' => 'nullable|in:active,inactive',
-            'fees_range' => 'required|string|max:255',
-            
-        ]);
 
-        $data = $request->except(['college_image', 'course_ids']);
+public function update(Request $request, College $college)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'phone' => 'nullable|string|max:20',
+        'website' => 'nullable|url|max:255',
+        'state_id' => 'required|exists:states,id',
+        'city_id' => 'required|exists:cities,id',
+        'course_ids' => 'required|array|min:1',
+        'course_ids.*' => 'exists:courses,id',
+        'application_deadline' => 'nullable|date',
+        'fees_range' => 'nullable|string|max:100',
+        'status' => 'nullable|in:active,inactive',
+        'college_image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:800',
+    ]);
 
-        if ($request->has('status')) {
-            $data['status'] = $request->status;
+    if ($request->hasFile('college_image')) {
+        // Delete old image if exists
+        if ($college->college_image && Storage::disk('public')->exists($college->college_image)) {
+            Storage::disk('public')->delete($college->college_image);
         }
-
-        // Handle image upload
-        if ($request->hasFile('college_image')) {
-            if ($college->college_image) {
-                Storage::disk('public')->delete($college->college_image);
-            }
-            $data['college_image'] = $request->file('college_image')->store('colleges', 'public');
-        }
-
-        // Handle course_ids (store as JSON via $casts)
-        if ($request->has('course_ids')) {
-            $data['course_ids'] = $request->course_ids;
-        }
-
-        $college->update($data);
-
-        return redirect()->route('colleges.index')->with('success', 'College updated successfully!');
+        $validated['college_image'] = $request->file('college_image')->store('colleges', 'public');
     }
 
+    // ✅ Update college (course_ids is already in $validated as array)
+    $college->update($validated);
+
+    // ✅ Return JSON for AJAX
+    if ($request->ajax() || $request->wantsJson()) {
+        return response()->json([
+            'message' => 'College updated successfully!',
+            'college' => $college
+        ]);
+    }
+
+    return redirect()->route('colleges.index')->with('success', 'College updated successfully!');
+}
     public function destroy(College $college)
     {
         if ($college->college_image) {

@@ -343,7 +343,21 @@ public function generateForConsultant(Request $request)
 
     $consultant = Consultant::findOrFail($validated['consultant_id']);
     
-    // Find accepted admissions without existing payments
+    // 🔹 STEP 1: Check if consultant has ANY accepted admissions
+    $hasAnyAcceptedAdmissions = AdmissionRequest::where('status', 'accepted')
+        ->whereHas('lead', function($q) use ($validated) {
+            $q->where('consultant_id', $validated['consultant_id']);
+        })
+        ->exists();
+
+    if (!$hasAnyAcceptedAdmissions) {
+        // ❌ Consultant has NO accepted admissions at all
+       return back()->with('warning', 
+    "Commission cannot be generated: '{$consultant->name}' has no accepted admissions."
+);
+    }
+
+    // 🔹 STEP 2: Check for admissions WITHOUT existing payments
     $query = AdmissionRequest::where('status', 'accepted')
         ->whereHas('lead', function($q) use ($validated) {
             $q->where('consultant_id', $validated['consultant_id']);
@@ -358,9 +372,14 @@ public function generateForConsultant(Request $request)
     $admissions = $query->get();
     
     if ($admissions->isEmpty()) {
-        return back()->with('info', 'No pending admissions found for this consultant.');
+        // ✅ Consultant has admissions, but all already have payments
+        $collegeNote = $validated['college_id'] ? ' is college ke liye' : '';
+        return back()->with('info', 
+            "Consultant '{$consultant->name}' ke sabhi accepted admissions{$collegeNote} ke commission already generate ho chuke hain. ✅"
+        );
     }
 
+    // 🔹 STEP 3: Generate payments for pending admissions
     $generated = 0;
     $failed = 0;
     $errors = [];
@@ -369,7 +388,6 @@ public function generateForConsultant(Request $request)
     try {
         foreach ($admissions as $admission) {
             try {
-                // Re-use existing generatePayment logic
                 $this->generatePayment($admission);
                 $generated++;
             } catch (\Exception $e) {
@@ -380,9 +398,9 @@ public function generateForConsultant(Request $request)
         }
         DB::commit();
         
-        $message = "✅ Generated {$generated} payments for {$consultant->name}.";
+        $message = "✅ {$generated} commission payments generate ho gaye '{$consultant->name}' ke liye.";
         if ($failed > 0) {
-            $message .= " ⚠️ {$failed} failed.";
+            $message .= " ⚠️ {$failed} failed (check logs).";
         }
         
         return back()->with('success', $message);

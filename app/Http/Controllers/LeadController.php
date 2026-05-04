@@ -459,38 +459,47 @@ class LeadController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'full_name' => 'required|string|max:255',
-            'mobile' => 'required|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'city_id' => 'nullable|exists:cities,id',
-            'state_id' => 'nullable|exists:states,id',
-            'qualification_id' => 'nullable|exists:qualifications,id',
-            'interested_course_id' => 'nullable|exists:courses,id',
-            'preferred_intake_id' => 'nullable|exists:intakes,id',
-            'priority_id' => 'nullable|exists:priorities,id',
-            'lead_source_id' => 'nullable|exists:lead_sources,id',
-            'notes' => 'nullable|string',
-            // ✅ Consultant required only when lead source is "Consultant"
-            'consultant_id' => 'nullable|exists:consultants,id',
-        ]);
+{
+    $validated = $request->validate([
+        'full_name' => 'required|string|max:255',
+        'mobile' => 'required|string|max:20',
+        'email' => 'nullable|email|max:255',
+        'city_id' => 'nullable|exists:cities,id',
+        'state_id' => 'nullable|exists:states,id',
+        'qualification_id' => 'nullable|exists:qualifications,id',
+        'interested_course_id' => 'nullable|exists:courses,id',
+        'preferred_intake_id' => 'nullable|exists:intakes,id',
+        'priority_id' => 'nullable|exists:priorities,id',
+        'lead_source_id' => 'nullable|exists:lead_sources,id',
+        'notes' => 'nullable|string',
+        'consultant_id' => 'nullable|exists:consultants,id',
+    ]);
 
-        // ✅ Auto-assign consultant logic
-        if ($request->filled('lead_source_id') && $request->filled('consultant_id')) {
-            $leadSource = LeadSource::find($request->lead_source_id);
+    // ✅ Convert empty string to null for foreign keys
+    $validated = array_map(function($value) {
+        return $value === '' ? null : $value;
+    }, $validated);
 
-            // Check if lead source name contains "consultant" (case-insensitive)
-            if ($leadSource && stripos($leadSource->name, 'consultant') !== false) {
-                $validated['consultant_id'] = $request->consultant_id;
-            }
+    // Auto-assign consultant logic
+    if ($request->filled('lead_source_id') && $request->filled('consultant_id')) {
+        $leadSource = LeadSource::find($request->lead_source_id);
+        if ($leadSource && stripos($leadSource->name, 'consultant') !== false) {
+            $validated['consultant_id'] = $request->consultant_id;
         }
-
-        $lead = Lead::create($validated);
-
-        return redirect()->route('leads.index')
-            ->with('success', 'Lead created successfully!');
     }
+
+    $lead = Lead::create($validated);
+
+    // Return JSON for AJAX
+    if ($request->ajax() || $request->wantsJson()) {
+        return response()->json([
+            'message' => 'Lead created successfully!',
+            'lead' => $lead
+        ], 201);
+    }
+
+    return redirect()->route('leads.index')->with('success', 'Lead created successfully!');
+}
     /**
      * Check if current user can access this lead
      */
@@ -651,7 +660,9 @@ class LeadController extends Controller
             'consultant_id' => 'nullable|exists:consultants,id',
             'counsellor_id' => 'nullable|exists:users,id',
         ]);
-
+ $validated = array_map(function($value) {
+        return $value === '' ? null : $value;
+    }, $validated);
         // ✅ Auto-assign consultant logic for updates
         if ($request->filled('lead_source_id') && $request->filled('consultant_id')) {
             $leadSource = LeadSource::find($request->lead_source_id);

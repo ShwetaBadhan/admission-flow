@@ -116,7 +116,7 @@
                               @can('view-consultants')
                                   <li class="{{ request()->routeIs('consultants.index') ? 'active' : '' }}">
                                       <a href="{{ route('consultants.index') }}"><i
-                                              class="ti ti-atom-2"></i><span>Consultant</span></a>
+                                              class="ti ti-atom-2"></i><span>Consultants</span></a>
                                   </li>
                               @endcan
                               @can('view-payment-requests')

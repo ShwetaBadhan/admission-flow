@@ -1,19 +1,63 @@
 @extends('layout.master')
 
+{{-- Session Messages with Dynamic Icons --}}
 @if (session('success'))
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        Swal.fire({ icon: 'success', title: 'Success!', text: @json(session('success')), timer: 4000, timerProgressBar: true, showConfirmButton: false });
-    });
-</script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: @json(session('success')),
+                timer: 5000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+        });
+    </script>
 @endif
 
-@if ($errors->any())
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        Swal.fire({ icon: 'error', title: 'Error!', html: @json($errors->all()), timer: 6000, timerProgressBar: true, showConfirmButton: true });
-    });
-</script>
+@if (session('error'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: @json(session('error')),
+                timer: 6000,
+                showConfirmButton: true
+            });
+        });
+    </script>
+@endif
+
+{{-- ✅ NEW: Handle warning/info messages --}}
+@if (session('warning'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Not Eligible',
+                text: @json(session('warning')),
+                timer: 7000,
+                showConfirmButton: true,
+                confirmButtonText: 'OK'
+            });
+        });
+    </script>
+@endif
+
+@if (session('info'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'info',
+                title: 'Info',
+                text: @json(session('info')),
+                timer: 5000,
+                showConfirmButton: false
+            });
+        });
+    </script>
 @endif
 
 @section('content')

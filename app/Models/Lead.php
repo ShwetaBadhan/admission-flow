@@ -25,7 +25,17 @@ class Lead extends Model
         'notes',
         'consultant_id',
     ];
-
+protected $casts = [
+    'state_id' => 'integer',
+    'city_id' => 'integer',
+    'qualification_id' => 'integer',
+    'interested_course_id' => 'integer',
+    'preferred_intake_id' => 'integer',
+    'priority_id' => 'integer',  // ✅ Ensure integer casting
+    'lead_source_id' => 'integer',
+    'consultant_id' => 'integer',
+    'assigned_at' => 'datetime',
+];
     public function city()
     {
         return $this->belongsTo(City::class);

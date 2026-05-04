@@ -92,7 +92,7 @@
                                     <th>College</th>
                                     <th>Course</th>
                                     <th>Type</th>
-                                    <th>Value</th>
+                                    <th>Commission Rate</th>
                                     <th>Status</th>
                                     <th class="text-end no-sort">Action</th>
                                 </tr>
