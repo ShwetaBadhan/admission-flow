@@ -20,7 +20,7 @@ class PermissionSeeder extends Seeder
         // 1. Define Modules based on your Blade Sidebar
         $modules = [
             'dashboard',
-            'crm', // Parent Group
+            'crm',
             'leads',
             'colleges',
             'courses',
@@ -29,7 +29,7 @@ class PermissionSeeder extends Seeder
             'commission-rules',
             'commission-payments',
             'consultants',
-            'crm-settings', // Parent Group
+            'crm-settings',
             'sources',
             'contact-stage',
             'qualifications',
@@ -37,7 +37,7 @@ class PermissionSeeder extends Seeder
             'priorities',
             'document-settings',
             'communication-logs',
-            'user-management', // Parent Group
+            'user-management',
             'users',
             'roles',
             'permissions',
@@ -46,34 +46,71 @@ class PermissionSeeder extends Seeder
         // 2. Define Actions
         $actions = ['view', 'create', 'edit', 'delete'];
 
-        // 3. Generate Permissions
+        // 3. Generate Permissions for Modules
         foreach ($modules as $module) {
             foreach ($actions as $action) {
-                // Special case: Dashboard usually only needs 'view', but we create all for consistency
                 Permission::firstOrCreate(['name' => "{$action}-{$module}"]);
             }
         }
 
-        // 4. Create Roles
+        // 4. ✅ ADD SETTINGS PERMISSIONS (New Section)
+        $settingsPermissions = [
+            // Main Settings Group
+            'view-settings',
+            
+            // General Settings
+            'view-general-settings',
+            'view-profile-settings',
+            'view-security-settings',
+            
+            // Website Settings
+            'view-website-settings',
+            'view-localization-settings',
+            'view-language-settings',
+            
+            // App Settings
+            'view-app-settings',
+            'view-invoice-settings',
+            
+            // System Settings
+            'view-system-settings',
+            'view-email-settings',
+            'view-cookie-settings',
+            
+            // Financial Settings
+            'view-financial-settings',
+            'view-payment-gateways',
+            'view-bank-accounts',
+            'view-tax-rates',
+            'view-currencies',
+        ];
+
+        foreach ($settingsPermissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
+
+        // 5. Create Roles
         $superAdmin = Role::firstOrCreate(['name' => 'superadmin']);
         $admin      = Role::firstOrCreate(['name' => 'admin']);
         $staff      = Role::firstOrCreate(['name' => 'staff']);
         $user       = Role::firstOrCreate(['name' => 'user']);
         $consultant = Role::firstOrCreate(['name' => 'consultant']);
-        // 5. Assign Permissions to Roles
 
-        // Super Admin: Gets Everything
+        // 6. Assign Permissions to Roles
+
+        // 🔹 Super Admin: Gets EVERYTHING including Settings
         $superAdmin->givePermissionTo(Permission::all());
 
-        // Admin: Gets everything except User Management (optional configuration)
-        $adminPermissions = Permission::whereNotIn('name', [
+        // 🔹 Admin: Gets everything except User Management deletion + ALL Settings
+        $adminExcluded = [
             'delete-users', 
             'delete-roles', 
             'delete-permissions'
-        ])->get();
+        ];
+        $adminPermissions = Permission::whereNotIn('name', $adminExcluded)->get();
         $admin->givePermissionTo($adminPermissions);
 
-        // Staff: CRM Access only (No Settings, No User Management)
+        // 🔹 Staff: CRM Access only (NO Settings, NO User Management)
         $staffPermissions = Permission::whereIn('name', [
             'view-dashboard',
             'view-crm', 'view-leads', 'create-leads', 'edit-leads',
@@ -83,56 +120,24 @@ class PermissionSeeder extends Seeder
         ])->get();
         $staff->givePermissionTo($staffPermissions);
 
-        // User: Read Only access to specific areas
+        // 🔹 Consultant: Limited Access (NO Settings)
+        $consultantPermissions = Permission::whereIn('name', [
+            'view-dashboard',
+            'view-leads',
+            'view-documents',
+            'view-commission-rules',
+            'view-payment-requests',
+            'view-consultants',
+            'edit-consultants',
+        ])->get();
+        $consultant->givePermissionTo($consultantPermissions);
+
+        // 🔹 User: Read Only (NO Settings)
         $user->givePermissionTo([
             'view-dashboard',
             'view-leads',
             'view-courses',
             'view-documents'
         ]);
-        // 5. Assign Permissions to Roles
-
-// Super Admin: Gets Everything
-$superAdmin->givePermissionTo(Permission::all());
-
-// Admin: Gets everything except User Management (optional)
-$adminPermissions = Permission::whereNotIn('name', [
-    'delete-users', 
-    'delete-roles', 
-    'delete-permissions'
-])->get();
-$admin->givePermissionTo($adminPermissions);
-
-// Staff: CRM Access only
-$staffPermissions = Permission::whereIn('name', [
-    'view-dashboard',
-    'view-crm', 'view-leads', 'create-leads', 'edit-leads',
-    'view-colleges', 'view-courses', 'view-admissions',
-    'view-documents', 'view-consultants',
-    'view-communication-logs', 'create-communication-logs'
-])->get();
-$staff->givePermissionTo($staffPermissions);
-
-// 👇 CONSULTANT ROLE: Limited Access 👇
-$consultantPermissions = Permission::whereIn('name', [
-    'view-dashboard',              // Dashboard access
-    'view-leads',                  // View leads (filtered in controller)
-    'view-documents',              // View documents
-    'view-commission-rules',       // View commission rules
-    'view-payment-requests',       // My Payment Requests
-    'view-consultants',            // View own consultant profile
-    'edit-consultants',    
-    'view-consultant-details',  
-    // Edit own profile (optional)
-])->get();
-$consultant->givePermissionTo($consultantPermissions);
-
-// User: Read Only
-$user->givePermissionTo([
-    'view-dashboard',
-    'view-leads',
-    'view-courses',
-    'view-documents'
-]);
     }
 }

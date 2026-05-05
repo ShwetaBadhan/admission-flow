@@ -136,7 +136,7 @@
 
 
                           </ul>
-                      </li>x
+                      </li>
                   @endcanany
                   @canany(['view-crm-settings', 'view-sources', 'view-qualifications', 'view-intakes',
                       'view-priorities', 'view-document-settings', 'view-communication-logs'])
@@ -222,95 +222,145 @@
                       </li>
                   @endcanany
 
+                  @canany(['view-settings', 'view-general-settings', 'view-profile-settings', 'view-security-settings',
+                      'view-website-settings', 'view-localization-settings', 'view-language-settings', 'view-app-settings',
+                      'view-invoice-settings', 'view-system-settings', 'view-email-settings', 'view-cookie-settings',
+                      'view-financial-settings', 'view-payment-gateways', 'view-bank-accounts', 'view-tax-rates',
+                      'view-currencies'])
+                      @can('view-settings')
+                          <li class="menu-title"><span>Settings</span></li>
+                      @endcan
+                      <li>
+                          <ul>
+                              <li class="submenu">
+                                  @can('view-general-settings')
+                                      <a href="javascript:void(0);"
+                                          class="{{ request()->routeIs('profile-settings') ? 'active' : '' }}">
+                                          <i class="ti ti-settings-cog"></i><span>General Settings</span><span
+                                              class="menu-arrow"></span>
+                                      </a>
+                                  @endcan
 
-                  <li class="menu-title"><span>Settings</span></li>
-                  <li>
-                      <ul>
-                          <li class="submenu">
-                              <a href="javascript:void(0);"
-                                  class="{{ request()->routeIs('profile-settings') ? 'active' : '' }}">
-                                  <i class="ti ti-settings-cog"></i><span>General Settings</span><span
-                                      class="menu-arrow"></span>
-                              </a>
-                              <ul>
-                                  <li>
-                                      <a class="{{ request()->routeIs('profile-settings') ? 'active' : '' }}"
-                                          href="{{ route('profile-settings') }}">Profile</a>
-                                  </li>
-                                  <li class="{{ request()->routeIs('security-settings') ? 'active' : '' }}">
-                                      <a class="{{ request()->routeIs('security-settings') ? 'active' : '' }}"
-                                          href="{{ route('security-settings') }}">Security</a>
-                                  </li>
+                                  <ul>
+                                      @can('view-profile-settings')
+                                          <li>
+
+
+
+                                              <a class="{{ request()->routeIs('profile-settings') ? 'active' : '' }}"
+                                                  href="{{ route('profile-settings') }}">Profile</a>
+                                          </li>
+                                      @endcan
+                                      @can('view-security-settings')
+                                          <li class="{{ request()->routeIs('security-settings') ? 'active' : '' }}">
+                                              <a class="{{ request()->routeIs('security-settings') ? 'active' : '' }}"
+                                                  href="{{ route('security-settings') }}">Security</a>
+                                          </li>
+                                      @endcan
                                   </ul>
-                          </li>
-                          <li class="submenu">
-                              <a href="javascript:void(0);"
-                                  class="{{ request()->routeIs('localization-settings') ? 'active' : '' }}">
-                                  <i class="ti ti-world-cog"></i><span>Website Settings</span><span
-                                      class="menu-arrow"></span>
-                              </a>
-                              <ul>
-
-                                  <li>
-                                      <a class="{{ request()->routeIs('localization-settings') ? 'active' : '' }}"
-                                          href="{{ route('localization-settings') }}">Localization</a>
-                                  </li>
-
-                                  <li >
-                                      <a class="{{ request()->routeIs('language-settings') ? 'active' : '' }}"  href="{{ route('language-settings') }}">Language</a>
-                                  </li>
-
-                              </ul>
-                          </li>
-                          <li class="submenu">
-                              <a href="javascript:void(0);" class="{{ request()->routeIs('invoice-settings.index') ? 'active' : '' }}">
-                                  <i class="ti ti-apps"></i><span>App Settings</span><span class="menu-arrow"></span>
-                              </a>
-                              <ul>
-                                  <li >
-                                      <a class="{{ request()->routeIs('invoice-settings.index') ? 'active' : '' }}" href="{{ route('invoice-settings.index') }}">Invoice Settings</a>
-                                  </li>
+                              </li>
+                              <li class="submenu">
+                                  @can('view-website-settings')
+                                      <a href="javascript:void(0);"
+                                          class="{{ request()->routeIs('localization-settings') ? 'active' : '' }}">
+                                          <i class="ti ti-world-cog"></i><span>Website Settings</span><span
+                                              class="menu-arrow"></span>
+                                      </a>
+                                  @endcan
+                                  <ul>
+                                      @can('view-localization-settings')
+                                          <li>
+                                              <a class="{{ request()->routeIs('localization-settings') ? 'active' : '' }}"
+                                                  href="{{ route('localization-settings') }}">Localization</a>
+                                          </li>
+                                      @endcan
+                                      @can('view-language-settings')
+                                          <li>
+                                              <a class="{{ request()->routeIs('language-settings') ? 'active' : '' }}"
+                                                  href="{{ route('language-settings') }}">Language</a>
+                                          </li>
+                                      @endcan
                                   </ul>
-                          </li>
-                          <li class="submenu">
-                              <a href="javascript:void(0);" class="{{ request()->routeIs('email-settings.index') ? 'active' : '' }}">
-                                  <i class="ti ti-device-laptop"></i><span>System Settings</span><span
-                                      class="menu-arrow"></span>
-                              </a>
-                              <ul>
-                                  <li>
-                                      <a class="{{ request()->routeIs('email-settings.index') ? 'active' : '' }}" href="{{ route('email-settings.index') }}">Email Settings</a>
-                                  </li>
+                              </li>
+                              <li class="submenu">
+                                  @can('view-app-settings')
+                                      <a href="javascript:void(0);"
+                                          class="{{ request()->routeIs('invoice-settings.index') ? 'active' : '' }}">
+                                          <i class="ti ti-apps"></i><span>App Settings</span><span class="menu-arrow"></span>
+                                      </a>
+                                  @endcan
+                                  <ul>
+                                      @can('view-invoice-settings')
+                                          <li>
+                                              <a class="{{ request()->routeIs('invoice-settings.index') ? 'active' : '' }}"
+                                                  href="{{ route('invoice-settings.index') }}">Invoice Settings</a>
+                                          </li>
+                                      @endcan
+                                  </ul>
 
-                                  <li class="{{ request()->routeIs('cookies.index') ? 'active' : '' }}">
-                                      <a class="{{ request()->routeIs('cookies.index') ? 'active' : '' }}" href="{{ route('cookies.index') }}">GDPR Cookies</a>
-                                  </li>
-                              </ul>
-                          </li>
-                          <li class="submenu">
-                              <a href="javascript:void(0);" class="{{ request()->routeIs('payment-gateway-settings.index') ? 'active' : '' }}">
-                                  <i class="ti ti-moneybag"></i><span>Financial Settings</span><span
-                                      class="menu-arrow"></span>
-                              </a>
-                              <ul>
-                                  <li
-                                      >
-                                      <a class="{{ request()->routeIs('payment-gateway-settings.index') ? 'active' : '' }}" href="{{ route('payment-gateway-settings.index') }}">Payment Gateways</a>
-                                  </li>
-                                  <li >
-                                      <a class="{{ request()->routeIs('bank-account-settings.index') ? 'active' : '' }}" href="{{ route('bank-account-settings.index') }}">Bank Accounts</a>
-                                  </li>
-                                  <li >
-                                      <a class="{{ request()->routeIs('tax-rates-settings.index') ? 'active' : '' }}" href="{{ route('tax-rate-settings.index') }}">Tax Rates</a>
-                                  </li>
-                                  <li >
-                                      <a class="{{ request()->routeIs('currency-settings.index') ? 'active' : '' }}" href="{{ route('currency-settings.index') }}">Currencies</a>
-                                  </li>
-                              </ul>
-                          </li>
-                      </ul>
-                  </li>
+                              </li>
+                              <li class="submenu">
+                                  @can('view-system-settings')
+                                      <a href="javascript:void(0);"
+                                          class="{{ request()->routeIs('email-settings.index') ? 'active' : '' }}">
+                                          <i class="ti ti-device-laptop"></i><span>System Settings</span><span
+                                              class="menu-arrow"></span>
+                                      </a>
+                                  @endcan
+                                  <ul>
+                                      @can('view-email-settings')
+                                          <li>
+                                              <a class="{{ request()->routeIs('email-settings.index') ? 'active' : '' }}"
+                                                  href="{{ route('email-settings.index') }}">Email Settings</a>
+                                          </li>
+                                      @endcan
+                                      @can('view-cookie-settings')
+                                          <li class="{{ request()->routeIs('cookies.index') ? 'active' : '' }}">
+                                              <a class="{{ request()->routeIs('cookies.index') ? 'active' : '' }}"
+                                                  href="{{ route('cookies.index') }}">GDPR Cookies</a>
+                                          </li>
+                                      @endcan
+                                  </ul>
+                              </li>
+                              <li class="submenu">
+                                  @can('view-financial-settings')
+                                      <a href="javascript:void(0);"
+                                          class="{{ request()->routeIs('payment-gateway-settings.index') ? 'active' : '' }}">
+                                          <i class="ti ti-moneybag"></i><span>Financial Settings</span><span
+                                              class="menu-arrow"></span>
+                                      </a>
+                                  @endcan
+                                  <ul>
+                                      @can('view-payment-gateways')
+                                          <li>
 
+                                              <a class="{{ request()->routeIs('payment-gateway-settings.index') ? 'active' : '' }}"
+                                                  href="{{ route('payment-gateway-settings.index') }}">Payment Gateways</a>
+                                          </li>
+                                      @endcan
+                                      @can('view-bank-accounts')
+                                          <li>
+                                              <a class="{{ request()->routeIs('bank-account-settings.index') ? 'active' : '' }}"
+                                                  href="{{ route('bank-account-settings.index') }}">Bank Accounts</a>
+                                          </li>
+                                      @endcan
+                                      @can('view-tax-rates')
+                                          <li>
+                                              <a class="{{ request()->routeIs('tax-rates-settings.index') ? 'active' : '' }}"
+                                                  href="{{ route('tax-rate-settings.index') }}">Tax Rates</a>
+                                          </li>
+                                      @endcan
+                                      @can('view-currencies')
+                                          <li>
+                                              <a class="{{ request()->routeIs('currency-settings.index') ? 'active' : '' }}"
+                                                  href="{{ route('currency-settings.index') }}">Currencies</a>
+                                          </li>
+                                      @endcan
+                                  </ul>
+                              </li>
+                          </ul>
+                      </li>
+                  @endcanany
 
               </ul>
           </div>
