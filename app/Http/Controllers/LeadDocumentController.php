@@ -73,4 +73,37 @@ class LeadDocumentController extends Controller
 
         return Storage::disk('public')->download($document->file_path, $document->file_name);
     }
+    
+public function verify(Lead $lead, LeadDocument $document)
+{
+    if ($document->lead_id !== $lead->id) {
+        abort(403);
+    }
+
+    $document->update([
+        'is_verified' => true,
+        'status' => 'verified',
+        'verified_by' => auth()->id(),
+        'verified_at' => now()
+    ]);
+
+    return redirect()->back()->with('success', 'Document verified successfully!');
 }
+
+public function reject(Lead $lead, LeadDocument $document)
+{
+    if ($document->lead_id !== $lead->id) {
+        abort(403);
+    }
+
+    $document->update([
+        'is_verified' => false,
+        'status' => 'rejected',
+        'verified_by' => auth()->id(),
+        'verified_at' => now()
+    ]);
+
+    return redirect()->back()->with('success', 'Document rejected successfully!');
+}
+}
+

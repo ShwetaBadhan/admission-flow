@@ -206,12 +206,15 @@
                                     <th>Status</th>
                                     <th>Verified By</th>
                                     <th>Uploaded</th>
-                                    <th class="text-end">Actions</th>
+                                    @can('view-docs-action')
+                                       <th class="text-end">Actions</th> 
+                                    @endcan
+                                    
                                 </tr>
                             </thead>
                             <tbody>
                                 @php $serial = 1; @endphp
-                                @foreach($documents as $doc)
+                                @foreach ($documents as $doc)
                                     <tr>
                                         <td>{{ $serial++ }}</td>
 
@@ -261,11 +264,14 @@
                                             <span
                                                 class="text-muted">{{ \Carbon\Carbon::parse($doc->created_at)->diffForHumans() }}</span>
                                         </td>
-                                        <td class="text-end">
+                                        @canany(['view-docs-action', 'view-reject-lead-docs', 'view-approve-lead-docs'])
+                                             <td class="text-end">
                                             @if ($doc->is_verified === null)
                                                 <!-- Pending: Show Verify and Reject buttons -->
-                                                <div class="d-inline-flex align-items-center gap-2">
-                                                    <form
+                                                <div class="d-inline-flex align-items-center gap-2"> 
+                                                    @can('view-approve-lead-docs')
+                                                         <!-- ✅ Verify Form with ID -->
+                                                    <form id="verify-form-{{ $doc->id }}"
                                                         action="{{ route('leads.verify-document', [$doc->lead, $doc]) }}"
                                                         method="POST" class="d-inline">
                                                         @csrf
@@ -274,10 +280,15 @@
                                                             data-doc-id="{{ $doc->id }}">
                                                             Verify
                                                         </button>
-
                                                     </form>
+                                                    @endcan
+                                                   
+
                                                     <span class="text-muted">|</span>
-                                                    <form
+
+                                                    @can('view-reject-lead-docs')
+                                                    <!-- ✅ Reject Form with ID -->
+                                                    <form id="reject-form-{{ $doc->id }}"
                                                         action="{{ route('leads.reject-document', [$doc->lead, $doc]) }}"
                                                         method="POST" class="d-inline">
                                                         @csrf
@@ -287,17 +298,20 @@
                                                             Reject
                                                         </button>
                                                     </form>
+                                                    @endcan
+                                                 
                                                 </div>
                                             @else
                                                 <!-- Verified/Rejected: Show View button -->
-                                                <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank"
+                                                <a href="{{ asset($doc->file_path) }}" target="_blank"
                                                     class="btn btn-sm btn-link text-dark p-0">
                                                     <i class="ti ti-external-link me-1"></i>View
                                                 </a>
                                             @endif
-                                        </td>
+                                        </td> 
+                                        @endcanany
+                                      
                                     </tr>
-                              
                                 @endforeach
                             </tbody>
                         </table>
@@ -357,15 +371,23 @@
             });
         });
     </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Verify button click handler
+
+            // ✅ Verify Handler
             document.querySelectorAll('.verify-btn').forEach(button => {
                 button.addEventListener('click', function(e) {
-                    e.preventDefault(); // ⚠️ Stop immediate form submission
-
+                    e.preventDefault();
                     const docId = this.getAttribute('data-doc-id');
                     const form = document.getElementById(`verify-form-${docId}`);
+
+                    // 🔍 Debug: Check if form exists
+                    if (!form) {
+                        console.error('❌ Verify form not found for doc ID:', docId);
+                        Swal.fire('Error', 'Form not found. Please refresh the page.', 'error');
+                        return;
+                    }
 
                     Swal.fire({
                         title: 'Verify Document?',
@@ -374,24 +396,29 @@
                         showCancelButton: true,
                         confirmButtonColor: '#28a745',
                         cancelButtonColor: '#6c757d',
-                        confirmButtonText: 'Yes, Verify it!',
-                        cancelButtonText: 'Cancel',
+                        confirmButtonText: 'Yes, Verify!',
                         reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            form.submit(); // ✅ Submit only after confirmation
+                            form.submit();
                         }
                     });
                 });
             });
 
-            // Reject button click handler
+            // ✅ Reject Handler
             document.querySelectorAll('.reject-btn').forEach(button => {
                 button.addEventListener('click', function(e) {
-                    e.preventDefault(); // ⚠️ Stop immediate form submission
-
+                    e.preventDefault();
                     const docId = this.getAttribute('data-doc-id');
                     const form = document.getElementById(`reject-form-${docId}`);
+
+                    // 🔍 Debug: Check if form exists
+                    if (!form) {
+                        console.error('❌ Reject form not found for doc ID:', docId);
+                        Swal.fire('Error', 'Form not found. Please refresh the page.', 'error');
+                        return;
+                    }
 
                     Swal.fire({
                         title: 'Reject Document?',
@@ -400,12 +427,11 @@
                         showCancelButton: true,
                         confirmButtonColor: '#dc3545',
                         cancelButtonColor: '#6c757d',
-                        confirmButtonText: 'Yes, Reject it!',
-                        cancelButtonText: 'Cancel',
+                        confirmButtonText: 'Yes, Reject!',
                         reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            form.submit(); // ✅ Submit only after confirmation
+                            form.submit();
                         }
                     });
                 });
