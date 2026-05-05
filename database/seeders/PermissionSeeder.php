@@ -129,6 +129,8 @@ class PermissionSeeder extends Seeder
             'view-payment-requests',
             'view-consultants',
             'edit-consultants',
+            'create-leads',
+            'edit-leads',
         ])->get();
         $consultant->givePermissionTo($consultantPermissions);
 
