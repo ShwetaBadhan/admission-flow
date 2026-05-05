@@ -266,7 +266,7 @@ Route::delete('/contact-stage/{id}', [ContactStageController::class, 'destroy'])
 Route::get('/calls', function () {
     return view(view: 'pages.calls.index');
 })->name('calls');
-
+Route::middleware(['auth'])->group(function () {
 // consultant
 
 Route::get('/consultants', [ConsultantController::class, 'index'])->name('consultants.index');
@@ -292,7 +292,7 @@ Route::post('/consultants/{id}/kyc/{kyc_id}/reject', [ConsultantController::clas
 // API route for AJAX (must be BEFORE any conflicting routes)
 Route::get('/api/cities/{stateId}', [ConsultantController::class, 'getCitiesByState'])
     ->name('api.cities.byState');
-
+});
     // settings
     
 // general settings

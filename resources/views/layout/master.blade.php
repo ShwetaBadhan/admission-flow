@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -136,6 +137,20 @@
     <script src="{{ url ('assets/js/script.js')}}" ></script>
 @stack('scripts')
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Access Denied',
+                text: @json(session('error')),
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#dc3545'
+            });
+        @endif
 
+      
+    });
+</script>
 
 </html>

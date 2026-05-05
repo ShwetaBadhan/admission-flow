@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Support\Facades\Validator;  // ← Add this line
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Exports\LeadsExport;
@@ -459,47 +459,47 @@ class LeadController extends Controller
     }
 
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'full_name' => 'required|string|max:255',
-        'mobile' => 'required|string|max:20',
-        'email' => 'nullable|email|max:255',
-        'city_id' => 'nullable|exists:cities,id',
-        'state_id' => 'nullable|exists:states,id',
-        'qualification_id' => 'nullable|exists:qualifications,id',
-        'interested_course_id' => 'nullable|exists:courses,id',
-        'preferred_intake_id' => 'nullable|exists:intakes,id',
-        'priority_id' => 'nullable|exists:priorities,id',
-        'lead_source_id' => 'nullable|exists:lead_sources,id',
-        'notes' => 'nullable|string',
-        'consultant_id' => 'nullable|exists:consultants,id',
-    ]);
+    {
+        $validated = $request->validate([
+            'full_name' => 'required|string|max:255',
+            'mobile' => 'required|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'city_id' => 'nullable|exists:cities,id',
+            'state_id' => 'nullable|exists:states,id',
+            'qualification_id' => 'nullable|exists:qualifications,id',
+            'interested_course_id' => 'nullable|exists:courses,id',
+            'preferred_intake_id' => 'nullable|exists:intakes,id',
+            'priority_id' => 'nullable|exists:priorities,id',
+            'lead_source_id' => 'nullable|exists:lead_sources,id',
+            'notes' => 'nullable|string',
+            'consultant_id' => 'nullable|exists:consultants,id',
+        ]);
 
-    // ✅ Convert empty string to null for foreign keys
-    $validated = array_map(function($value) {
-        return $value === '' ? null : $value;
-    }, $validated);
+        // ✅ Convert empty string to null for foreign keys
+        $validated = array_map(function ($value) {
+            return $value === '' ? null : $value;
+        }, $validated);
 
-    // Auto-assign consultant logic
-    if ($request->filled('lead_source_id') && $request->filled('consultant_id')) {
-        $leadSource = LeadSource::find($request->lead_source_id);
-        if ($leadSource && stripos($leadSource->name, 'consultant') !== false) {
-            $validated['consultant_id'] = $request->consultant_id;
+        // Auto-assign consultant logic
+        if ($request->filled('lead_source_id') && $request->filled('consultant_id')) {
+            $leadSource = LeadSource::find($request->lead_source_id);
+            if ($leadSource && stripos($leadSource->name, 'consultant') !== false) {
+                $validated['consultant_id'] = $request->consultant_id;
+            }
         }
+
+        $lead = Lead::create($validated);
+
+        // Return JSON for AJAX
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'message' => 'Lead created successfully!',
+                'lead' => $lead
+            ], 201);
+        }
+
+        return redirect()->route('leads.index')->with('success', 'Lead created successfully!');
     }
-
-    $lead = Lead::create($validated);
-
-    // Return JSON for AJAX
-    if ($request->ajax() || $request->wantsJson()) {
-        return response()->json([
-            'message' => 'Lead created successfully!',
-            'lead' => $lead
-        ], 201);
-    }
-
-    return redirect()->route('leads.index')->with('success', 'Lead created successfully!');
-}
     /**
      * Check if current user can access this lead
      */
@@ -521,9 +521,9 @@ class LeadController extends Controller
 
     public function show(Lead $lead)
     {
-        // 🔐 Authorization check
         if (!$this->canAccessLead($lead)) {
-            abort(403, 'Unauthorized access to this lead.');
+            return back()->with('access_denied', true)
+                ->with('error', 'You are not authorized to access this lead. Please connect to admin.');
         }
 
         $lead->load([
@@ -616,7 +616,8 @@ class LeadController extends Controller
     public function edit(Lead $lead)
     {
         if (!$this->canAccessLead($lead)) {
-            abort(403, 'Unauthorized access.');
+            return back()->with('access_denied', true)
+                ->with('error', 'You are not authorized to access this lead. Please connect to admin.');
         }
         $states = State::all();
         $cities = City::all();
@@ -641,8 +642,9 @@ class LeadController extends Controller
 
     public function update(Request $request, Lead $lead)
     {
-        if (!$this->canAccessLead($lead)) {
-            abort(403, 'Unauthorized access.');
+         if (!$this->canAccessLead($lead)) {
+            return back()->with('access_denied', true)
+                ->with('error', 'You are not authorized to access this lead. Please connect to admin.');
         }
 
         $validated = $request->validate([
@@ -660,9 +662,9 @@ class LeadController extends Controller
             'consultant_id' => 'nullable|exists:consultants,id',
             'counsellor_id' => 'nullable|exists:users,id',
         ]);
- $validated = array_map(function($value) {
-        return $value === '' ? null : $value;
-    }, $validated);
+        $validated = array_map(function ($value) {
+            return $value === '' ? null : $value;
+        }, $validated);
         // ✅ Auto-assign consultant logic for updates
         if ($request->filled('lead_source_id') && $request->filled('consultant_id')) {
             $leadSource = LeadSource::find($request->lead_source_id);
@@ -680,8 +682,9 @@ class LeadController extends Controller
 
     public function destroy(Lead $lead)
     {
-        if (!$this->canAccessLead($lead)) {
-            abort(403, 'Unauthorized access.');
+         if (!$this->canAccessLead($lead)) {
+            return back()->with('access_denied', true)
+                ->with('error', 'You are not authorized to access this lead. Please connect to admin.');
         }
         $lead->delete();
         return redirect()->route('leads.index')

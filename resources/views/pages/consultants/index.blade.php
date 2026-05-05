@@ -1,5 +1,18 @@
 @extends('layout.master')
-
+{{-- 🔍 TEMPORARY DEBUG --}}
+{{-- @php
+    if (auth()->user()->hasRole('consultant')) {
+        echo '<pre style="background:#fff;padding:15px;z-index:9999;position:fixed;top:0;left:0;right:0;max-height:50vh;overflow:auto">';
+        echo '<strong>🔍 DEBUG - Consultant View Data:</strong><br>';
+        echo 'User: ' . auth()->user()->email . '<br>';
+        echo 'Consultants Count: ' . ($consultants->count() ?? 0) . '<br>';
+        if ($consultants->count() > 0) {
+            echo 'First Consultant:<br>';
+            print_r($consultants->first()->toArray());
+        }
+        echo '</pre>';
+    }
+@endphp --}}
 {{-- Session Messages --}}
 @if (session('success'))
     <script>

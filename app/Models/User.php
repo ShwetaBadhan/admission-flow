@@ -49,4 +49,9 @@ public function profile()
 {
     return $this->hasOne(UserProfile::class);
 }
+public function consultant()
+{
+    // Link by email since that's your common field
+    return $this->hasOne(\App\Models\Consultant::class, 'email', 'email');
+}
 }

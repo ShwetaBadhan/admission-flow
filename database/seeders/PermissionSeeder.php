@@ -59,7 +59,7 @@ class PermissionSeeder extends Seeder
         $admin      = Role::firstOrCreate(['name' => 'admin']);
         $staff      = Role::firstOrCreate(['name' => 'staff']);
         $user       = Role::firstOrCreate(['name' => 'user']);
-
+        $consultant = Role::firstOrCreate(['name' => 'consultant']);
         // 5. Assign Permissions to Roles
 
         // Super Admin: Gets Everything
@@ -90,5 +90,49 @@ class PermissionSeeder extends Seeder
             'view-courses',
             'view-documents'
         ]);
+        // 5. Assign Permissions to Roles
+
+// Super Admin: Gets Everything
+$superAdmin->givePermissionTo(Permission::all());
+
+// Admin: Gets everything except User Management (optional)
+$adminPermissions = Permission::whereNotIn('name', [
+    'delete-users', 
+    'delete-roles', 
+    'delete-permissions'
+])->get();
+$admin->givePermissionTo($adminPermissions);
+
+// Staff: CRM Access only
+$staffPermissions = Permission::whereIn('name', [
+    'view-dashboard',
+    'view-crm', 'view-leads', 'create-leads', 'edit-leads',
+    'view-colleges', 'view-courses', 'view-admissions',
+    'view-documents', 'view-consultants',
+    'view-communication-logs', 'create-communication-logs'
+])->get();
+$staff->givePermissionTo($staffPermissions);
+
+// 👇 CONSULTANT ROLE: Limited Access 👇
+$consultantPermissions = Permission::whereIn('name', [
+    'view-dashboard',              // Dashboard access
+    'view-leads',                  // View leads (filtered in controller)
+    'view-documents',              // View documents
+    'view-commission-rules',       // View commission rules
+    'view-payment-requests',       // My Payment Requests
+    'view-consultants',            // View own consultant profile
+    'edit-consultants',    
+    'view-consultant-details',  
+    // Edit own profile (optional)
+])->get();
+$consultant->givePermissionTo($consultantPermissions);
+
+// User: Read Only
+$user->givePermissionTo([
+    'view-dashboard',
+    'view-leads',
+    'view-courses',
+    'view-documents'
+]);
     }
 }

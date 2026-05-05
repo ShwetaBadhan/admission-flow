@@ -11,30 +11,78 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 
-
 class ConsultantController extends Controller
 {
     public function index()
     {
-        // ✅ Eager load state and city relationships
+        $user = Auth::user();
+
+        // 🔐 Consultant can only see their own record
+        if ($user->hasRole('consultant')) {
+            $consultant = $user->consultant; // Assuming User hasOne Consultant
+            
+            if (!$consultant) {
+                // No consultant profile linked? Show empty or redirect
+                return view('pages.consultants.index', [
+                    'consultants' => collect(),
+                    'states' => collect(),
+                    'cities' => collect(),
+                    'activeColleges' => collect()
+                ])->with('error', 'No consultant profile found. Please contact admin.');
+            }
+
+            // Load only their own data
+            $consultants = collect([$consultant->load([
+                'state',
+                'city',
+                'kycDocuments' => function ($query) {
+                    $query->whereNull('is_verified')->orderBy('created_at', 'desc');
+                }
+            ])]);
+
+            $states = State::where('id', $consultant->state_id)->get();
+            $cities = City::where('id', $consultant->city_id)->get();
+            $activeColleges = $consultant->lockedColleges()
+                ->where('colleges.status', 'active')
+                ->select('colleges.id', 'colleges.name')
+                ->orderBy('colleges.name')
+                ->get();
+
+            return view('pages.consultants.index', compact('consultants', 'states', 'cities', 'activeColleges'));
+        }
+
+        // ✅ Admin/Superadmin: See all consultants
         $consultants = Consultant::with([
             'state',
             'city',
             'kycDocuments' => function ($query) {
-                $query->whereNull('is_verified')->orderBy('created_at', 'desc'); // Only pending
+                $query->whereNull('is_verified')->orderBy('created_at', 'desc');
             }
         ])->orderBy('created_at', 'desc')->get();
-        $states = State::orderBy('name')->get();
-        $cities = City::orderBy('name')->get(); // Load all cities for initial edit modals
-   // ✅ Add this: All active colleges for dropdown
-    $activeColleges = College::where('status', 'active')->select('id', 'name')->orderBy('name')->get();
 
+        $states = State::orderBy('name')->get();
+        $cities = City::orderBy('name')->get();
+        $activeColleges = College::where('status', 'active')
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
 
         return view('pages.consultants.index', compact('consultants', 'states', 'cities', 'activeColleges'));
     }
 
     public function show($id)
     {
+        $user = Auth::user();
+
+        // 🔐 Consultant can only view their own profile
+        if ($user->hasRole('consultant')) {
+            $consultant = $user->consultant;
+            
+            if (!$consultant || $consultant->id != $id) {
+                abort(403, 'Unauthorized access to this consultant profile.');
+            }
+        }
+
         $consultant = Consultant::with([
             'state',
             'city',
@@ -43,7 +91,6 @@ class ConsultantController extends Controller
             }
         ])->findOrFail($id);
 
-        // Summary stats
         $stats = [
             'total_docs' => $consultant->kycDocuments->count(),
             'pending' => $consultant->kycDocuments->where('is_verified', null)->count(),
@@ -53,8 +100,14 @@ class ConsultantController extends Controller
 
         return view('pages.consultants.show', compact('consultant', 'stats'));
     }
+
     public function store(Request $request)
     {
+        // 🔐 Only admin/staff can create consultants
+        if (Auth::user()->hasRole('consultant')) {
+            abort(403, 'Consultants cannot create new consultant records.');
+        }
+
         $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:consultants,email',
@@ -71,6 +124,26 @@ class ConsultantController extends Controller
 
     public function update(Request $request, string $id)
     {
+        $user = Auth::user();
+        $consultant = Consultant::findOrFail($id);
+
+        // 🔐 Consultant can only update their own profile
+        if ($user->hasRole('consultant')) {
+            if ($user->consultant?->id !== $consultant->id) {
+                abort(403, 'You can only update your own profile.');
+            }
+            // Optional: Restrict which fields consultant can update
+            $validated = $request->validate([
+                'name' => 'required|string|max:100',
+                'phone' => 'required|string|max:20',
+                'address' => 'required|string',
+                // ❌ Consultants cannot change email, state, city, status
+            ]);
+            $consultant->update($validated);
+            return redirect()->back()->with('success', 'Profile updated successfully!');
+        }
+
+        // ✅ Admin: Full update
         $request->validate([
             'name' => 'required|string|max:100',
             'email' => ['required', 'email', Rule::unique('consultants', 'email')->ignore($id)],
@@ -81,35 +154,43 @@ class ConsultantController extends Controller
             'status' => 'required|in:0,1',
         ]);
 
-        $consultant = Consultant::findOrFail($id);
         $consultant->update($request->all());
         return redirect()->back()->with('success', 'Consultant updated successfully!');
     }
 
     public function destroy(string $id)
     {
+        // 🔐 Consultants cannot delete any consultant (including themselves)
+        if (Auth::user()->hasRole('consultant')) {
+            abort(403, 'Consultants cannot delete records.');
+        }
+
         $consultant = Consultant::findOrFail($id);
         $consultant->delete();
         return redirect()->back()->with('success', 'Consultant deleted successfully!');
     }
-
-
 
     // API Endpoint for Dependent Dropdown
     public function getCitiesByState($stateId)
     {
         $cities = City::where('state_id', $stateId)
             ->orderBy('name')
-            ->get(['id', 'name']); // Only fetch needed columns
+            ->get(['id', 'name']);
 
         return response()->json($cities);
     }
 
-    // ConsultantController.php
-
     public function uploadKyc(Request $request, $id)
     {
+        $user = Auth::user();
         $consultant = Consultant::findOrFail($id);
+
+        // 🔐 Consultant can only upload KYC for their own profile
+        if ($user->hasRole('consultant')) {
+            if ($user->consultant?->id !== $consultant->id) {
+                abort(403, 'You can only upload documents for your own profile.');
+            }
+        }
 
         $validated = $request->validate([
             'document_type' => [
@@ -146,7 +227,11 @@ class ConsultantController extends Controller
 
     public function verifyKyc($id, $kyc_id)
     {
-        // Ensure KYC belongs to this consultant (security)
+        // 🔐 Only admin/staff can verify KYC
+        if (Auth::user()->hasRole('consultant')) {
+            abort(403, 'Consultants cannot verify KYC documents.');
+        }
+
         $kyc = ConsultantKyc::where('id', $kyc_id)
             ->where('consultant_id', $id)
             ->firstOrFail();
@@ -162,6 +247,11 @@ class ConsultantController extends Controller
 
     public function rejectKyc($id, $kyc_id)
     {
+        // 🔐 Only admin/staff can reject KYC
+        if (Auth::user()->hasRole('consultant')) {
+            abort(403, 'Consultants cannot reject KYC documents.');
+        }
+
         $kyc = ConsultantKyc::where('id', $kyc_id)
             ->where('consultant_id', $id)
             ->firstOrFail();
@@ -174,7 +264,51 @@ class ConsultantController extends Controller
 
         return back()->with('info', 'KYC document rejected.');
     }
-    // Helper method (if not already present)
+
+    public function lockCollege(Request $request, $consultantId)
+    {
+        $user = Auth::user();
+        $consultant = Consultant::findOrFail($consultantId);
+
+        // 🔐 Consultant can only lock colleges for their own profile
+        if ($user->hasRole('consultant')) {
+            if ($user->consultant?->id !== $consultant->id) {
+                abort(403, 'You can only manage colleges for your own profile.');
+            }
+        }
+
+        $request->validate([
+            'college_id' => 'required|exists:colleges,id'
+        ]);
+        
+        if ($consultant->lockedColleges()->where('college_id', $request->college_id)->exists()) {
+            return back()->with('error', 'This college is already locked!');
+        }
+        
+        $consultant->lockedColleges()->attach($request->college_id, [
+            'locked_by' => Auth::id()
+        ]);
+        
+        return back()->with('success', 'College locked successfully!');
+    }
+
+    public function unlockCollege($consultantId, $collegeId)
+    {
+        $user = Auth::user();
+        $consultant = Consultant::findOrFail($consultantId);
+
+        // 🔐 Consultant can only unlock colleges for their own profile
+        if ($user->hasRole('consultant')) {
+            if ($user->consultant?->id !== $consultant->id) {
+                abort(403, 'You can only manage colleges for your own profile.');
+            }
+        }
+
+        $consultant->lockedColleges()->detach($collegeId);
+        return back()->with('success', 'College unlocked!');
+    }
+
+    // Helper method
     protected function formatFileSize($bytes)
     {
         if ($bytes >= 1073741824) return round($bytes / 1073741824, 2) . ' GB';
@@ -182,36 +316,4 @@ class ConsultantController extends Controller
         if ($bytes >= 1024) return round($bytes / 1024, 2) . ' KB';
         return $bytes . ' B';
     }
-    // ConsultantController.php
-
-// 🔹 Lock college - Simple form submission handler
-public function lockCollege(Request $request, $consultantId)
-{
-    $request->validate([
-        'college_id' => 'required|exists:colleges,id'
-    ]);
-    
-    $consultant = Consultant::findOrFail($consultantId);
-    
-    // Check if already locked
-    if ($consultant->lockedColleges()->where('college_id', $request->college_id)->exists()) {
-        return back()->with('error', 'This college is already locked!');
-    }
-    
-    // Lock it
-    $consultant->lockedColleges()->attach($request->college_id, [
-        'locked_by' => Auth::id()
-    ]);
-    
-    return back()->with('success', 'College locked successfully!');
-}
-
-// 🔹 Unlock college - GET route, simple redirect
-public function unlockCollege($consultantId, $collegeId)
-{
-    $consultant = Consultant::findOrFail($consultantId);
-    $consultant->lockedColleges()->detach($collegeId);
-    
-    return back()->with('success', 'College unlocked!');
-}
 }

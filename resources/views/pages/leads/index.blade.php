@@ -567,7 +567,7 @@
                                                                 <div class="mb-3">
                                                                     <label class="form-label">Priority</label>
                                                                     <select name="priority_id" class="select">
-                                                                        <option value="">Select Priority</option>
+                                                                        <option value="" selected disabled>Select Priority</option>
                                                                         @foreach ($priorities as $priority)
                                                                             @php
                                                                                 $currentPriorityId = old(

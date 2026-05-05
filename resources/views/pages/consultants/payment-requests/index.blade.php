@@ -38,36 +38,49 @@
             </div>
 
             <!-- Summary Cards -->
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="card border-0 bg-soft-warning shadow-sm text-center">
-                        <div class="card-body">
-                            <h2 class="mb-0">{{ $requests->where('status', 'pending')->count() }}</h2>
-                            <small class="text-muted">Pending</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card border-0 bg-soft-info shadow-sm text-center">
+            <!-- Summary Cards -->
+            <div class="row mb-4 justify-content-center">
+                <div class="col-6 col-md-2">
+                    <div class="card border-0 bg-soft-success shadow-sm text-center">
                         <div class="card-body">
                             <h2 class="mb-0">{{ $requests->where('status', 'approved')->count() }}</h2>
                             <small class="text-muted">Approved</small>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card border-0 bg-soft-success shadow-sm text-center">
-                        <div class="card-body">
-                            <h2 class="mb-0">{{ $requests->where('status', 'paid')->count() }}</h2>
-                            <small class="text-muted">Paid</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
+                <div class="col-6 col-md-2">
                     <div class="card border-0 bg-soft-danger shadow-sm text-center">
                         <div class="card-body">
                             <h2 class="mb-0">{{ $requests->where('status', 'rejected')->count() }}</h2>
                             <small class="text-muted">Rejected</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-2">
+                    <div class="card border-0 bg-soft-info shadow-sm text-center">
+                        <div class="card-body">
+                            <h2 class="mb-0">₹{{ number_format($requests->sum('requested_amount') ?? 0, 0) }}</h2>
+                            <small class="text-muted">Total Amount</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-2">
+                    <div class="card border-0 bg-soft-warning shadow-sm text-center">
+                        <div class="card-body">
+                            <h2 class="mb-0">
+                                ₹{{ number_format($requests->where('status', 'paid')->sum('requested_amount') ?? 0, 0) }}
+                            </h2>
+                            <small class="text-muted">Paid Amount</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-2">
+                    <div class="card border-0 bg-soft-primary shadow-sm text-center">
+                        <div class="card-body">
+                            <h2 class="mb-0">
+                                ₹{{ number_format(max(0, ($requests->sum('requested_amount') ?? 0) - ($requests->where('status', 'paid')->sum('requested_amount') ?? 0)), 0) }}
+                            </h2>
+                            <small class="text-muted">Balance</small>
                         </div>
                     </div>
                 </div>

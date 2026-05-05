@@ -191,7 +191,9 @@
                                                 <th>File</th>
                                                 <th>Uploaded</th>
                                                 <th>Status</th>
+                                                @can('view-kyc-actions')
                                                 <th>Actions</th>
+                                                @endcan
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -210,6 +212,7 @@
                                                         </a>
                                                     </td>
                                                     <td>{{ $kyc->created_at->format('d M Y') }}</td>
+                                                   
                                                     <td>
                                                         @if ($kyc->is_verified === null)
                                                             <span class="badge bg-warning text-dark">Pending</span>
@@ -219,6 +222,8 @@
                                                             <span class="badge bg-danger">Rejected</span>
                                                         @endif
                                                     </td>
+                                                    
+                                                     @canany(['view-kyc-actions','reject-kyc-docs','approve-kyc-docs'])
                                                     <td>
                                                         @if ($kyc->is_verified === null)
                                                             <div class="d-flex gap-1">
@@ -226,27 +231,34 @@
                                                                     action="{{ route('consultants.kyc.verify', ['id' => $consultant->id, 'kyc_id' => $kyc->id]) }}"
                                                                     method="POST" id="verify-form-{{ $kyc->id }}">
                                                                     @csrf
-                                                                    <button type="button"
+                                                                    @can('approve-kyc-docs')
+                                                                         <button type="button"
                                                                         class="btn btn-sm btn-outline-success verify-kyc-btn"
                                                                         data-kyc-id="{{ $kyc->id }}" title="Verify">
                                                                         <i class="ti ti-check"></i>
                                                                     </button>
+                                                                    @endcan
+                                                                   
                                                                 </form>
                                                                 <form
                                                                     action="{{ route('consultants.kyc.reject', ['id' => $consultant->id, 'kyc_id' => $kyc->id]) }}"
                                                                     method="POST" id="reject-form-{{ $kyc->id }}">
                                                                     @csrf
-                                                                    <button type="button"
+                                                                      @can('reject-kyc-docs')
+                                                                      <button type="button"
                                                                         class="btn btn-sm btn-outline-danger reject-kyc-btn"
                                                                         data-kyc-id="{{ $kyc->id }}" title="Reject">
                                                                         <i class="ti ti-x"></i>
                                                                     </button>
+                                                                      @endcan
+                                                                    
                                                                 </form>
                                                             </div>
                                                         @else
                                                             <span class="text-muted small">—</span>
                                                         @endif
                                                     </td>
+                                                    @endcan
                                                 </tr>
                                             @endforeach
                                         </tbody>

@@ -136,7 +136,7 @@
 
 
                           </ul>
-                      </li>
+                      </li>x
                   @endcanany
                   @canany(['view-crm-settings', 'view-sources', 'view-qualifications', 'view-intakes',
                       'view-priorities', 'view-document-settings', 'view-communication-logs'])
